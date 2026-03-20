@@ -1,0 +1,56 @@
+{% extends 'foods/base.html' %}
+
+{% block title %}Meal Record Saved - Kenya Food Database{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px;">
+    <h1 style="color: #28a745;">✅ Meal Record Saved!</h1>
+    
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3>Summary</h3>
+        <p><strong>Date:</strong> {{ record.date }}</p>
+        {% if record.person_name %}
+        <p><strong>Name:</strong> {{ record.person_name }}</p>
+        {% endif %}
+        {% if record.person_age %}
+        <p><strong>Age:</strong> {{ record.person_age }}</p>
+        {% endif %}
+        {% if record.person_gender %}
+        <p><strong>Gender:</strong> {{ record.person_gender|title }}</p>
+        {% endif %}
+    </div>
+    
+    <h3>Foods Eaten</h3>
+    {% for item in food_items %}
+    <div style="background: #f8f9fa; padding: 10px; margin: 5px 0; border-radius: 5px;">
+        <strong>{{ item.meal_category.name }}:</strong> 
+        {{ item.amount }} {{ item.unit }} {{ item.food.food_name }}
+        <span style="color: #666; float: right;">{{ item.grams }}g</span>
+    </div>
+    {% empty %}
+    <p>No foods recorded.</p>
+    {% endfor %}
+    
+    <h3 style="margin-top: 20px;">Water Intake</h3>
+    {% for water in water_items %}
+    <div style="background: #e3f2fd; padding: 10px; margin: 5px 0; border-radius: 5px;">
+        💧 {{ water.amount_ml }} ml ({{ water.to_glasses }} glasses)
+    </div>
+    {% empty %}
+    <p>No water recorded.</p>
+    {% endfor %}
+    
+    <div style="background: #e8f4fd; padding: 20px; border-radius: 8px; margin-top: 30px;">
+        <h3>Daily Totals</h3>
+        <p>🔥 Energy: {{ totals.energy|floatformat:1 }} kcal</p>
+        <p>🥩 Protein: {{ totals.protein|floatformat:1 }} g</p>
+        <p>⚡ Iron: {{ totals.iron|floatformat:2 }} mg</p>
+        <p>💧 Water: {{ totals.water_ml }} ml ({{ totals.water_ml|floatformat:0|add:"0"|divisibleby:250|floatformat:1 }} glasses)</p>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{% url 'meal_recall' %}" style="background: #667eea; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block;">+ New Meal Record</a>
+        <a href="{% url 'home' %}" style="margin-left: 10px; color: #666;">← Back to Home</a>
+    </div>
+</div>
+{% endblock %}

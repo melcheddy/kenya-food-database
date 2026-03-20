@@ -1,0 +1,308 @@
+{% extends 'foods/base.html' %}
+
+{% block title %}{{ food.food_name }} - Kenya Food Database{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-bottom: 15px;
+        color: #667eea;
+        text-decoration: none;
+        font-size: 14px;
+    }
+    
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    h1 {
+        color: #2c3e50;
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .category-badge {
+        background: #667eea;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+    
+    .kfct-code {
+        color: #666;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+    
+    .nutrient-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+    
+    .nutrient-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+    }
+    
+    .card-title {
+        color: #2c3e50;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 10px 0;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .nutrient-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px dashed #dee2e6;
+        font-size: 14px;
+    }
+    
+    .nutrient-item:last-child {
+        border-bottom: none;
+    }
+    
+    .nutrient-name {
+        color: #495057;
+    }
+    
+    .nutrient-value {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .unit {
+        color: #6c757d;
+        font-size: 12px;
+        margin-left: 4px;
+    }
+    
+    .calculator-prompt {
+        margin-top: 25px;
+        padding: 20px;
+        background: #e8f4fd;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .calculator-link {
+        display: inline-block;
+        padding: 12px 25px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 500;
+        margin-top: 10px;
+    }
+    
+    .footer-note {
+        margin-top: 20px;
+        text-align: center;
+        color: #6c757d;
+        font-size: 12px;
+    }
+    
+    @media (max-width: 480px) {
+        .detail-container { padding: 15px; }
+        h1 { font-size: 20px; }
+        .header { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="javascript:history.back()" class="back-link">← Back</a>
+    
+    <div class="header">
+        <h1>{{ food.food_name }}</h1>
+        <span class="category-badge">{{ food.category.name }}</span>
+    </div>
+    
+    {% if food.kfct_code %}
+    <div class="kfct-code">KFCT Code: {{ food.kfct_code }}</div>
+    {% endif %}
+    
+    <div class="nutrient-grid">
+        <!-- Energy Card -->
+        <div class="nutrient-card">
+            <div class="card-title">🔥 Energy</div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Energy</span>
+                <span class="nutrient-value">{{ food.energy_kcal }} <span class="unit">kcal</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Water</span>
+                <span class="nutrient-value">{{ food.water_g }} <span class="unit">g</span></span>
+            </div>
+        </div>
+        
+        <!-- Proximates Card -->
+        <div class="nutrient-card">
+            <div class="card-title">🥩 Proximates</div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Protein</span>
+                <span class="nutrient-value">{{ food.protein_g }} <span class="unit">g</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Fat</span>
+                <span class="nutrient-value">{{ food.fat_g }} <span class="unit">g</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Carbohydrate</span>
+                <span class="nutrient-value">{{ food.carbohydrate_g }} <span class="unit">g</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Fiber</span>
+                <span class="nutrient-value">{{ food.fiber_g }} <span class="unit">g</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Ash</span>
+                <span class="nutrient-value">{{ food.ash_g }} <span class="unit">g</span></span>
+            </div>
+        </div>
+        
+        <!-- Minerals Card -->
+        <div class="nutrient-card">
+            <div class="card-title">⚡ Minerals</div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Calcium</span>
+                <span class="nutrient-value">{{ food.calcium_mg }} <span class="unit">mg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Iron</span>
+                <span class="nutrient-value">{{ food.iron_mg }} <span class="unit">mg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Magnesium</span>
+                <span class="nutrient-value">{{ food.magnesium_mg }} <span class="unit">mg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Phosphorus</span>
+                <span class="nutrient-value">{{ food.phosphorus_mg }} <span class="unit">mg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Potassium</span>
+                <span class="nutrient-value">{{ food.potassium_mg }} <span class="unit">mg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Sodium</span>
+                <span class="nutrient-value">{{ food.sodium_mg }} <span class="unit">mg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Zinc</span>
+                <span class="nutrient-value">{{ food.zinc_mg }} <span class="unit">mg</span></span>
+            </div>
+        </div>
+        
+        <!-- Vitamins Card -->
+        <div class="nutrient-card">
+            <div class="card-title">💊 Vitamins</div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Vitamin A</span>
+                <span class="nutrient-value">{{ food.vitamin_a_rae_ug }} <span class="unit">µg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Thiamin (B1)</span>
+                <span class="nutrient-value">{{ food.thiamin_mg }} <span class="unit">mg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Riboflavin (B2)</span>
+                <span class="nutrient-value">{{ food.riboflavin_mg }} <span class="unit">mg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Niacin (B3)</span>
+                <span class="nutrient-value">{{ food.niacin_mg }} <span class="unit">mg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Vitamin B6</span>
+                <span class="nutrient-value">{{ food.vitamin_b6_mg }} <span class="unit">mg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Folate</span>
+                <span class="nutrient-value">{{ food.folate_ug }} <span class="unit">µg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Vitamin B12</span>
+                <span class="nutrient-value">{{ food.vitamin_b12_ug }} <span class="unit">µg</span></span>
+            </div>
+            <div class="nutrient-item">
+                <span class="nutrient-name">Vitamin C</span>
+                <span class="nutrient-value">{{ food.vitamin_c_mg }} <span class="unit">mg</span></span>
+            </div>
+        </div>
+    </div>
+    
+    ... (all your nutrient cards above) ...
+
+<!-- Smart Swap Suggestions -->
+{% if swap_suggestions %}
+<div style="margin-top: 30px; padding: 20px; background: #e8f4fd; border-radius: 10px; border-left: 4px solid #667eea;">
+    <h3 style="color: #2c3e50; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+        <span>💡</span> Healthier Kenyan Swaps
+    </h3>
+    
+    <div style="display: grid; gap: 12px;">
+        {% for swap in swap_suggestions %}
+        <div style="background: white; padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <div style="font-weight: 600; color: #2c3e50;">
+                    🔄 Try <span style="color: #667eea;">{{ swap.name }}</span>
+                </div>
+                <div style="color: #666; font-size: 14px;">
+                    {{ swap.benefit }}
+                </div>
+            </div>
+            <a href="{% url 'food_detail' swap.id %}" 
+               style="background: #667eea; color: white; padding: 6px 16px; border-radius: 6px; text-decoration: none; font-size: 13px;">
+                View Swap →
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <p style="margin-top: 15px; color: #2c3e50; font-size: 12px; opacity: 0.7;">
+        🇰🇪 Small swaps can make a big difference in your daily nutrition!
+    </p>
+</div>
+{% endif %}
+
+<!-- Calculator Prompt -->
+<div class="calculator-prompt">
+    <p>Want to calculate nutrients for your portion size?</p>
+    <a href="{% url 'calculator' %}?food={{ food.id }}" class="calculator-link">
+        🧮 Open Nutrient Calculator
+    </a>
+</div>
+    
+    <div class="footer-note">
+        <p>All values are per 100g of edible portion • Source: KFCT 2018</p>
+    </div>
+</div>
+{% endblock %}

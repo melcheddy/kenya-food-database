@@ -1,0 +1,331 @@
+{% extends 'foods/base.html' %}
+
+{% block title %}24-Hour Meal Recall - Kenya Food Database{% endblock %}
+
+{% block extra_css %}
+<style>
+    .recall-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    h1 {
+        color: #2c3e50;
+        font-size: 28px;
+        font-weight: 600;
+        margin: 0 0 10px;
+    }
+    
+    .subtitle {
+        color: #666;
+        margin-bottom: 20px;
+        font-size: 15px;
+    }
+    
+    .person-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #495057;
+        font-weight: 500;
+        font-size: 14px;
+    }
+    
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .meal-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .meal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .meal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .add-food-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .food-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr auto;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+    
+    .food-row select, .food-row input {
+        margin: 0;
+    }
+    
+    .remove-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    
+    .water-section {
+        background: #e3f2fd;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    
+    .water-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr auto;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+    
+    .submit-btn {
+        width: 100%;
+        padding: 15px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+    
+    .submit-btn:hover {
+        background: #5a67d8;
+    }
+    
+    @media (max-width: 768px) {
+        .food-row, .water-row {
+            grid-template-columns: 1fr;
+            gap: 5px;
+        }
+        
+        .person-info {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="recall-container">
+    <h1>📋 24-Hour Meal Recall</h1>
+    <p class="subtitle">Record everything you ate and drank in the last 24 hours</p>
+    
+    <form method="POST" id="recallForm">
+        {% csrf_token %}
+        
+        <!-- Person Information -->
+        <div class="person-info">
+            <div>
+                <label>Name (optional)</label>
+                <input type="text" name="person_name" placeholder="e.g., John Doe">
+            </div>
+            <div>
+                <label>Age (optional)</label>
+                <input type="number" name="person_age" min="0" max="120">
+            </div>
+            <div>
+                <label>Gender (optional)</label>
+                <select name="person_gender">
+                    <option value="">-- Select --</option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Meal Categories -->
+        {% for category in meal_categories %}
+        <div class="meal-section" id="meal-{{ category.id }}">
+            <div class="meal-header">
+                <span class="meal-title">{{ category.name }}</span>
+                <button type="button" class="add-food-btn" onclick="addFoodItem({{ category.id }})">+ Add Food</button>
+            </div>
+            
+            <div id="foods-{{ category.id }}">
+                <!-- Food items will be added here dynamically -->
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Water Intake -->
+        <div class="water-section">
+            <div class="meal-header">
+                <span class="meal-title">💧 Water Intake</span>
+                <button type="button" class="add-food-btn" onclick="addWater()">+ Add Water</button>
+            </div>
+            
+            <div id="water-items">
+                <!-- Water items will be added here dynamically -->
+            </div>
+            <small style="color: #666;">1 glass = 250ml • 1 cup = 240ml • 1 bottle = 500ml</small>
+        </div>
+        
+        <!-- Notes -->
+        <div class="form-group">
+            <label>Additional Notes</label>
+            <textarea name="notes" rows="3" placeholder="Any other details..."></textarea>
+        </div>
+        
+        <button type="submit" class="submit-btn">Save Meal Record</button>
+    </form>
+</div>
+
+<script>
+    // Food search data
+    const foods = [
+        {% for food in foods %}
+        { id: {{ food.id }}, name: "{{ food.food_name|escapejs }}", category: "{{ food.category.name|escapejs }}" },
+        {% endfor %}
+    ];
+    
+    // Available units for foods (simplified)
+    const units = ['grams', 'tablespoon', 'teaspoon', 'cup', 'piece', 'handful', 'bunch'];
+    
+    let foodCounters = {};
+    let waterCounter = 0;
+    
+    // Initialize counters for each meal category
+    {% for category in meal_categories %}
+    foodCounters[{{ category.id }}] = 0;
+    {% endfor %}
+    
+    function addFoodItem(categoryId) {
+        foodCounters[categoryId]++;
+        const container = document.getElementById(`foods-${categoryId}`);
+        const index = foodCounters[categoryId];
+        
+        const foodRow = document.createElement('div');
+        foodRow.className = 'food-row';
+        foodRow.id = `food-row-${categoryId}-${index}`;
+        
+        // Food select dropdown
+        const foodSelect = document.createElement('select');
+        foodSelect.name = `food_name[]`;
+        foodSelect.required = true;
+        foodSelect.innerHTML = '<option value="">-- Select Food --</option>' + 
+            foods.map(f => `<option value="${f.id}">${f.name} (${f.category})</option>`).join('');
+        
+        // Amount input
+        const amountInput = document.createElement('input');
+        amountInput.type = 'number';
+        amountInput.name = `amount[]`;
+        amountInput.placeholder = 'Amount';
+        amountInput.step = '0.1';
+        amountInput.min = '0.1';
+        amountInput.required = true;
+        
+        // Unit select
+        const unitSelect = document.createElement('select');
+        unitSelect.name = `unit[]`;
+        unitSelect.innerHTML = units.map(u => `<option value="${u}">${u}</option>`).join('');
+        
+        // Hidden meal category
+        const categoryInput = document.createElement('input');
+        categoryInput.type = 'hidden';
+        categoryInput.name = `meal_category[]`;
+        categoryInput.value = categoryId;
+        
+        // Remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-btn';
+        removeBtn.textContent = '✕';
+        removeBtn.onclick = function() {
+            container.removeChild(foodRow);
+        };
+        
+        foodRow.appendChild(foodSelect);
+        foodRow.appendChild(amountInput);
+        foodRow.appendChild(unitSelect);
+        foodRow.appendChild(categoryInput);
+        foodRow.appendChild(removeBtn);
+        
+        container.appendChild(foodRow);
+    }
+    
+    function addWater() {
+        waterCounter++;
+        const container = document.getElementById('water-items');
+        
+        const waterRow = document.createElement('div');
+        waterRow.className = 'water-row';
+        waterRow.id = `water-row-${waterCounter}`;
+        
+        const waterInput = document.createElement('input');
+        waterInput.type = 'number';
+        waterInput.name = `water_ml[]`;
+        waterInput.placeholder = 'Amount in ml';
+        waterInput.min = '1';
+        waterInput.step = '1';
+        waterInput.required = true;
+        
+        const unitSpan = document.createElement('span');
+        unitSpan.textContent = 'ml';
+        unitSpan.style.color = '#666';
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-btn';
+        removeBtn.textContent = '✕';
+        removeBtn.onclick = function() {
+            container.removeChild(waterRow);
+        };
+        
+        waterRow.appendChild(waterInput);
+        waterRow.appendChild(unitSpan);
+        waterRow.appendChild(removeBtn);
+        
+        container.appendChild(waterRow);
+    }
+</script>
+{% endblock %}

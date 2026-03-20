@@ -1,0 +1,289 @@
+{% extends 'foods/base.html' %}
+
+{% block title %}Search Results - Kenya Food Database{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    h1 {
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 300;
+        margin-bottom: 1.5rem;
+    }
+    
+    .search-box {
+        margin-bottom: 1.5rem;
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .search-input {
+        flex: 1;
+        padding: 0.8rem 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .search-submit {
+        padding: 0.8rem 1.5rem;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    
+    .filter-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .category-search-box {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    
+    .filter-select {
+        width: 100%;
+        max-width: 300px;
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        font-size: 14px;
+        height: 120px;
+        background: white;
+    }
+    
+    .filter-select option {
+        padding: 6px;
+    }
+    
+    .result-count {
+        color: #666;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .food-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.2rem;
+    }
+    
+    .food-card {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 1.2rem;
+        transition: all 0.3s;
+    }
+    
+    .food-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        background: white;
+    }
+    
+    .food-name {
+        color: #2c3e50;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+    
+    .food-category {
+        color: #667eea;
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .nutrient-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.4rem 0;
+        border-bottom: 1px dashed #dee2e6;
+        font-size: 0.9rem;
+    }
+    
+    .nutrient-row:last-child {
+        border-bottom: none;
+    }
+    
+    .view-button {
+        display: block;
+        text-align: center;
+        margin-top: 1rem;
+        padding: 0.6rem;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: background 0.3s;
+    }
+    
+    .view-button:hover {
+        background: #5a67d8;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+        grid-column: 1/-1;
+    }
+    
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .helper-text {
+        display: block;
+        margin-top: 5px;
+        color: #6c757d;
+        font-size: 12px;
+    }
+    
+    @media (max-width: 768px) {
+        .search-container {
+            padding: 1.5rem;
+        }
+        
+        h1 {
+            font-size: 1.6rem;
+        }
+        
+        .search-form {
+            flex-direction: column;
+        }
+        
+        .search-submit {
+            width: 100%;
+        }
+        
+        .food-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <a href="{% url 'home' %}" class="back-link">← Back to Home</a>
+    
+    <h1>🔍 Search Foods</h1>
+    
+    <div class="search-box">
+        <form action="{% url 'search' %}" method="GET" class="search-form">
+            <input type="text" name="q" class="search-input" placeholder="Search foods..." value="{{ query }}">
+            <button type="submit" class="search-submit">Search</button>
+        </form>
+    </div>
+    
+    <div class="filter-section">
+        <label style="display: block; margin-bottom: 8px; color: #495057; font-weight: 500;">Filter by Category:</label>
+        <input type="text" id="categorySearch" class="category-search-box" placeholder="Type category name...">
+        <form action="{% url 'search' %}" method="GET" id="categoryForm">
+            <input type="hidden" name="q" value="{{ query }}">
+            <select name="category" id="categorySelect" class="filter-select" size="4">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" data-name="{{ category.name|lower }}" {% if selected_category == category.id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+        <span class="helper-text">🔍 Type above to filter, then click to select</span>
+    </div>
+    
+    <div class="result-count">
+        Found {{ foods|length }} food{{ foods|length|pluralize }}
+    </div>
+    
+    <div class="food-grid">
+        {% for food in foods %}
+        <div class="food-card">
+            <div class="food-name">{{ food.food_name|truncatechars:40 }}</div>
+            <div class="food-category">{{ food.category.name }}</div>
+            <div class="nutrient-row">
+                <span>🔥 Energy</span>
+                <span>{{ food.energy_kcal }} kcal</span>
+            </div>
+            <div class="nutrient-row">
+                <span>🥩 Protein</span>
+                <span>{{ food.protein_g }} g</span>
+            </div>
+            <div class="nutrient-row">
+                <span>⚡ Iron</span>
+                <span>{{ food.iron_mg }} mg</span>
+            </div>
+            <a href="{% url 'food_detail' food.id %}" class="view-button">View Details →</a>
+        </div>
+        {% empty %}
+        <div class="no-results">
+            <p>No foods found matching "{{ query }}"</p>
+            <p style="margin-top: 1rem; color: #999;">Try: maize, beans, sukuma, rice</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    // Category search functionality
+    const categorySearch = document.getElementById('categorySearch');
+    const categorySelect = document.getElementById('categorySelect');
+    
+    if (categorySearch) {
+        categorySearch.addEventListener('keyup', function() {
+            let searchText = this.value.toLowerCase();
+            let options = categorySelect.options;
+            
+            for (let i = 0; i < options.length; i++) {
+                let catName = options[i].getAttribute('data-name') || options[i].text.toLowerCase();
+                if (searchText.length > 0) {
+                    options[i].style.display = catName.includes(searchText) ? 'block' : 'none';
+                } else {
+                    options[i].style.display = 'block';
+                }
+            }
+        });
+    }
+    
+    // Auto-submit when category selected
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function() {
+            document.getElementById('categoryForm').submit();
+        });
+    }
+</script>
+{% endblock %}

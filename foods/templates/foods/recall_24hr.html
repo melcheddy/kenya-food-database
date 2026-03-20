@@ -1,0 +1,693 @@
+{% extends 'foods/base.html' %}
+
+{% block title %}24-Hour Recall - Kenya Food Database{% endblock %}
+
+{% block extra_css %}
+<style>
+    .recall-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    h1 {
+        color: #2c3e50;
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .subtitle {
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 15px;
+    }
+    
+    .user-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+    }
+    
+    .user-info input, .user-info select {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 12px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+    
+    .meal-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .meal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        cursor: pointer;
+        padding: 10px;
+        background: #e9ecef;
+        border-radius: 8px;
+    }
+    
+    .meal-header h3 {
+        color: #2c3e50;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .meal-header .toggle-icon {
+        font-size: 20px;
+        color: #667eea;
+    }
+    
+    .meal-content {
+        display: none;
+    }
+    
+    .meal-content.active {
+        display: block;
+    }
+    
+    .food-entry {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .food-search-area {
+        margin-bottom: 15px;
+    }
+    
+    .food-search-box {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    
+    .food-results {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        background: white;
+        display: none;
+    }
+    
+    .food-results.active {
+        display: block;
+    }
+    
+    .food-result-item {
+        padding: 12px;
+        border-bottom: 1px solid #e9ecef;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .food-result-item:hover,
+    .food-result-item:active {
+        background: #667eea;
+        color: white;
+    }
+    
+    .food-result-item:last-child {
+        border-bottom: none;
+    }
+    
+    .food-result-name {
+        font-weight: 500;
+    }
+    
+    .food-result-category {
+        font-size: 12px;
+        color: #666;
+        margin-left: 8px;
+    }
+    
+    .selected-food {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        background: #e3f2fd;
+        border: 1px solid #90caf9;
+        border-radius: 8px;
+        margin-top: 8px;
+    }
+    
+    .selected-food-info {
+        flex: 1;
+    }
+    
+    .selected-food-name {
+        font-weight: 600;
+        color: #1976d2;
+    }
+    
+    .selected-food-category {
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .change-food-btn {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+    
+    .amount-unit-row {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+    }
+    
+    .amount-input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+    
+    .unit-select {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        font-size: 16px;
+        background: white;
+    }
+    
+    .remove-food {
+        color: #dc3545;
+        text-decoration: none;
+        font-size: 14px;
+        margin-top: 10px;
+        display: inline-block;
+    }
+    
+    .add-food-btn {
+        width: 100%;
+        padding: 12px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    
+    .calculate-recall-btn {
+        width: 100%;
+        padding: 15px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        margin: 20px 0;
+    }
+    
+    .results {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .results h3 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+    
+    .total-nutrients {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .nutrient-card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .nutrient-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    .nutrient-label {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .rda-percent {
+        font-size: 12px;
+        color: #28a745;
+        margin-top: 5px;
+    }
+    
+    @media (max-width: 480px) {
+        .amount-unit-row {
+            flex-direction: column;
+        }
+        
+        .user-info {
+            padding: 15px;
+        }
+        
+        .meal-section {
+            padding: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="recall-container">
+    <h1>📋 24-Hour Dietary Recall</h1>
+    <p class="subtitle">Tell us everything you ate and drank in the last 24 hours</p>
+    
+    <form method="POST" id="recallForm">
+        {% csrf_token %}
+        
+        <!-- User Information -->
+        <div class="user-info">
+            <input type="text" name="name" placeholder="Your name (optional)" value="{{ results.name|default:'' }}">
+            <input type="number" name="age" placeholder="Age (years)" value="{{ results.age|default:'' }}" min="0" max="120">
+            <select name="gender">
+                <option value="">-- Select gender --</option>
+                <option value="female" {% if results.gender == 'female' %}selected{% endif %}>Female</option>
+                <option value="male" {% if results.gender == 'male' %}selected{% endif %}>Male</option>
+            </select>
+        </div>
+        
+        <!-- Meal Sections -->
+        {% for meal in meals %}
+        <div class="meal-section" id="meal-{{ meal.id }}">
+            <div class="meal-header" onclick="toggleMeal({{ meal.id }})">
+                <h3>{{ meal.name }}</h3>
+                <span class="toggle-icon" id="toggle-{{ meal.id }}">▼</span>
+            </div>
+            <div class="meal-content" id="content-{{ meal.id }}">
+                <div id="foods-{{ meal.id }}">
+                    <!-- Foods will be added here dynamically -->
+                </div>
+                <button type="button" class="add-food-btn" onclick="addFood({{ meal.id }})">
+                    + Add Food to {{ meal.name }}
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Fluids Section -->
+        <div class="meal-section" style="margin-top: 20px; border-left: 4px solid #17a2b8;">
+            <div class="meal-header" onclick="toggleMeal('fluids')">
+                <h3>💧 Fluids (Water, Tea, Juice, etc.)</h3>
+                <span class="toggle-icon" id="toggle-fluids">▼</span>
+            </div>
+            <div class="meal-content" id="content-fluids">
+                <div id="fluids-container">
+                    <!-- Fluids will be added here -->
+                </div>
+                <button type="button" class="add-food-btn" onclick="addFluid()" style="background: #17a2b8;">
+                    + Add Fluid
+                </button>
+            </div>
+        </div>
+        
+        <button type="submit" class="calculate-recall-btn">Calculate Total Nutrients</button>
+    </form>
+    
+    {% if results %}
+    <div class="results">
+        <h3>📊 Your 24-Hour Total</h3>
+        
+        <!-- Macronutrients -->
+        <div style="margin-bottom: 20px;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">Energy & Protein</h4>
+            <div class="total-nutrients">
+                <div class="nutrient-card">
+                    <div class="nutrient-value">{{ results.total_energy|floatformat:0 }}</div>
+                    <div class="nutrient-label">Calories (kcal)</div>
+                </div>
+                <div class="nutrient-card">
+                    <div class="nutrient-value">{{ results.total_protein|floatformat:1 }}</div>
+                    <div class="nutrient-label">Protein (g)</div>
+                </div>
+                <div class="nutrient-card">
+                    <div class="nutrient-value">{{ results.total_iron|floatformat:1 }}</div>
+                    <div class="nutrient-label">Iron (mg)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hydration Section -->
+        <div style="margin-top: 25px; padding-top: 20px; border-top: 2px dashed #e9ecef;">
+            <h4 style="color: #2c3e50; margin-bottom: 15px;">💧 Hydration Analysis</h4>
+            
+            <div class="total-nutrients" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="nutrient-card">
+                    <div class="nutrient-value">{{ results.total_fluid_ml|floatformat:0 }}</div>
+                    <div class="nutrient-label">Total Fluids (ml)</div>
+                </div>
+                <div class="nutrient-card">
+                    <div class="nutrient-value">{{ results.total_fluid_l|floatformat:1 }}</div>
+                    <div class="nutrient-label">Total (Liters)</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #495057;">Target:</span>
+                    <span style="font-weight: 600;">{{ results.ai_liters }} Liters</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: #495057;">You consumed:</span>
+                    <span style="font-weight: 600;">{{ results.fluid_percent|floatformat:0 }}% of target</span>
+                </div>
+                
+                <!-- Progress bar -->
+                <div style="background: #e9ecef; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 15px;">
+                    <div style="background: 
+                        {% if results.fluid_percent < 80 %}#dc3545
+                        {% elif results.fluid_percent <= 120 %}#28a745
+                        {% else %}#17a2b8{% endif %}; 
+                        width: {% if results.fluid_percent > 100 %}100{% else %}{{ results.fluid_percent }}{% endif %}%; 
+                        height: 10px;">
+                    </div>
+                </div>
+                
+                <!-- Hydration message -->
+                <div style="padding: 12px; background: 
+                    {% if results.fluid_percent < 80 %}#f8d7da
+                    {% elif results.fluid_percent <= 120 %}#d4edda
+                    {% else %}#d1ecf1{% endif %}; 
+                    border-radius: 6px; color: 
+                    {% if results.fluid_percent < 80 %}#721c24
+                    {% elif results.fluid_percent <= 120 %}#155724
+                    {% else %}#0c5460{% endif %};">
+                    {{ results.hydration_message }}
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; color: #666; font-size: 13px; font-style: italic;">
+                Based on Adequate Intake (AI) standards for total water from all sources (drinks + food moisture)
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    <!-- Improvement Suggestions -->
+    {% if results.improvements %}
+    <div style="margin-top: 30px; padding: 20px; background: #e8f4fd; border-radius: 12px;">
+        <h3 style="color: #2c3e50; margin-bottom: 15px;">💡 How to Improve Your Nutrition</h3>
+        
+        {% for imp in results.improvements %}
+        <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 10px; border-left: 4px solid #667eea;">
+            <div style="font-weight: 600; color: #2c3e50;">
+                🥩 {{ imp.nutrient }}: {{ imp.current|floatformat:1 }} / {{ imp.target }} target
+            </div>
+            <div style="margin-top: 10px;">
+                <div style="font-size: 13px; color: #666; margin-bottom: 8px;">Try adding:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    {% for suggestion in imp.suggestions %}
+                    <a href="{% url 'search' %}?q={{ suggestion.0 }}" 
+                       style="background: #f0f0f0; padding: 6px 14px; border-radius: 25px; text-decoration: none; color: #2c3e50; font-size: 13px;">
+                        ➕ {{ suggestion.0 }} — {{ suggestion.1 }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    let foodCounter = 0;
+    let allFoods = [
+        {% for food in foods %}
+        { id: {{ food.id }}, name: "{{ food.food_name|escapejs }}", category: "{{ food.category.name|escapejs }}" },
+        {% endfor %}
+    ];
+    
+    function toggleMeal(mealId) {
+        let content = document.getElementById(`content-${mealId}`);
+        let toggle = document.getElementById(`toggle-${mealId}`);
+        
+        if (content) {
+            content.classList.toggle('active');
+            toggle.textContent = content.classList.contains('active') ? '▲' : '▼';
+        }
+    }
+    
+    function addFood(mealId) {
+        let container = document.getElementById(`foods-${mealId}`);
+        let foodId = `food_${mealId}_${foodCounter++}`;
+        
+        let foodDiv = document.createElement('div');
+        foodDiv.className = 'food-entry';
+        foodDiv.id = foodId;
+        foodDiv.innerHTML = `
+            <div class="food-search-area">
+                <input type="text" class="food-search-box" placeholder="Type food name..." onkeyup="searchFood(this, '${foodId}')">
+                <div class="food-results" id="results-${foodId}"></div>
+                <div class="selected-food" style="display: none;" id="selected-${foodId}">
+                    <div class="selected-food-info">
+                        <div class="selected-food-name" id="selected-name-${foodId}"></div>
+                        <div class="selected-food-category" id="selected-cat-${foodId}"></div>
+                    </div>
+                    <button type="button" class="change-food-btn" onclick="changeFood('${foodId}')">Change</button>
+                </div>
+                <input type="hidden" name="food_id_${mealId}[]" id="hidden-${foodId}" value="">
+            </div>
+            <div class="amount-unit-row">
+                <input type="number" name="amount_${mealId}[]" class="amount-input" placeholder="Amount" step="0.1" min="0">
+    <select name="unit_${mealId}[]" class="unit-select">
+        <option value="grams">grams (g)</option>
+    </select>
+
+    <!-- Quick Measure Buttons -->
+    <div class="quick-buttons" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;">
+        <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'bowl', 250)">Bowl</button>
+        <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'plate', 400)">Plate</button>
+        <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'handful', 30)">Handful</button>
+        <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'piece', 50)">Piece</button>
+        <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'cup', 240)">Cup</button>
+    </div>
+            <a href="#" class="remove-food" onclick="removeFood('${foodId}'); return false;">Remove</a>
+        `;
+        
+        container.appendChild(foodDiv);
+    }
+    
+    function searchFood(input, foodId) {
+        let searchText = input.value.toLowerCase();
+        let resultsDiv = document.getElementById(`results-${foodId}`);
+        
+        if (searchText.length < 2) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        
+        let matches = allFoods.filter(f => 
+            f.name.toLowerCase().includes(searchText)
+        ).slice(0, 10);
+        
+        if (matches.length > 0) {
+            resultsDiv.innerHTML = matches.map(f => `
+                <div class="food-result-item" onclick="selectFood(${f.id}, '${f.name.replace(/'/g, "\\'")}', '${f.category.replace(/'/g, "\\'")}', '${foodId}')">
+                    <span class="food-result-name">${f.name}</span>
+                    <span class="food-result-category">${f.category}</span>
+                </div>
+            `).join('');
+            resultsDiv.classList.add('active');
+        } else {
+            resultsDiv.innerHTML = '<div class="food-result-item">No foods found</div>';
+            resultsDiv.classList.add('active');
+        }
+    }
+    
+    function selectFood(foodId, foodName, foodCategory, foodIdStr) {
+        document.getElementById(`hidden-${foodIdStr}`).value = foodId;
+        document.getElementById(`selected-name-${foodIdStr}`).textContent = foodName;
+        document.getElementById(`selected-cat-${foodIdStr}`).textContent = foodCategory;
+        document.getElementById(`selected-${foodIdStr}`).style.display = 'flex';
+        document.getElementById(`results-${foodIdStr}`).classList.remove('active');
+    
+        let searchBox = document.querySelector(`#${foodIdStr} .food-search-box`);
+        searchBox.style.display = 'none';
+    
+        // Load units for this food
+        loadUnitsForFood(foodId, foodIdStr);
+    }
+
+    function changeFood(foodIdStr) {
+        document.getElementById(`hidden-${foodIdStr}`).value = '';
+        document.getElementById(`selected-${foodIdStr}`).style.display = 'none';
+        let searchBox = document.querySelector(`#${foodIdStr} .food-search-box`);
+        searchBox.style.display = 'block';
+        searchBox.value = '';
+    }
+    
+    function addFluid() {
+        let container = document.getElementById('fluids-container');
+        let fluidId = `fluid_${foodCounter++}`;
+        
+        let fluidDiv = document.createElement('div');
+        fluidDiv.className = 'food-entry';
+        fluidDiv.id = fluidId;
+        fluidDiv.innerHTML = `
+            <div class="food-search-area">
+                <input type="text" class="food-search-box" placeholder="Type fluid name (water, tea, juice...)" onkeyup="searchFluid(this, '${fluidId}')">
+                <div class="food-results" id="results-${fluidId}"></div>
+                <div class="selected-food" style="display: none;" id="selected-${fluidId}">
+                    <div class="selected-food-info">
+                        <div class="selected-food-name" id="selected-name-${fluidId}"></div>
+                        <div class="selected-food-category" id="selected-cat-${fluidId}">Beverage</div>
+                    </div>
+                    <button type="button" class="change-food-btn" onclick="changeFood('${fluidId}')">Change</button>
+                </div>
+                <input type="hidden" name="fluid_id[]" id="hidden-${fluidId}" value="">
+            </div>
+            <div class="amount-unit-row">
+                <input type="number" name="fluid_amount[]" class="amount-input" placeholder="Amount" step="0.1" min="0">
+                <select name="fluid_unit[]" class="unit-select">
+                    <option value="ml">milliliters (ml)</option>
+                    <option value="cup">cup (240 ml)</option>
+                    <option value="glass">glass (250 ml)</option>
+                    <option value="bottle">bottle (500 ml)</option>
+                </select>
+            </div>
+            <a href="#" class="remove-food" onclick="removeFood('${fluidId}'); return false;">Remove</a>
+        `;
+        
+        container.appendChild(fluidDiv);
+    }
+    
+    function searchFluid(input, fluidId) {
+        // Common beverages
+        let beverages = [
+            { id: 9991, name: "Water", category: "Beverages" },
+            { id: 9992, name: "Black Tea", category: "Beverages" },
+            { id: 9993, name: "Milk Tea", category: "Beverages" },
+            { id: 9994, name: "Coffee", category: "Beverages" },
+            { id: 9995, name: "Orange Juice", category: "Beverages" },
+            { id: 9996, name: "Soda", category: "Beverages" },
+            { id: 9997, name: "Fermented Milk (Mursik)", category: "Beverages" },
+            { id: 9998, name: "Yogurt Drink", category: "Beverages" },
+            { id: 9999, name: "Fresh Juice", category: "Beverages" },
+        ];
+        
+        let searchText = input.value.toLowerCase();
+        let resultsDiv = document.getElementById(`results-${fluidId}`);
+        
+        if (searchText.length < 2) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        
+        let matches = beverages.filter(b => 
+            b.name.toLowerCase().includes(searchText)
+        );
+        
+        if (matches.length > 0) {
+            resultsDiv.innerHTML = matches.map(b => `
+                <div class="food-result-item" onclick="selectFluid(${b.id}, '${b.name.replace(/'/g, "\\'")}', '${fluidId}')">
+                    <span class="food-result-name">${b.name}</span>
+                    <span class="food-result-category">${b.category}</span>
+                </div>
+            `).join('');
+            resultsDiv.classList.add('active');
+        } else {
+            resultsDiv.innerHTML = '<div class="food-result-item">No beverages found</div>';
+            resultsDiv.classList.add('active');
+        }
+    }
+    
+    function selectFluid(fluidId, fluidName, elementId) {
+        document.getElementById(`hidden-${elementId}`).value = fluidId;
+        document.getElementById(`selected-name-${elementId}`).textContent = fluidName;
+        document.getElementById(`selected-${elementId}`).style.display = 'flex';
+        document.getElementById(`results-${elementId}`).classList.remove('active');
+        
+        let searchBox = document.querySelector(`#${elementId} .food-search-box`);
+        searchBox.style.display = 'none';
+    }
+    
+    function removeFood(foodId) {
+        document.getElementById(foodId).remove();
+    }
+    function loadUnitsForFood(foodId, foodIdStr) {
+    // Fetch units from server
+    fetch(`/get-units/?food_id=${foodId}`)
+        .then(response => response.json())
+        .then(data => {
+            let unitSelect = document.querySelector(`#${foodIdStr} .unit-select`);
+            unitSelect.innerHTML = '<option value="grams">grams (g)</option>';
+            
+            if (data.units) {
+                data.units.forEach(unit => {
+                    let option = document.createElement('option');
+                    option.value = unit.name;
+                    option.textContent = `${unit.name} (1 = ${unit.grams}g)`;
+                    unitSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(error => console.error('Error loading units:', error));
+}
+
+function setQuickMeasure(button, unit, grams) {
+    let foodEntry = button.closest('.food-entry');
+    let amountInput = foodEntry.querySelector('.amount-input');
+    let unitSelect = foodEntry.querySelector('.unit-select');
+    
+    amountInput.value = 1;
+    for (let i = 0; i < unitSelect.options.length; i++) {
+        if (unitSelect.options[i].value === unit) {
+            unitSelect.selectedIndex = i;
+            break;
+        }
+    }
+    
+    amountInput.style.border = "2px solid #28a745";
+    setTimeout(() => { amountInput.style.border = ""; }, 500);
+}
+
+</script>
+{% endblock %}
