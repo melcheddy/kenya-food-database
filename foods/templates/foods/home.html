@@ -4,201 +4,238 @@
 
 {% block extra_css %}
 <style>
-    /* MOBILE-FIRST STYLES - Guaranteed to work */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+    .hero {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: linear-gradient(135deg, #2c5e2e 0%, #3e7a41 100%);
+        border-radius: 20px;
+        color: white;
+        margin-bottom: 2rem;
     }
     
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: #f5f5f5;
-        line-height: 1.6;
+    .hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
     }
     
-    .home-container {
-        max-width: 100%;
+    .hero p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+        max-width: 600px;
         margin: 0 auto;
+    }
+    
+    .search-section {
         background: white;
-        padding: 20px;
-        border-radius: 0;
-        box-shadow: none;
-    }
-    
-    h1 {
-        color: #2c3e50;
-        font-size: 28px;
-        font-weight: 600;
-        margin-bottom: 10px;
-        line-height: 1.2;
-    }
-    
-    .subtitle {
-        color: #666;
-        font-size: 16px;
-        margin-bottom: 25px;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
     }
     
     .search-form {
         display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin: 20px 0;
+        gap: 1rem;
+        margin: 1rem 0;
     }
     
     .search-input {
-        width: 100%;
-        padding: 15px;
-        font-size: 16px;
+        flex: 1;
+        padding: 1rem;
         border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        background: white;
+        border-radius: 50px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #2c5e2e;
     }
     
     .search-button {
-        width: 100%;
-        padding: 15px;
-        background: #667eea;
+        padding: 1rem 2rem;
+        background: #2c5e2e;
         color: white;
         border: none;
-        border-radius: 8px;
-        font-size: 16px;
+        border-radius: 50px;
+        font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .search-button:hover {
+        background: #1e421f;
     }
     
     .stats {
         display: flex;
-        flex-direction: column;
-        gap: 15px;
-        margin: 30px 0;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 12px;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: #f8f5f0;
+        border-radius: 20px;
     }
     
-    .stat-item {
+    .stat {
         text-align: center;
     }
     
     .stat-number {
-        font-size: 32px;
+        font-size: 2.5rem;
         font-weight: 700;
-        color: #667eea;
-        line-height: 1.2;
+        color: #2c5e2e;
     }
     
     .stat-label {
         color: #666;
-        font-size: 14px;
+        font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
     
-    .section-title {
-        color: #2c3e50;
-        font-size: 22px;
-        font-weight: 600;
-        margin: 25px 0 15px;
-        text-align: center;
-    }
-    
-    .category-grid {
+    .categories {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin: 15px 0;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
     }
     
     .category-card {
-        background: #f8f9fa;
-        padding: 18px 12px;
-        border-radius: 10px;
+        background: white;
+        padding: 1rem;
+        border-radius: 12px;
         text-align: center;
         text-decoration: none;
-        color: #2c3e50;
+        color: #2c3e2f;
         font-weight: 500;
-        font-size: 16px;
+        transition: all 0.3s;
         border: 1px solid #e9ecef;
-        display: block;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
     }
     
-    .calculator-section {
-        margin: 30px 0 20px;
+    .category-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        border-color: #2c5e2e;
+    }
+    
+    .feature-box {
+        background: #f8f5f0;
+        border-radius: 20px;
+        padding: 2rem;
         text-align: center;
+        margin: 2rem 0;
     }
     
-    .calculator-link {
-        display: block;
-        padding: 18px;
-        background: #28a745;
+    .feature-link {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.8rem 2rem;
+        background: #2c5e2e;
         color: white;
         text-decoration: none;
-        border-radius: 10px;
-        font-size: 18px;
+        border-radius: 50px;
         font-weight: 600;
+        transition: background 0.3s;
     }
     
-    .calculator-note {
-        margin-top: 12px;
-        color: #666;
-        font-size: 14px;
+    .feature-link:hover {
+        background: #1e421f;
     }
     
-    /* Small phone adjustments */
-    @media (max-width: 380px) {
-        h1 { font-size: 24px; }
-        .category-grid { grid-template-columns: 1fr; }
-        .stat-number { font-size: 28px; }
+    @media (max-width: 600px) {
+        .hero h1 {
+            font-size: 1.8rem;
+        }
+        
+        .hero p {
+            font-size: 1rem;
+        }
+        
+        .search-form {
+            flex-direction: column;
+        }
+        
+        .search-button {
+            width: 100%;
+        }
+        
+        .stats {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .categories {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="home-container">
+<div class="hero">
     <h1>🇰🇪 Kenya Food Database</h1>
-    <p class="subtitle">Explore over 600 Kenyan foods and their nutritional content</p>
-    
+    <p>Discover the nutritional value of over 600 traditional Kenyan foods</p>
+</div>
+
+<div class="search-section">
+    <h2 style="color: #2c3e2f;">🔍 Find a Food</h2>
     <form action="{% url 'search' %}" method="GET" class="search-form">
-        <input type="text" name="q" class="search-input" placeholder="Search foods (e.g., ugali, sukuma, beans)" required>
-        <button type="submit" class="search-button">🔍 Search</button>
+        <input type="text" name="q" class="search-input" placeholder="Search for ugali, sukuma, beans, or any Kenyan food..." required>
+        <button type="submit" class="search-button">Search Foods →</button>
     </form>
-    
-    <div class="stats">
-        <div class="stat-item">
-            <div class="stat-number">628</div>
-            <div class="stat-label">Foods</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">16</div>
-            <div class="stat-label">Categories</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number">40+</div>
-            <div class="stat-label">Nutrients</div>
-        </div>
+</div>
+
+<div class="stats">
+    <div class="stat">
+        <div class="stat-number">628</div>
+        <div class="stat-label">Foods</div>
     </div>
-    
-    <h2 class="section-title">Browse Categories</h2>
-    <div class="category-grid">
-        <a href="{% url 'search' %}?category=1" class="category-card">🌽 Cereals</a>
-        <a href="{% url 'search' %}?category=2" class="category-card">🥔 Roots & Tubers</a>
-        <a href="{% url 'search' %}?category=3" class="category-card">🫘 Legumes</a>
-        <a href="{% url 'search' %}?category=4" class="category-card">🥬 Vegetables</a>
-        <a href="{% url 'search' %}?category=5" class="category-card">🍎 Fruits</a>
-        <a href="{% url 'search' %}?category=6" class="category-card">🥩 Meat & Poultry</a>
-        <a href="{% url 'search' %}?category=7" class="category-card">🐟 Fish</a>
-        <a href="{% url 'search' %}?category=8" class="category-card">🥚 Eggs</a>
-        <a href="{% url 'search' %}?category=9" class="category-card">🥛 Dairy</a>
-        <a href="{% url 'search' %}?category=10" class="category-card">🫒 Fats & Oils</a>
+    <div class="stat">
+        <div class="stat-number">16</div>
+        <div class="stat-label">Categories</div>
     </div>
-    
-    <div class="calculator-section">
-        <a href="{% url 'calculator' %}" class="calculator-link">
-            🧮 Open Nutrient Calculator
-        </a>
-        <p class="calculator-note">Calculate nutrients for any food based on your portion size</p>
+    <div class="stat">
+        <div class="stat-number">40+</div>
+        <div class="stat-label">Nutrients</div>
     </div>
+</div>
+
+<h2 style="color: #2c3e2f; margin: 1rem 0;">📂 Browse by Category</h2>
+<div class="categories">
+    <a href="{% url 'search' %}?category=1" class="category-card">🌽 Cereals</a>
+    <a href="{% url 'search' %}?category=2" class="category-card">🥔 Roots & Tubers</a>
+    <a href="{% url 'search' %}?category=3" class="category-card">🫘 Legumes</a>
+    <a href="{% url 'search' %}?category=4" class="category-card">🥬 Vegetables</a>
+    <a href="{% url 'search' %}?category=5" class="category-card">🍎 Fruits</a>
+    <a href="{% url 'search' %}?category=6" class="category-card">🥩 Meat & Poultry</a>
+    <a href="{% url 'search' %}?category=7" class="category-card">🐟 Fish</a>
+    <a href="{% url 'search' %}?category=8" class="category-card">🥚 Eggs</a>
+    <a href="{% url 'search' %}?category=9" class="category-card">🥛 Dairy</a>
+    <a href="{% url 'search' %}?category=10" class="category-card">🫒 Fats & Oils</a>
+</div>
+
+<div class="feature-box">
+    <h2 style="color: #2c3e2f;">🧮 Try the Nutrient Calculator</h2>
+    <p>Enter any food and portion size to see exactly what you're getting.</p>
+    <a href="{% url 'calculator' %}" class="feature-link">Open Calculator →</a>
+</div>
+
+<div class="feature-box" style="background: #e8f0e8;">
+    <h2 style="color: #2c3e2f;">📋 24-Hour Dietary Recall</h2>
+    <p>Track everything you ate in the last 24 hours and get personalized nutrition insights.</p>
+    <a href="{% url 'recall' %}" class="feature-link">Start Recall →</a>
+</div>
+
+<div class="feature-box">
+    <h2 style="color: #2c3e2f;">🔍 Compare Foods</h2>
+    <p>See how different Kenyan foods stack up against each other.</p>
+    <a href="{% url 'compare' %}" class="feature-link">Compare Now →</a>
 </div>
 {% endblock %}
