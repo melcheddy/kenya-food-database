@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import Food, Category, RDA, UnitConversion
 from .swap_suggestions import SWAP_SUGGESTIONS, NUTRIENT_SWAPS, get_cost_tag
 from django.http import JsonResponse
+from django.http import JsonResponse
 
 def home(request):
     """Homepage with search"""
@@ -146,10 +147,8 @@ def food_detail(request, food_id):
         'cost_tag': current_cost,
     })
 def nutrient_calculator(request):
-    """Calculate nutrients based on food and amount with unit conversion"""
     foods = Food.objects.all().order_by('food_name')
     categories = Category.objects.all()
-    rdas = RDA.objects.all()
     
     result = None
     food_selected = None
@@ -168,25 +167,20 @@ def nutrient_calculator(request):
         
         try:
             food_selected = Food.objects.get(id=food_id)
-            
-            # Get available units for this food
             available_units = UnitConversion.objects.filter(food=food_selected)
             
-            # Convert to grams if unit is not 'grams'
+            # Convert to grams
             grams = amount
             if unit != 'grams':
                 try:
-                    conversion = UnitConversion.objects.get(
-                        food=food_selected,
-                        unit_name=unit
-                    )
+                    conversion = UnitConversion.objects.get(food=food_selected, unit_name=unit)
                     grams = amount * conversion.grams
                 except UnitConversion.DoesNotExist:
                     grams = amount
             
-            # Calculate nutrients based on grams
+            # Calculate nutrients
             result = {
-                'food': food_selected,
+                'food_name': food_selected.food_name,
                 'amount': amount,
                 'unit': unit,
                 'grams': grams,
@@ -203,58 +197,34 @@ def nutrient_calculator(request):
                 'zinc_mg': (grams / 100) * food_selected.zinc_mg,
             }
             
-            # Find appropriate RDA based on gender and age
-            if age < 1:
-                life_stage = 'infant'
-            elif age < 4:
-                life_stage = 'child_1_3'
-            elif age < 9:
-                life_stage = 'child_4_8'
-            elif age < 14:
-                life_stage = 'child_9_13'
-            elif age < 19:
-                life_stage = 'adolescent_14_18'
+            # Get RDA (simplified)
+            rda = None
+            if age < 19:
+                if gender == 'female':
+                    rda = {'energy_kcal': 2000, 'protein_g': 46, 'iron_mg': 15, 'calcium_mg': 1300}
+                else:
+                    rda = {'energy_kcal': 2400, 'protein_g': 52, 'iron_mg': 11, 'calcium_mg': 1300}
             else:
-                life_stage = 'adult'
+                if gender == 'female':
+                    rda = {'energy_kcal': 2100, 'protein_g': 46, 'iron_mg': 29, 'calcium_mg': 1000}
+                else:
+                    rda = {'energy_kcal': 2500, 'protein_g': 56, 'iron_mg': 11, 'calcium_mg': 1000}
             
-            # For adults, we need to check age ranges
-            if life_stage == 'adult':
-                # First try to find exact age match
-                rda_entry = RDA.objects.filter(
-                    gender=gender,
-                    life_stage='adult',
-                    age_min__lte=age,
-                    age_max__gte=age
-                ).first()
-                
-                # If no exact match, try to get any adult entry (fallback)
-                if not rda_entry:
-                    rda_entry = RDA.objects.filter(
-                        gender=gender,
-                        life_stage='adult'
-                    ).first()
-            else:
-                # For non-adults, just filter by life stage
-                rda_entry = RDA.objects.filter(
-                    gender=gender,
-                    life_stage=life_stage
-                ).first()
-            
-            # Add percentage calculations
-            if result and rda_entry:
-                result['energy_percent'] = (result['energy_kcal'] / rda_entry.energy_kcal) * 100
-                result['iron_percent'] = (result['iron_mg'] / rda_entry.iron_mg) * 100 if rda_entry.iron_mg > 0 else 0
-                result['protein_percent'] = (result['protein_g'] / rda_entry.protein_g) * 100 if rda_entry.protein_g > 0 else 0
-            
-            result['rda'] = rda_entry
+            # If AJAX request, return JSON
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'result': result,
+                    'rda': rda
+                })
             
         except Food.DoesNotExist:
-            pass
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': 'Food not found'})
     
     return render(request, 'foods/calculator.html', {
         'foods': foods,
         'categories': categories,
-        'result': result,
         'food_selected': food_selected,
         'amount': amount,
         'unit': unit,
