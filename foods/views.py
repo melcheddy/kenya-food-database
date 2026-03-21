@@ -596,7 +596,105 @@ def compare_foods(request):
 def compare_foods(request):
     import traceback
     try:
-        except Exception as e:
+        foods = Food.objects.all().order_by('food_name')
+        
+        food1 = None
+        food2 = None
+        comparison = None
+        messages = []
+        
+        if request.method == 'POST':
+            food1_id = request.POST.get('food1')
+            food2_id = request.POST.get('food2')
+            
+            if food1_id and food2_id:
+                try:
+                    food1 = Food.objects.get(id=food1_id)
+                    food2 = Food.objects.get(id=food2_id)
+                    
+                    # Prepare comparison data
+                    nutrients = [
+                        {'name': 'Energy (kcal)', 'key': 'energy_kcal', 'unit': 'kcal', 'higher_is': 'better'},
+                        {'name': 'Protein (g)', 'key': 'protein_g', 'unit': 'g', 'higher_is': 'better'},
+                        {'name': 'Fat (g)', 'key': 'fat_g', 'unit': 'g', 'higher_is': 'neutral'},
+                        {'name': 'Carbohydrate (g)', 'key': 'carbohydrate_g', 'unit': 'g', 'higher_is': 'neutral'},
+                        {'name': 'Fiber (g)', 'key': 'fiber_g', 'unit': 'g', 'higher_is': 'better'},
+                        {'name': 'Iron (mg)', 'key': 'iron_mg', 'unit': 'mg', 'higher_is': 'better'},
+                        {'name': 'Calcium (mg)', 'key': 'calcium_mg', 'unit': 'mg', 'higher_is': 'better'},
+                        {'name': 'Vitamin A (µg)', 'key': 'vitamin_a_rae_ug', 'unit': 'µg', 'higher_is': 'better'},
+                        {'name': 'Vitamin C (mg)', 'key': 'vitamin_c_mg', 'unit': 'mg', 'higher_is': 'better'},
+                        {'name': 'Zinc (mg)', 'key': 'zinc_mg', 'unit': 'mg', 'higher_is': 'better'},
+                    ]
+                    
+                    comparison = []
+                    for n in nutrients:
+                        val1 = getattr(food1, n['key'], 0)
+                        val2 = getattr(food2, n['key'], 0)
+                        
+                        if n['higher_is'] == 'better':
+                            if val1 > val2:
+                                winner = 1
+                            elif val2 > val1:
+                                winner = 2
+                            else:
+                                winner = 0
+                        else:
+                            winner = 0
+                        
+                        max_val = max(val1, val2)
+                        if max_val > 0:
+                            pct1 = (val1 / max_val) * 100
+                            pct2 = (val2 / max_val) * 100
+                        else:
+                            pct1 = 0
+                            pct2 = 0
+                        
+                        comparison.append({
+                            'name': n['name'],
+                            'key': n['key'],
+                            'unit': n['unit'],
+                            'val1': val1,
+                            'val2': val2,
+                            'pct1': pct1,
+                            'pct2': pct2,
+                            'winner': winner,
+                        })
+                    
+                    # Generate behavior change messages
+                    messages = []
+                    
+                    if food1.iron_mg > food2.iron_mg * 1.5 and food2.iron_mg > 0:
+                        percent_more = ((food1.iron_mg / food2.iron_mg) - 1) * 100
+                        messages.append(f"🔴 {food1.food_name[:30]} has {food1.iron_mg:.1f}mg iron — {percent_more:.0f}% more than {food2.food_name[:30]}")
+                    elif food2.iron_mg > food1.iron_mg * 1.5 and food1.iron_mg > 0:
+                        percent_more = ((food2.iron_mg / food1.iron_mg) - 1) * 100
+                        messages.append(f"🔴 {food2.food_name[:30]} has {food2.iron_mg:.1f}mg iron — {percent_more:.0f}% more than {food1.food_name[:30]}")
+                    
+                    if food1.fiber_g > food2.fiber_g * 1.5 and food2.fiber_g > 0:
+                        messages.append(f"🌾 {food1.food_name[:30]} has {food1.fiber_g:.1f}g fiber — great for digestion!")
+                    elif food2.fiber_g > food1.fiber_g * 1.5 and food1.fiber_g > 0:
+                        messages.append(f"🌾 {food2.food_name[:30]} has {food2.fiber_g:.1f}g fiber — great for digestion!")
+                    
+                    if food1.protein_g > food2.protein_g * 1.5 and food2.protein_g > 0:
+                        messages.append(f"🥩 {food1.food_name[:30]} is higher in protein ({food1.protein_g:.1f}g vs {food2.protein_g:.1f}g)")
+                    elif food2.protein_g > food1.protein_g * 1.5 and food1.protein_g > 0:
+                        messages.append(f"🥩 {food2.food_name[:30]} is higher in protein ({food2.protein_g:.1f}g vs {food1.protein_g:.1f}g)")
+                    
+                    if not messages:
+                        messages.append("💡 These foods have similar nutritional profiles. Consider variety in your diet!")
+                    
+                except Food.DoesNotExist:
+                    pass
+        
+        return render(request, 'foods/compare.html', {
+            'foods': foods,
+            'food1': food1,
+            'food2': food2,
+            'comparison': comparison,
+            'messages': messages,
+        })
+    
+    except Exception as e:
         print("="*50)
         print("ERROR in compare_foods:")
         traceback.print_exc()
@@ -608,14 +706,6 @@ def compare_foods(request):
             'comparison': None,
             'messages': ['Error loading compare page. Please try again.'],
         })
-    # ... all your code ...
-    return render(request, 'foods/compare.html', {
-        'foods': foods,
-        'food1': food1,
-        'food2': food2,
-        'comparison': comparison,
-        'messages': messages,
-    })
 
 def get_units(request):
     """Return available units for a food as JSON"""
