@@ -146,6 +146,7 @@ def food_detail(request, food_id):
         'swap_suggestions': swap_suggestions,
         'cost_tag': current_cost,
     })
+
 def nutrient_calculator(request):
     foods = Food.objects.all().order_by('food_name')
     categories = Category.objects.all()
@@ -157,6 +158,7 @@ def nutrient_calculator(request):
     gender = 'female'
     age = 30
     available_units = []
+    rda = None
     
     if request.method == 'POST':
         food_id = request.POST.get('food_id')
@@ -197,8 +199,7 @@ def nutrient_calculator(request):
                 'zinc_mg': (grams / 100) * food_selected.zinc_mg,
             }
             
-            # Get RDA (simplified)
-            rda = None
+            # Get RDA based on age and gender
             if age < 19:
                 if gender == 'female':
                     rda = {'energy_kcal': 2000, 'protein_g': 46, 'iron_mg': 15, 'calcium_mg': 1300}
@@ -210,17 +211,12 @@ def nutrient_calculator(request):
                 else:
                     rda = {'energy_kcal': 2500, 'protein_g': 56, 'iron_mg': 11, 'calcium_mg': 1000}
             
-            # If AJAX request, return JSON
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': True,
-                    'result': result,
-                    'rda': rda
-                })
+            # Add percentages
+            result['energy_percent'] = (result['energy_kcal'] / rda['energy_kcal']) * 100
+            result['iron_percent'] = (result['iron_mg'] / rda['iron_mg']) * 100 if rda['iron_mg'] > 0 else 0
             
         except Food.DoesNotExist:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'error': 'Food not found'})
+            pass
     
     return render(request, 'foods/calculator.html', {
         'foods': foods,
@@ -231,7 +227,10 @@ def nutrient_calculator(request):
         'gender': gender,
         'age': age,
         'available_units': available_units,
+        'result': result,
+        'rda': rda,
     })
+
 def recall_24hr(request):
     """24-hour dietary recall with searchable foods and fluids"""
     foods = Food.objects.all().order_by('food_name')
