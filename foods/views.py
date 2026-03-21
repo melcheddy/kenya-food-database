@@ -594,6 +594,20 @@ def compare_foods(request):
                 pass
     
 def compare_foods(request):
+    import traceback
+    try:
+        except Exception as e:
+        print("="*50)
+        print("ERROR in compare_foods:")
+        traceback.print_exc()
+        print("="*50)
+        return render(request, 'foods/compare.html', {
+            'foods': Food.objects.all().order_by('food_name'),
+            'food1': None,
+            'food2': None,
+            'comparison': None,
+            'messages': ['Error loading compare page. Please try again.'],
+        })
     # ... all your code ...
     return render(request, 'foods/compare.html', {
         'foods': foods,
