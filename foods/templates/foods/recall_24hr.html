@@ -426,31 +426,49 @@
                 Based on Adequate Intake (AI) standards for total water from all sources (drinks + food moisture)
             </p>
         </div>
-    </div>
-    {% endif %}
-    <!-- Improvement Suggestions -->
-    {% if results.improvements %}
-    <div style="margin-top: 30px; padding: 20px; background: #e8f4fd; border-radius: 12px;">
-        <h3 style="color: #2c3e50; margin-bottom: 15px;">💡 How to Improve Your Nutrition</h3>
         
-        {% for imp in results.improvements %}
-        <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 10px; border-left: 4px solid #667eea;">
-            <div style="font-weight: 600; color: #2c3e50;">
-                🥩 {{ imp.nutrient }}: {{ imp.current|floatformat:1 }} / {{ imp.target }} target
-            </div>
-            <div style="margin-top: 10px;">
-                <div style="font-size: 13px; color: #666; margin-bottom: 8px;">Try adding:</div>
-                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                    {% for suggestion in imp.suggestions %}
-                    <a href="{% url 'search' %}?q={{ suggestion.0 }}" 
-                       style="background: #f0f0f0; padding: 6px 14px; border-radius: 25px; text-decoration: none; color: #2c3e50; font-size: 13px;">
-                        ➕ {{ suggestion.0 }} — {{ suggestion.1 }}
-                    </a>
-                    {% endfor %}
+        <!-- Improvement Suggestions -->
+        {% if results.improvements %}
+        <div style="margin-top: 30px; padding: 20px; background: #e8f4fd; border-radius: 12px;">
+            <h3 style="color: #2c3e50; margin-bottom: 15px;">💡 How to Improve Your Nutrition</h3>
+            {% for imp in results.improvements %}
+            <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 10px; border-left: 4px solid #667eea;">
+                <div style="font-weight: 600; color: #2c3e50;">
+                    🥩 {{ imp.nutrient }}: {{ imp.current|floatformat:1 }} / {{ imp.target }} target
+                </div>
+                <div style="margin-top: 10px;">
+                    <div style="font-size: 13px; color: #666; margin-bottom: 8px;">Try adding:</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        {% for suggestion in imp.suggestions %}
+                        <a href="{% url 'search' %}?q={{ suggestion.0 }}" 
+                           style="background: #f0f0f0; padding: 6px 14px; border-radius: 25px; text-decoration: none; color: #2c3e50; font-size: 13px;">
+                            ➕ {{ suggestion.0 }} — {{ suggestion.1 }}
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        {% endif %}
+        
+        <!-- SHARE BUTTONS -->
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px dashed #e9ecef;">
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <a href="https://wa.me/?text=My%2024-hour%20nutrition%20summary%3A%20{{ results.total_energy|floatformat:0 }}%20kcal,%20{{ results.total_protein|floatformat:1 }}g%20protein,%20{{ results.total_iron|floatformat:1 }}mg%20iron.%20Track%20yours%20at%20Kenya%20Food%20Database%20{{ request.build_absolute_uri|urlencode }}"
+                   target="_blank" style="background:#25D366; color:white; padding:8px 16px; border-radius:40px; text-decoration:none; font-size:13px;">
+                    💬 Share on WhatsApp
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
+                   target="_blank" style="background:#1877F2; color:white; padding:8px 16px; border-radius:40px; text-decoration:none; font-size:13px;">
+                    📘 Facebook
+                </a>
+                <button onclick="copyLink()" style="background:#6c757d; color:white; border:none; padding:8px 16px; border-radius:40px; font-size:13px; cursor:pointer;">
+                    🔗 Copy Link
+                </button>
+            </div>
+            <p style="text-align: center; margin-top: 12px; font-size: 12px; color: #666;">📢 Share your nutrition summary</p>
+        </div>
     </div>
     {% endif %}
 </div>
@@ -495,18 +513,10 @@
             </div>
             <div class="amount-unit-row">
                 <input type="number" name="amount_${mealId}[]" class="amount-input" placeholder="Amount" step="0.1" min="0">
-    <select name="unit_${mealId}[]" class="unit-select">
-        <option value="grams">grams (g)</option>
-    </select>
-
-    <!-- Quick Measure Buttons -->
-    <div class="quick-buttons" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;">
-        <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'bowl', 250)">Bowl</button>
-        <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'plate', 400)">Plate</button>
-        <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'handful', 30)">Handful</button>
-        <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'piece', 50)">Piece</button>
-        <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'cup', 240)">Cup</button>
-    </div>
+                <select name="unit_${mealId}[]" class="unit-select">
+                    <option value="grams">grams (g)</option>
+                </select>
+            </div>
             <a href="#" class="remove-food" onclick="removeFood('${foodId}'); return false;">Remove</a>
         `;
         
@@ -547,20 +557,27 @@
         document.getElementById(`selected-cat-${foodIdStr}`).textContent = foodCategory;
         document.getElementById(`selected-${foodIdStr}`).style.display = 'flex';
         document.getElementById(`results-${foodIdStr}`).classList.remove('active');
-    
+        
         let searchBox = document.querySelector(`#${foodIdStr} .food-search-box`);
         searchBox.style.display = 'none';
-    
+        
         // Load units for this food
-        loadUnitsForFood(foodId, foodIdStr);
+        loadUnits(foodId, foodIdStr);
     }
-
+    
     function changeFood(foodIdStr) {
         document.getElementById(`hidden-${foodIdStr}`).value = '';
         document.getElementById(`selected-${foodIdStr}`).style.display = 'none';
         let searchBox = document.querySelector(`#${foodIdStr} .food-search-box`);
         searchBox.style.display = 'block';
         searchBox.value = '';
+    }
+    
+    function loadUnits(foodId, foodIdStr) {
+        // This would normally fetch units from server
+        // For now, we'll keep default grams
+        let unitSelect = document.querySelector(`#${foodIdStr} .unit-select`);
+        unitSelect.innerHTML = '<option value="grams">grams (g)</option>';
     }
     
     function addFluid() {
@@ -599,7 +616,6 @@
     }
     
     function searchFluid(input, fluidId) {
-        // Common beverages
         let beverages = [
             { id: 9991, name: "Water", category: "Beverages" },
             { id: 9992, name: "Black Tea", category: "Beverages" },
@@ -652,42 +668,10 @@
     function removeFood(foodId) {
         document.getElementById(foodId).remove();
     }
-    function loadUnitsForFood(foodId, foodIdStr) {
-    // Fetch units from server
-    fetch(`/get-units/?food_id=${foodId}`)
-        .then(response => response.json())
-        .then(data => {
-            let unitSelect = document.querySelector(`#${foodIdStr} .unit-select`);
-            unitSelect.innerHTML = '<option value="grams">grams (g)</option>';
-            
-            if (data.units) {
-                data.units.forEach(unit => {
-                    let option = document.createElement('option');
-                    option.value = unit.name;
-                    option.textContent = `${unit.name} (1 = ${unit.grams}g)`;
-                    unitSelect.appendChild(option);
-                });
-            }
-        })
-        .catch(error => console.error('Error loading units:', error));
-}
-
-function setQuickMeasure(button, unit, grams) {
-    let foodEntry = button.closest('.food-entry');
-    let amountInput = foodEntry.querySelector('.amount-input');
-    let unitSelect = foodEntry.querySelector('.unit-select');
     
-    amountInput.value = 1;
-    for (let i = 0; i < unitSelect.options.length; i++) {
-        if (unitSelect.options[i].value === unit) {
-            unitSelect.selectedIndex = i;
-            break;
-        }
+    function copyLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
     }
-    
-    amountInput.style.border = "2px solid #28a745";
-    setTimeout(() => { amountInput.style.border = ""; }, 500);
-}
-
 </script>
 {% endblock %}
