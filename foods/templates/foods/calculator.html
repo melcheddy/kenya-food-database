@@ -4,142 +4,79 @@
 
 {% block extra_css %}
 <style>
-    .calculator-container {
+    .calc-container {
         max-width: 800px;
         margin: 0 auto;
         background: white;
         padding: 2rem;
         border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
     }
-    
-    h1 {
-        color: #2c5e2e;
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    
-    .subtitle {
-        color: #666;
-        margin-bottom: 2rem;
-        font-size: 1rem;
-    }
-    
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-    
-    label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #2c3e2f;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-    
-    .form-control, select, input {
+    h1 { color: #2c5e2e; margin-bottom: 0.5rem; }
+    .subtitle { color: #666; margin-bottom: 2rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+    select, input {
         width: 100%;
-        padding: 12px 16px;
+        padding: 12px;
         border: 2px solid #e9ecef;
         border-radius: 12px;
-        font-size: 1rem;
-        transition: all 0.3s;
         background: #faf7f2;
     }
-    
-    .form-control:focus, select:focus, input:focus {
+    select:focus, input:focus {
         outline: none;
         border-color: #2c5e2e;
         background: white;
     }
-    
     .food-search-box {
         width: 100%;
-        padding: 12px 16px;
+        padding: 12px;
         border: 2px solid #e9ecef;
         border-radius: 12px;
-        font-size: 1rem;
         margin-bottom: 10px;
-        background: #faf7f2;
     }
-    
     .food-select {
         width: 100%;
         padding: 12px;
         border: 2px solid #e9ecef;
         border-radius: 12px;
         height: 150px;
-        background: white;
     }
-    
-    .selected-food-display {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
+    .selected-food {
         background: #e8f0e8;
+        padding: 12px;
         border-radius: 12px;
-        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         border-left: 4px solid #2c5e2e;
     }
-    
-    .selected-food-name {
-        font-weight: 700;
-        color: #2c5e2e;
-        font-size: 1.1rem;
-    }
-    
-    .selected-food-category {
-        font-size: 0.8rem;
-        color: #666;
-    }
-    
-    .change-food-btn {
+    .change-btn {
         background: #6c757d;
         color: white;
         border: none;
         padding: 6px 14px;
         border-radius: 20px;
         cursor: pointer;
-        font-size: 0.8rem;
     }
-    
     .quick-buttons {
-        margin-top: 12px;
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+        margin-top: 10px;
     }
-    
     .quick-btn {
         background: #f0f0f0;
-        border: 1px solid #ddd;
-        padding: 6px 12px;
-        border-radius: 30px;
+        border: none;
+        padding: 5px 12px;
+        border-radius: 20px;
         font-size: 0.75rem;
         cursor: pointer;
-        transition: all 0.2s;
     }
-    
-    .quick-btn:hover {
-        background: #2c5e2e;
-        color: white;
-        border-color: #2c5e2e;
-    }
-    
-    .form-row {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .form-row .form-group {
-        flex: 1;
-        min-width: 150px;
-    }
-    
-    .calculate-btn {
+    .quick-btn:hover { background: #2c5e2e; color: white; }
+    .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .form-row .form-group { flex: 1; min-width: 150px; }
+    .calc-btn {
         width: 100%;
         padding: 14px;
         background: #2c5e2e;
@@ -150,219 +87,95 @@
         font-weight: 600;
         cursor: pointer;
         margin-top: 1rem;
-        transition: all 0.3s;
     }
-    
-    .calculate-btn:hover {
-        background: #1e421f;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(44,94,46,0.3);
+    .calc-btn:hover { background: #1e421f; }
+    .results {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 16px;
     }
-    
-    /* Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 1000;
-        align-items: center;
-        justify-content: center;
+    .result-header {
+        border-bottom: 2px solid #2c5e2e;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
     }
-    
-    .modal.active {
-        display: flex;
+    .nutrient-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
     }
-    
-    .modal-content {
+    .nutrient-card {
         background: white;
-        max-width: 500px;
-        width: 90%;
-        max-height: 80vh;
-        overflow-y: auto;
-        border-radius: 24px;
-        padding: 24px;
-        position: relative;
-        animation: slideUp 0.3s ease;
+        padding: 1rem;
+        border-radius: 12px;
     }
-    
-    @keyframes slideUp {
-        from {
-            transform: translateY(50px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-    
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid #f0f0f0;
-    }
-    
-    .modal-header h3 {
-        color: #2c5e2e;
-        margin: 0;
-        font-size: 1.3rem;
-    }
-    
-    .close-modal {
-        background: none;
-        border: none;
-        font-size: 28px;
-        cursor: pointer;
-        color: #999;
-        transition: color 0.2s;
-    }
-    
-    .close-modal:hover {
-        color: #2c5e2e;
-    }
-    
-    .result-food-name {
-        font-size: 1.2rem;
+    .nutrient-title {
         font-weight: 700;
         color: #2c5e2e;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 5px;
     }
-    
-    .result-amount {
-        color: #666;
-        font-size: 0.9rem;
-        margin-bottom: 20px;
-    }
-    
     .nutrient-row {
         display: flex;
         justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #f0f0f0;
+        padding: 6px 0;
     }
-    
-    .nutrient-name {
-        font-weight: 500;
-        color: #2c3e2f;
-    }
-    
-    .nutrient-value {
-        font-weight: 600;
-        color: #2c5e2e;
-    }
-    
-    .alert-badge {
-        background: #ffc107;
-        color: #856404;
+    .rda-badge {
+        background: #e3f2fd;
         padding: 2px 8px;
         border-radius: 20px;
         font-size: 0.7rem;
-        margin-left: 8px;
     }
-    
     .alert-low {
-        background: #dc3545;
-        color: white;
-    }
-    
-    .alert-good {
-        background: #28a745;
-        color: white;
-    }
-    
-    .rda-progress {
+        background: #ffebee;
+        color: #c62828;
+        padding: 8px;
+        border-radius: 8px;
         margin-top: 8px;
-        height: 6px;
-        background: #e9ecef;
-        border-radius: 3px;
-        overflow: hidden;
-    }
-    
-    .rda-progress-bar {
-        height: 100%;
-        background: #2c5e2e;
-        border-radius: 3px;
-        transition: width 0.3s;
-    }
-    
-    .insight-box {
-        background: #e8f0e8;
-        padding: 16px;
-        border-radius: 12px;
-        margin-top: 20px;
-        border-left: 4px solid #2c5e2e;
-    }
-    
-    .insight-box h4 {
-        margin-bottom: 8px;
-        color: #2c5e2e;
-    }
-    
-    .insight-suggestion {
-        display: inline-block;
-        background: white;
-        padding: 4px 12px;
-        border-radius: 20px;
         font-size: 0.8rem;
-        margin: 4px;
-        text-decoration: none;
-        color: #2c5e2e;
     }
-    
     @media (max-width: 600px) {
-        .calculator-container {
-            padding: 1rem;
-        }
-        
-        .form-row {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
+        .calc-container { padding: 1rem; }
+        .form-row { flex-direction: column; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="calculator-container">
+<div class="calc-container">
     <h1>🧮 Nutrient Calculator</h1>
-    <p class="subtitle">Select a food and amount to see its nutritional value</p>
+    <p class="subtitle">Select a food and portion size</p>
     
-    <form method="POST" id="calculatorForm">
+    <form method="POST">
         {% csrf_token %}
         <input type="hidden" name="food_id" id="selectedFoodId" value="{% if food_selected %}{{ food_selected.id }}{% endif %}">
         
-        <!-- Food Selection Area -->
+        <!-- Food Selection -->
         <div class="form-group">
             <label>1. Find Food</label>
             
             {% if food_selected %}
-            <div class="selected-food-display">
-                <div class="selected-food-info">
-                    <div class="selected-food-name">{{ food_selected.food_name }}</div>
-                    <div class="selected-food-category">{{ food_selected.category.name }}</div>
+            <div class="selected-food">
+                <div>
+                    <strong>{{ food_selected.food_name }}</strong><br>
+                    <small>{{ food_selected.category.name }}</small>
                 </div>
-                <button type="button" class="change-food-btn" onclick="resetFoodSelection()">Change Food</button>
+                <button type="button" class="change-btn" onclick="resetFood()">Change</button>
             </div>
             {% endif %}
             
-            <div id="foodSelectionArea" {% if food_selected %}style="display: none;"{% endif %}>
-                <input type="text" id="foodSearchInput" class="food-search-box" placeholder="Type food name (e.g., maize, beans, sukuma)">
-                <select id="foodSelectDropdown" class="food-select" size="5">
+            <div id="foodArea" {% if food_selected %}style="display: none;"{% endif %}>
+                <input type="text" id="foodSearch" class="food-search-box" placeholder="Type food name...">
+                <select name="food_id" id="foodSelect" class="food-select" size="5">
                     <option value="">-- Select a food --</option>
                     {% for food in foods %}
-                    <option value="{{ food.id }}" data-name="{{ food.food_name|lower }}" data-category="{{ food.category.name }}">
+                    <option value="{{ food.id }}" data-name="{{ food.food_name|lower }}">
                         {{ food.food_name }} ({{ food.category.name }})
                     </option>
                     {% endfor %}
                 </select>
-                <div class="helper-text" style="font-size: 0.75rem; color: #666; margin-top: 5px;">🔍 Type above to filter, then click on a food to select it</div>
             </div>
         </div>
         
@@ -370,12 +183,12 @@
         <div class="form-row">
             <div class="form-group">
                 <label>2. Amount</label>
-                <input type="number" name="amount" id="amountInput" value="{{ amount }}" min="0.1" step="0.1" class="form-control" required>
+                <input type="number" name="amount" value="{{ amount }}" step="0.1" min="0.1" required>
             </div>
             
             <div class="form-group">
                 <label>3. Unit</label>
-                <select name="unit" id="unitSelect" class="form-control" {% if not food_selected %}disabled{% endif %}>
+                <select name="unit">
                     <option value="grams" {% if unit == 'grams' %}selected{% endif %}>grams (g)</option>
                     {% for conv in available_units %}
                     <option value="{{ conv.unit_name }}" {% if unit == conv.unit_name %}selected{% endif %}>
@@ -384,13 +197,12 @@
                     {% endfor %}
                 </select>
                 
-                <!-- Quick Measure Buttons -->
                 {% if available_units %}
                 <div class="quick-buttons">
                     {% for conv in available_units %}
                         {% if conv.unit_name in 'cup,tablespoon,teaspoon,small_plate,medium_plate,large_plate,bowl,handful,piece,slice' %}
-                        <button type="button" class="quick-btn" onclick="setQuickMeasure('{{ conv.unit_name }}')">
-                            {{ conv.unit_name|cut:"_"|capfirst }}
+                        <button type="button" class="quick-btn" onclick="setQuick('{{ conv.unit_name }}')">
+                            {{ conv.unit_name }}
                         </button>
                         {% endif %}
                     {% endfor %}
@@ -403,7 +215,7 @@
         <div class="form-row">
             <div class="form-group">
                 <label>4. Gender</label>
-                <select name="gender" id="genderSelect" class="form-control">
+                <select name="gender">
                     <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
                     <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
                 </select>
@@ -411,348 +223,133 @@
             
             <div class="form-group">
                 <label>5. Age (years)</label>
-                <input type="number" name="age" id="ageInput" value="{{ age }}" min="0" max="120" step="1" class="form-control" required>
+                <input type="number" name="age" value="{{ age }}" min="0" max="120">
             </div>
         </div>
         
-        <button type="button" id="calculateBtn" class="calculate-btn" {% if not food_selected %}disabled{% endif %}>Calculate Nutrients →</button>
+        <button type="submit" class="calc-btn">Calculate Nutrients →</button>
     </form>
-</div>
-
-<!-- Modern Modal Popup -->
-<div id="resultModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>📊 Your Nutrition Results</h3>
-            <button class="close-modal" onclick="closeModal()">×</button>
+    
+    {% if result %}
+    <div class="results">
+        <div class="result-header">
+            <h3 style="margin:0;">{{ result.amount }} {{ result.unit }} {{ result.food_name }}</h3>
+            {% if result.unit != 'grams' %}
+            <small>({{ result.grams|floatformat:1 }} grams)</small>
+            {% endif %}
         </div>
-        <div id="modalContent">
-            <!-- Results will be loaded here via JavaScript -->
-            <div style="text-align: center; padding: 20px;">
-                <div class="loader">Loading...</div>
+        
+        <div class="nutrient-grid">
+            <div class="nutrient-card">
+                <div class="nutrient-title">🔥 Energy</div>
+                <div class="nutrient-row">
+                    <span>Energy:</span>
+                    <span><strong>{{ result.energy_kcal|floatformat:0 }} kcal</strong>
+                    {% if rda %}
+                    <span class="rda-badge">{{ result.energy_percent|floatformat:0 }}% RDA</span>
+                    {% endif %}
+                    </span>
+                </div>
+                {% if rda and result.energy_percent < 50 %}
+                <div class="alert-low">⚠️ Low energy intake</div>
+                {% endif %}
+            </div>
+            
+            <div class="nutrient-card">
+                <div class="nutrient-title">🥩 Protein & Carbs</div>
+                <div class="nutrient-row"><span>Protein:</span><span><strong>{{ result.protein_g|floatformat:1 }} g</strong></span></div>
+                <div class="nutrient-row"><span>Fat:</span><span><strong>{{ result.fat_g|floatformat:1 }} g</strong></span></div>
+                <div class="nutrient-row"><span>Carbs:</span><span><strong>{{ result.carbohydrate_g|floatformat:1 }} g</strong></span></div>
+                <div class="nutrient-row"><span>Fiber:</span><span><strong>{{ result.fiber_g|floatformat:1 }} g</strong></span></div>
+            </div>
+            
+            <div class="nutrient-card">
+                <div class="nutrient-title">⚡ Iron</div>
+                <div class="nutrient-row">
+                    <span>Iron:</span>
+                    <span><strong>{{ result.iron_mg|floatformat:2 }} mg</strong>
+                    {% if rda %}
+                    <span class="rda-badge">{{ result.iron_percent|floatformat:0 }}% RDA</span>
+                    {% endif %}
+                    </span>
+                </div>
+                {% if rda and result.iron_percent < 50 %}
+                <div class="alert-low">⚠️ Low iron. Try sukuma wiki, beans, or omena.</div>
+                {% endif %}
+                <div class="nutrient-row"><span>Calcium:</span><span><strong>{{ result.calcium_mg|floatformat:0 }} mg</strong></span></div>
+                <div class="nutrient-row"><span>Zinc:</span><span><strong>{{ result.zinc_mg|floatformat:2 }} mg</strong></span></div>
+            </div>
+            
+            <div class="nutrient-card">
+                <div class="nutrient-title">💊 Vitamins</div>
+                <div class="nutrient-row"><span>Vitamin A:</span><span><strong>{{ result.vitamin_a_rae_ug|floatformat:0 }} µg</strong></span></div>
+                <div class="nutrient-row"><span>Vitamin C:</span><span><strong>{{ result.vitamin_c_mg|floatformat:1 }} mg</strong></span></div>
+                <div class="nutrient-row"><span>Folate:</span><span><strong>{{ result.folate_ug|floatformat:0 }} µg</strong></span></div>
             </div>
         </div>
+        
+        {% if rda %}
+        <div style="margin-top: 15px; padding: 12px; background: #e8f0e8; border-radius: 12px;">
+            📊 Based on {{ gender }}, {{ age }} years
+        </div>
+        {% endif %}
+        
+        <!-- Share -->
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="https://wa.me/?text={{ result.amount }}%20{{ result.unit }}%20{{ result.food_name|urlencode }}%20has%20{{ result.energy_kcal|floatformat:0 }}%20kcal%20and%20{{ result.iron_mg|floatformat:1 }}mg%20iron%20{{ request.build_absolute_uri|urlencode }}"
+               target="_blank" style="background:#25D366; color:white; padding:6px 14px; border-radius:50px; text-decoration:none; display:inline-block; margin:4px;">💬 WhatsApp</a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
+               target="_blank" style="background:#1877F2; color:white; padding:6px 14px; border-radius:50px; text-decoration:none; display:inline-block; margin:4px;">📘 Facebook</a>
+            <button onclick="copyLink()" style="background:#6c757d; color:white; border:none; padding:6px 14px; border-radius:50px; cursor:pointer;">🔗 Copy Link</button>
+        </div>
     </div>
+    {% endif %}
 </div>
 
 <script>
-    // Get DOM elements
-    const foodSearchInput = document.getElementById('foodSearchInput');
-    const foodSelectDropdown = document.getElementById('foodSelectDropdown');
-    const selectedFoodId = document.getElementById('selectedFoodId');
-    const unitSelect = document.getElementById('unitSelect');
-    const calculateBtn = document.getElementById('calculateBtn');
-    const amountInput = document.getElementById('amountInput');
-    const genderSelect = document.getElementById('genderSelect');
-    const ageInput = document.getElementById('ageInput');
-    const modal = document.getElementById('resultModal');
-    
-    // Food search filtering
-    if (foodSearchInput) {
-        foodSearchInput.addEventListener('keyup', function() {
-            const searchText = this.value.toLowerCase();
-            const options = foodSelectDropdown.options;
-            
-            for (let i = 0; i < options.length; i++) {
-                const foodName = options[i].getAttribute('data-name') || options[i].text.toLowerCase();
-                if (searchText.length === 0 || foodName.includes(searchText)) {
-                    options[i].style.display = 'block';
-                } else {
-                    options[i].style.display = 'none';
-                }
+    // Search filter
+    const search = document.getElementById('foodSearch');
+    const select = document.getElementById('foodSelect');
+    if (search) {
+        search.addEventListener('keyup', function() {
+            const text = this.value.toLowerCase();
+            for (let i = 0; i < select.options.length; i++) {
+                const name = select.options[i].getAttribute('data-name') || select.options[i].text.toLowerCase();
+                select.options[i].style.display = name.includes(text) ? 'block' : 'none';
             }
         });
     }
     
-    // Food selection
-    if (foodSelectDropdown) {
-        foodSelectDropdown.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            if (selectedOption.value) {
-                selectedFoodId.value = selectedOption.value;
-                // Reload to get units
-                location.reload();
-            }
+    // Select food
+    if (select) {
+        select.addEventListener('change', function() {
+            if (this.value) this.form.submit();
         });
     }
     
-    // Reset food selection
-    window.resetFoodSelection = function() {
-        selectedFoodId.value = '';
-        document.getElementById('foodSelectionArea').style.display = 'block';
-        const displayDiv = document.querySelector('.selected-food-display');
-        if (displayDiv) displayDiv.remove();
-        unitSelect.disabled = true;
-        calculateBtn.disabled = true;
-        location.reload();
+    // Reset
+    window.resetFood = function() {
+        document.getElementById('selectedFoodId').value = '';
+        document.getElementById('foodArea').style.display = 'block';
+        document.querySelector('.selected-food')?.remove();
+        document.querySelector('form').submit();
     };
     
-    // Quick measure function
-    window.setQuickMeasure = function(unit) {
-        amountInput.value = 1;
+    // Quick measure
+    window.setQuick = function(unit) {
+        document.querySelector('input[name="amount"]').value = 1;
+        const unitSelect = document.querySelector('select[name="unit"]');
         for (let i = 0; i < unitSelect.options.length; i++) {
             if (unitSelect.options[i].value === unit) {
                 unitSelect.selectedIndex = i;
                 break;
             }
         }
-        amountInput.style.border = "2px solid #28a745";
-        setTimeout(() => { amountInput.style.border = ""; }, 500);
     };
     
-    // Calculate button - AJAX call with popup
-    if (calculateBtn) {
-        calculateBtn.addEventListener('click', function(e) {
-            if (!selectedFoodId.value) {
-                alert('Please select a food first');
-                return;
-            }
-            
-            // Show loading modal
-            document.getElementById('modalContent').innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <div style="font-size: 2rem;">🧮</div>
-                    <div style="margin-top: 16px;">Calculating your nutrition...</div>
-                </div>
-            `;
-            modal.classList.add('active');
-            
-            // Prepare form data
-            const formData = new FormData();
-            formData.append('food_id', selectedFoodId.value);
-            formData.append('amount', amountInput.value);
-            formData.append('unit', unitSelect.value);
-            formData.append('gender', genderSelect.value);
-            formData.append('age', ageInput.value);
-            
-            // Send AJAX request
-            fetch(window.location.href, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    displayResults(data);
-                } else {
-                    displayError(data.error || 'Something went wrong');
-                }
-            })
-            .catch(error => {
-                displayError('Network error. Please try again.');
-            });
-        });
+    function copyLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Link copied!');
     }
-    
-    function displayResults(data) {
-        const result = data.result;
-        const rda = data.rda;
-        
-        let html = `
-            <div class="result-food-name">${result.food_name}</div>
-            <div class="result-amount">${result.amount} ${result.unit} ${result.amount !== result.grams ? `(${result.grams}g)` : ''}</div>
-        `;
-        
-        // Energy
-        const energyPercent = rda ? (result.energy_kcal / rda.energy_kcal * 100) : null;
-        html += `
-            <div class="nutrient-row">
-                <span class="nutrient-name">🔥 Energy</span>
-                <span class="nutrient-value">${result.energy_kcal.toFixed(0)} kcal</span>
-            </div>
-        `;
-        if (energyPercent) {
-            html += `
-                <div class="rda-progress">
-                    <div class="rda-progress-bar" style="width: ${Math.min(energyPercent, 100)}%"></div>
-                </div>
-                <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">
-                    ${energyPercent.toFixed(0)}% of daily needs
-                    ${energyPercent < 50 ? '<span class="alert-badge alert-low">⚠️ Low</span>' : ''}
-                    ${energyPercent > 100 ? '<span class="alert-badge">💪 High</span>' : ''}
-                </div>
-            `;
-        }
-        
-        // Protein
-        const proteinPercent = rda ? (result.protein_g / rda.protein_g * 100) : null;
-        html += `
-            <div class="nutrient-row">
-                <span class="nutrient-name">🥩 Protein</span>
-                <span class="nutrient-value">${result.protein_g.toFixed(1)} g</span>
-            </div>
-        `;
-        if (proteinPercent) {
-            html += `
-                <div class="rda-progress">
-                    <div class="rda-progress-bar" style="width: ${Math.min(proteinPercent, 100)}%"></div>
-                </div>
-                <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">
-                    ${proteinPercent.toFixed(0)}% of daily needs
-                    ${proteinPercent < 50 ? '<span class="alert-badge alert-low">⚠️ Low</span>' : ''}
-                </div>
-            `;
-        }
-        
-        // Iron
-        const ironPercent = rda ? (result.iron_mg / rda.iron_mg * 100) : null;
-        html += `
-            <div class="nutrient-row">
-                <span class="nutrient-name">⚡ Iron</span>
-                <span class="nutrient-value">${result.iron_mg.toFixed(2)} mg</span>
-            </div>
-        `;
-        if (ironPercent) {
-            html += `
-                <div class="rda-progress">
-                    <div class="rda-progress-bar" style="width: ${Math.min(ironPercent, 100)}%"></div>
-                </div>
-                <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">
-                    ${ironPercent.toFixed(0)}% of daily needs
-                    ${ironPercent < 50 ? '<span class="alert-badge alert-low">⚠️ Low</span>' : ''}
-                </div>
-            `;
-        }
-        
-        // Calcium
-        if (result.calcium_mg) {
-            const calciumPercent = rda ? (result.calcium_mg / rda.calcium_mg * 100) : null;
-            html += `
-                <div class="nutrient-row">
-                    <span class="nutrient-name">🦴 Calcium</span>
-                    <span class="nutrient-value">${result.calcium_mg.toFixed(1)} mg</span>
-                </div>
-            `;
-            if (calciumPercent) {
-                html += `
-                    <div class="rda-progress">
-                        <div class="rda-progress-bar" style="width: ${Math.min(calciumPercent, 100)}%"></div>
-                    </div>
-                    <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">
-                        ${calciumPercent.toFixed(0)}% of daily needs
-                        ${calciumPercent < 50 ? '<span class="alert-badge alert-low">⚠️ Low</span>' : ''}
-                    </div>
-                `;
-            }
-        }
-        
-        // Fiber
-        if (result.fiber_g) {
-            html += `
-                <div class="nutrient-row">
-                    <span class="nutrient-name">🌾 Fiber</span>
-                    <span class="nutrient-value">${result.fiber_g.toFixed(1)} g</span>
-                </div>
-            `;
-        }
-        
-        // Vitamin A
-        if (result.vitamin_a_rae_ug) {
-            html += `
-                <div class="nutrient-row">
-                    <span class="nutrient-name">🥕 Vitamin A</span>
-                    <span class="nutrient-value">${result.vitamin_a_rae_ug.toFixed(1)} µg</span>
-                </div>
-            `;
-        }
-        
-        // Vitamin C
-        if (result.vitamin_c_mg) {
-            html += `
-                <div class="nutrient-row">
-                    <span class="nutrient-name">🍊 Vitamin C</span>
-                    <span class="nutrient-value">${result.vitamin_c_mg.toFixed(1)} mg</span>
-                </div>
-            `;
-        }
-        
-        // Insights
-        html += `<div class="insight-box">`;
-        html += `<h4>💡 Nutrition Insights</h4>`;
-        
-        // Smart suggestions based on deficiencies
-        if (ironPercent && ironPercent < 50) {
-            html += `<p>⚠️ Your iron intake is low. Try adding:</p>`;
-            html += `<div>`;
-            html += `<a href="#" class="insight-suggestion" onclick="searchAndClose('sukuma wiki')">🥬 Sukuma wiki</a>`;
-            html += `<a href="#" class="insight-suggestion" onclick="searchAndClose('beans')">🫘 Beans</a>`;
-            html += `<a href="#" class="insight-suggestion" onclick="searchAndClose('dagaa')">🐟 Dagaa (omena)</a>`;
-            html += `</div>`;
-        } else if (ironPercent && ironPercent > 80) {
-            html += `<p>✅ Great! Your iron intake is good. Iron helps carry oxygen in your blood.</p>`;
-        }
-        
-        if (proteinPercent && proteinPercent < 50) {
-            html += `<p>⚠️ Your protein intake is low. Try adding:</p>`;
-            html += `<div>`;
-            html += `<a href="#" class="insight-suggestion" onclick="searchAndClose('beans')">🫘 Beans</a>`;
-            html += `<a href="#" class="insight-suggestion" onclick="searchAndClose('eggs')">🥚 Eggs</a>`;
-            html += `<a href="#" class="insight-suggestion" onclick="searchAndClose('chicken')">🍗 Chicken</a>`;
-            html += `</div>`;
-        }
-        
-        if (result.fiber_g && result.fiber_g < 5) {
-            html += `<p>🌾 Add more fiber to your diet with whole grains, beans, and vegetables.</p>`;
-        }
-        
-        html += `</div>`;
-        
-        // Share buttons
-        html += `
-            <div style="margin-top: 20px; text-align: center;">
-                <button onclick="shareResults()" style="background: #25D366; color: white; border: none; padding: 8px 16px; border-radius: 50px; margin: 4px; cursor: pointer;">
-                    💬 Share via WhatsApp
-                </button>
-                <button onclick="copyResults()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 50px; margin: 4px; cursor: pointer;">
-                    🔗 Copy Results
-                </button>
-            </div>
-        `;
-        
-        document.getElementById('modalContent').innerHTML = html;
-    }
-    
-    function displayError(message) {
-        document.getElementById('modalContent').innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <div style="font-size: 3rem;">😕</div>
-                <div style="margin-top: 16px; color: #dc3545;">${message}</div>
-                <button onclick="closeModal()" style="margin-top: 20px; padding: 8px 24px; background: #2c5e2e; color: white; border: none; border-radius: 50px; cursor: pointer;">Close</button>
-            </div>
-        `;
-    }
-    
-    function closeModal() {
-        modal.classList.remove('active');
-    }
-    
-    function shareResults() {
-        const url = window.location.href;
-        const text = document.querySelector('.result-food-name')?.innerText || 'Check out this nutrition calculation';
-        window.open(`https://wa.me/?text=${encodeURIComponent(text + ' - ' + url)}`, '_blank');
-    }
-    
-    function copyResults() {
-        const content = document.querySelector('#modalContent .result-food-name')?.innerText || '';
-        const nutrients = Array.from(document.querySelectorAll('.nutrient-row')).map(row => row.innerText).join('\n');
-        const text = `${content}\n\n${nutrients}\n\nFrom Kenya Food Database`;
-        navigator.clipboard.writeText(text);
-        alert('Results copied to clipboard!');
-    }
-    
-    function searchAndClose(query) {
-        closeModal();
-        window.location.href = `/search/?q=${encodeURIComponent(query)}`;
-    }
-    
-    // Close modal when clicking outside
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
 </script>
 {% endblock %}
