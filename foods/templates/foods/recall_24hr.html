@@ -223,7 +223,7 @@
     .calculate-recall-btn {
         width: 100%;
         padding: 15px;
-        background: #667eea;
+        background: #2c5e2e;
         color: white;
         border: none;
         border-radius: 8px;
@@ -263,7 +263,7 @@
     .nutrient-value {
         font-size: 24px;
         font-weight: 700;
-        color: #667eea;
+        color: #2c5e2e;
     }
     
     .nutrient-label {
@@ -272,10 +272,17 @@
         margin-top: 5px;
     }
     
-    .rda-percent {
-        font-size: 12px;
-        color: #28a745;
-        margin-top: 5px;
+    /* RDI Grid Styles */
+    .rdi-grid {
+        display: grid;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    @media (min-width: 768px) {
+        .rdi-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
     
     @media (max-width: 480px) {
@@ -427,7 +434,107 @@
             </p>
         </div>
         
-        <!-- Improvement Suggestions -->
+        <!-- RDI Analysis -->
+        {% if results.rdi %}
+        <div style="margin-top: 30px; padding: 20px; background: #e8f0e8; border-radius: 16px;">
+            <h3 style="color: #2c5e2e; margin-bottom: 15px;">📊 RDI Analysis (Daily Needs)</h3>
+            <p style="margin-bottom: 15px; color: #666;">Based on: {{ results.gender }}, {{ results.age }} years</p>
+            
+            <div class="rdi-grid">
+                <!-- Energy -->
+                <div style="background: white; padding: 15px; border-radius: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-weight: 600;">🔥 Energy</span>
+                        <span>{{ results.total_energy|floatformat:0 }} / {{ results.rdi.energy_kcal }} kcal</span>
+                    </div>
+                    <div style="background: #e9ecef; height: 10px; border-radius: 5px; overflow: hidden;">
+                        <div style="background: {% if results.rdi_percentages.energy_percent < 70 %}#dc3545{% elif results.rdi_percentages.energy_percent > 130 %}#ffc107{% else %}#28a745{% endif %}; 
+                                    width: {% if results.rdi_percentages.energy_percent > 100 %}100{% else %}{{ results.rdi_percentages.energy_percent }}{% endif %}%; 
+                                    height: 10px;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 0.85rem;">
+                        {{ results.rdi_percentages.energy_percent|floatformat:0 }}% of daily needs
+                    </div>
+                </div>
+                
+                <!-- Protein -->
+                <div style="background: white; padding: 15px; border-radius: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-weight: 600;">🥩 Protein</span>
+                        <span>{{ results.total_protein|floatformat:1 }} / {{ results.rdi.protein_g }} g</span>
+                    </div>
+                    <div style="background: #e9ecef; height: 10px; border-radius: 5px; overflow: hidden;">
+                        <div style="background: {% if results.rdi_percentages.protein_percent < 70 %}#dc3545{% else %}#28a745{% endif %}; 
+                                    width: {% if results.rdi_percentages.protein_percent > 100 %}100{% else %}{{ results.rdi_percentages.protein_percent }}{% endif %}%; 
+                                    height: 10px;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 0.85rem;">
+                        {{ results.rdi_percentages.protein_percent|floatformat:0 }}% of daily needs
+                    </div>
+                </div>
+                
+                <!-- Iron -->
+                <div style="background: white; padding: 15px; border-radius: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-weight: 600;">⚡ Iron</span>
+                        <span>{{ results.total_iron|floatformat:1 }} / {{ results.rdi.iron_mg }} mg</span>
+                    </div>
+                    <div style="background: #e9ecef; height: 10px; border-radius: 5px; overflow: hidden;">
+                        <div style="background: {% if results.rdi_percentages.iron_percent < 70 %}#dc3545{% else %}#28a745{% endif %}; 
+                                    width: {% if results.rdi_percentages.iron_percent > 100 %}100{% else %}{{ results.rdi_percentages.iron_percent }}{% endif %}%; 
+                                    height: 10px;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 0.85rem;">
+                        {{ results.rdi_percentages.iron_percent|floatformat:0 }}% of daily needs
+                    </div>
+                </div>
+                
+                <!-- Calcium -->
+                <div style="background: white; padding: 15px; border-radius: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-weight: 600;">🦴 Calcium</span>
+                        <span>{{ results.total_calcium|floatformat:0 }} / {{ results.rdi.calcium_mg }} mg</span>
+                    </div>
+                    <div style="background: #e9ecef; height: 10px; border-radius: 5px; overflow: hidden;">
+                        <div style="background: {% if results.rdi_percentages.calcium_percent < 70 %}#dc3545{% else %}#28a745{% endif %}; 
+                                    width: {% if results.rdi_percentages.calcium_percent > 100 %}100{% else %}{{ results.rdi_percentages.calcium_percent }}{% endif %}%; 
+                                    height: 10px;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 0.85rem;">
+                        {{ results.rdi_percentages.calcium_percent|floatformat:0 }}% of daily needs
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actionable Suggestions -->
+            <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 12px;">
+                <h4 style="color: #2c5e2e; margin-bottom: 12px;">💡 How to Improve</h4>
+                {% for msg in results.status_messages %}
+                <div style="margin-bottom: 12px; padding: 8px; background: 
+                    {% if msg.status == 'low' %}#ffebee{% elif msg.status == 'high' %}#fff3cd{% else %}#e8f5e9{% endif %}; 
+                    border-radius: 8px;">
+                    <p style="margin: 0; font-size: 0.9rem;">{{ msg.message }}</p>
+                    {% if msg.suggestions %}
+                    <div style="margin-top: 8px;">
+                        {% for suggestion in msg.suggestions %}
+                        <a href="{% url 'search' %}?q={{ suggestion }}" 
+                           style="display: inline-block; background: #f0f0f0; padding: 4px 12px; border-radius: 20px; margin: 4px; text-decoration: none; color: #2c5e2e; font-size: 0.8rem;">
+                            + {{ suggestion }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Improvement Suggestions (Nutrient-based) -->
         {% if results.improvements %}
         <div style="margin-top: 30px; padding: 20px; background: #e8f4fd; border-radius: 12px;">
             <h3 style="color: #2c3e50; margin-bottom: 15px;">💡 How to Improve Your Nutrition</h3>
@@ -561,7 +668,6 @@
         let searchBox = document.querySelector(`#${foodIdStr} .food-search-box`);
         searchBox.style.display = 'none';
         
-        // Load units for this food
         loadUnits(foodId, foodIdStr);
     }
     
@@ -574,8 +680,6 @@
     }
     
     function loadUnits(foodId, foodIdStr) {
-        // This would normally fetch units from server
-        // For now, we'll keep default grams
         let unitSelect = document.querySelector(`#${foodIdStr} .unit-select`);
         unitSelect.innerHTML = '<option value="grams">grams (g)</option>';
     }
