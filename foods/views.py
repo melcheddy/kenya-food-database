@@ -40,7 +40,6 @@ def food_detail(request, food_id):
     viewed.append(food.food_name)
     request.session['viewed_foods'] = viewed[-10:]
     
-    # Detect if user is budget-conscious
     affordable_keywords = ['maize', 'beans', 'sukuma', 'cabbage', 'dagaa', 'omena', 
                            'sweet potato', 'cassava', 'spinach', 'amaranth']
     
@@ -54,13 +53,11 @@ def food_detail(request, food_id):
     is_budget_conscious = affordable_count >= 4
     print(f"Budget-conscious: {is_budget_conscious} (viewed {affordable_count} affordable foods)")
     
-    # Get cost of current food
     current_cost = get_cost_tag(food.food_name)
     
     swap_suggestions = []
     food_name_lower = food.food_name.lower()
     
-    # Check for direct swaps
     for keyword, swaps in SWAP_SUGGESTIONS.items():
         if keyword in food_name_lower:
             for swap in swaps:
@@ -84,7 +81,6 @@ def food_detail(request, food_id):
                 except:
                     pass
     
-    # Add cost-aware suggestions for high-cost foods
     if current_cost == 'high':
         affordable_swaps = [
             ('beans', 'Affordable plant protein — 1/4 the price of meat'),
@@ -106,7 +102,6 @@ def food_detail(request, food_id):
             except:
                 pass
     
-    # Check for nutrient-based swaps
     if len(swap_suggestions) < 3:
         if food.iron_mg < 2.0:
             for swap_name, benefit in NUTRIENT_SWAPS['low_iron']:
@@ -160,7 +155,6 @@ def nutrient_calculator(request):
     if request.method == 'POST':
         food_id = request.POST.get('food_id')
         
-        # Handle no food selected (Change button)
         if not food_id:
             gender = request.POST.get('gender', 'female')
             try:
@@ -189,7 +183,6 @@ def nutrient_calculator(request):
             food_selected = Food.objects.get(id=food_id)
             available_units = UnitConversion.objects.filter(food=food_selected)
             
-            # Convert to grams
             grams = amount
             if unit != 'grams':
                 try:
@@ -198,20 +191,17 @@ def nutrient_calculator(request):
                 except UnitConversion.DoesNotExist:
                     grams = amount
             
-            # Calculate nutrients — THIS IS YOUR RESULT DICTIONARY
             result = {
                 'food_name': food_selected.food_name,
                 'amount': amount,
                 'unit': unit,
                 'grams': grams,
-                # Proximates
                 'energy_kcal': (grams / 100) * food_selected.energy_kcal,
                 'protein_g': (grams / 100) * food_selected.protein_g,
                 'fat_g': (grams / 100) * food_selected.fat_g,
                 'carbohydrate_g': (grams / 100) * food_selected.carbohydrate_g,
                 'fiber_g': (grams / 100) * food_selected.fiber_g,
                 'water_g': (grams / 100) * food_selected.water_g,
-                # Minerals
                 'iron_mg': (grams / 100) * food_selected.iron_mg,
                 'calcium_mg': (grams / 100) * food_selected.calcium_mg,
                 'magnesium_mg': (grams / 100) * food_selected.magnesium_mg,
@@ -219,7 +209,6 @@ def nutrient_calculator(request):
                 'potassium_mg': (grams / 100) * food_selected.potassium_mg,
                 'sodium_mg': (grams / 100) * food_selected.sodium_mg,
                 'zinc_mg': (grams / 100) * food_selected.zinc_mg,
-                # Vitamins
                 'vitamin_a_rae_ug': (grams / 100) * food_selected.vitamin_a_rae_ug,
                 'thiamin_mg': (grams / 100) * food_selected.thiamin_mg,
                 'riboflavin_mg': (grams / 100) * food_selected.riboflavin_mg,
@@ -230,7 +219,6 @@ def nutrient_calculator(request):
                 'vitamin_c_mg': (grams / 100) * food_selected.vitamin_c_mg,
             }
             
-            # Get RDA based on age and gender
             if age < 19:
                 if gender == 'female':
                     rda = {'energy_kcal': 2000, 'protein_g': 46, 'iron_mg': 15, 'calcium_mg': 1300}
@@ -245,16 +233,15 @@ def nutrient_calculator(request):
             result['energy_percent'] = (result['energy_kcal'] / rda['energy_kcal']) * 100
             result['iron_percent'] = (result['iron_mg'] / rda['iron_mg']) * 100 if rda['iron_mg'] > 0 else 0
             
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'result': result,
+                    'rda': rda,
+                })
+            
         except Food.DoesNotExist:
             pass
-    
-    # Prepare AJAX response if needed
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return JsonResponse({
-            'success': True,
-            'result': result,
-            'rda': rda,
-        })
     
     return render(request, 'foods/calculator.html', {
         'foods': foods,
@@ -285,12 +272,10 @@ def recall_24hr(request):
     results = None
     
     if request.method == 'POST':
-        # Get user info
         name = request.POST.get('name', '')
         age = request.POST.get('age', '')
         gender = request.POST.get('gender', 'female')
         
-        # Initialize totals
         total_energy = 0
         total_protein = 0
         total_iron = 0
@@ -299,13 +284,11 @@ def recall_24hr(request):
         total_vitamin_a = 0
         total_fluid_ml = 0
         
-        # Convert age to int if provided
         try:
             age = int(age) if age else 30
         except ValueError:
             age = 30
         
-        # Process fluids first
         fluid_ids = request.POST.getlist('fluid_id[]')
         fluid_amounts = request.POST.getlist('fluid_amount[]')
         fluid_units = request.POST.getlist('fluid_unit[]')
@@ -327,7 +310,6 @@ def recall_24hr(request):
                 except (ValueError, IndexError):
                     pass
         
-        # Process foods from all meals
         for meal in meals:
             meal_id = meal['id']
             food_ids = request.POST.getlist(f'food_id_{meal_id}[]')
@@ -344,10 +326,7 @@ def recall_24hr(request):
                         grams = amount
                         if unit != 'grams':
                             try:
-                                conversion = UnitConversion.objects.get(
-                                    food=food,
-                                    unit_name=unit
-                                )
+                                conversion = UnitConversion.objects.get(food=food, unit_name=unit)
                                 grams = amount * conversion.grams
                             except UnitConversion.DoesNotExist:
                                 grams = amount
@@ -363,7 +342,6 @@ def recall_24hr(request):
                     except (Food.DoesNotExist, ValueError):
                         pass
         
-        # Hydration AI
         if age < 4:
             ai_liters = 1.3
         elif age < 9:
@@ -378,7 +356,6 @@ def recall_24hr(request):
         total_fluid_l = total_fluid_ml / 1000
         fluid_percent = (total_fluid_l / ai_liters) * 100 if ai_liters > 0 else 0
         
-        # Prepare results
         results = {
             'total_energy': total_energy,
             'total_protein': total_protein,
@@ -395,7 +372,6 @@ def recall_24hr(request):
             'gender': gender,
         }
         
-        # Hydration message
         if fluid_percent < 80:
             results['hydration_message'] = '⚠️ You might be running low on fluids. Try to drink more water throughout the day.'
         elif fluid_percent <= 120:
@@ -403,126 +379,43 @@ def recall_24hr(request):
         else:
             results['hydration_message'] = '💧 You\'re well hydrated!'
         
-        # ===== RDI ANALYSIS =====
+        # RDI analysis
         if gender == 'female':
             if age < 19:
-                rdi = {
-                    'energy_kcal': 2000,
-                    'protein_g': 46,
-                    'iron_mg': 15,
-                    'calcium_mg': 1300,
-                    'vitamin_a_rae_ug': 600,
-                    'vitamin_c_mg': 45,
-                    'fiber_g': 25,
-                }
+                rdi = {'energy_kcal': 2000, 'protein_g': 46, 'iron_mg': 15, 'calcium_mg': 1300}
             else:
-                rdi = {
-                    'energy_kcal': 2100,
-                    'protein_g': 46,
-                    'iron_mg': 29,
-                    'calcium_mg': 1000,
-                    'vitamin_a_rae_ug': 500,
-                    'vitamin_c_mg': 45,
-                    'fiber_g': 25,
-                }
+                rdi = {'energy_kcal': 2100, 'protein_g': 46, 'iron_mg': 29, 'calcium_mg': 1000}
         else:
             if age < 19:
-                rdi = {
-                    'energy_kcal': 2400,
-                    'protein_g': 52,
-                    'iron_mg': 11,
-                    'calcium_mg': 1300,
-                    'vitamin_a_rae_ug': 700,
-                    'vitamin_c_mg': 45,
-                    'fiber_g': 31,
-                }
+                rdi = {'energy_kcal': 2400, 'protein_g': 52, 'iron_mg': 11, 'calcium_mg': 1300}
             else:
-                rdi = {
-                    'energy_kcal': 2500,
-                    'protein_g': 56,
-                    'iron_mg': 11,
-                    'calcium_mg': 1000,
-                    'vitamin_a_rae_ug': 600,
-                    'vitamin_c_mg': 45,
-                    'fiber_g': 30,
-                }
-        
-        # Calculate percentages
-        rdi_percentages = {
-            'energy_percent': (total_energy / rdi['energy_kcal']) * 100 if rdi['energy_kcal'] > 0 else 0,
-            'protein_percent': (total_protein / rdi['protein_g']) * 100 if rdi['protein_g'] > 0 else 0,
-            'iron_percent': (total_iron / rdi['iron_mg']) * 100 if rdi['iron_mg'] > 0 else 0,
-            'calcium_percent': (total_calcium / rdi['calcium_mg']) * 100 if rdi['calcium_mg'] > 0 else 0,
-        }
+                rdi = {'energy_kcal': 2500, 'protein_g': 56, 'iron_mg': 11, 'calcium_mg': 1000}
         
         results['rdi'] = rdi
-        results['rdi_percentages'] = rdi_percentages
+        results['rdi_percentages'] = {
+            'energy_percent': (total_energy / rdi['energy_kcal']) * 100,
+            'protein_percent': (total_protein / rdi['protein_g']) * 100,
+            'iron_percent': (total_iron / rdi['iron_mg']) * 100,
+            'calcium_percent': (total_calcium / rdi['calcium_mg']) * 100,
+        }
         
-        # Status messages
         results['status_messages'] = []
         
-        if rdi_percentages['iron_percent'] < 70:
+        if results['rdi_percentages']['iron_percent'] < 70:
             results['status_messages'].append({
                 'nutrient': 'Iron',
                 'status': 'low',
-                'message': f"⚠️ Your iron intake ({total_iron:.1f}mg) is only {rdi_percentages['iron_percent']:.0f}% of daily needs.",
-                'suggestions': ['sukuma wiki', 'beans', 'dagaa omena', 'whole maize flour']
-            })
-        elif rdi_percentages['iron_percent'] > 130:
-            results['status_messages'].append({
-                'nutrient': 'Iron',
-                'status': 'high',
-                'message': f"✅ Your iron intake ({total_iron:.1f}mg) is good at {rdi_percentages['iron_percent']:.0f}% of daily needs."
-            })
-        else:
-            results['status_messages'].append({
-                'nutrient': 'Iron',
-                'status': 'good',
-                'message': f"✅ Your iron intake ({total_iron:.1f}mg) meets {rdi_percentages['iron_percent']:.0f}% of daily needs."
+                'message': f"⚠️ Your iron intake ({total_iron:.1f}mg) is only {results['rdi_percentages']['iron_percent']:.0f}% of daily needs.",
+                'suggestions': ['sukuma wiki', 'beans', 'dagaa omena']
             })
         
-        if rdi_percentages['protein_percent'] < 70:
-            results['status_messages'].append({
-                'nutrient': 'Protein',
-                'status': 'low',
-                'message': f"⚠️ Your protein intake ({total_protein:.1f}g) is only {rdi_percentages['protein_percent']:.0f}% of daily needs.",
-                'suggestions': ['beans', 'eggs', 'chicken', 'fish']
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'results': results,
+                'name': name or 'there',
             })
-        else:
-            results['status_messages'].append({
-                'nutrient': 'Protein',
-                'status': 'good',
-                'message': f"✅ Your protein intake ({total_protein:.1f}g) meets {rdi_percentages['protein_percent']:.0f}% of daily needs."
-            })
-        
-        if rdi_percentages['energy_percent'] < 70:
-            results['status_messages'].append({
-                'nutrient': 'Energy',
-                'status': 'low',
-                'message': f"⚠️ Your energy intake ({total_energy:.0f}kcal) is only {rdi_percentages['energy_percent']:.0f}% of daily needs.",
-                'suggestions': ['ugali', 'rice', 'chapati', 'sweet potato']
-            })
-        elif rdi_percentages['energy_percent'] > 130:
-            results['status_messages'].append({
-                'nutrient': 'Energy',
-                'status': 'high',
-                'message': f"⚠️ Your energy intake ({total_energy:.0f}kcal) is {rdi_percentages['energy_percent']:.0f}% of daily needs — you may be overeating."
-            })
-        else:
-            results['status_messages'].append({
-                'nutrient': 'Energy',
-                'status': 'good',
-                'message': f"✅ Your energy intake ({total_energy:.0f}kcal) meets {rdi_percentages['energy_percent']:.0f}% of daily needs."
-            })
-
-    # After calculating results, if AJAX request, return JSON
-if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-    return JsonResponse({
-        'success': True,
-        'results': results,
-        'name': name or 'there',  # Personalized greeting
-    })
-
+    
     return render(request, 'foods/recall_24hr.html', {
         'foods': foods,
         'meals': meals,
@@ -554,9 +447,6 @@ def compare_foods(request):
                         {'name': 'Fiber (g)', 'key': 'fiber_g', 'unit': 'g', 'higher_is': 'better'},
                         {'name': 'Iron (mg)', 'key': 'iron_mg', 'unit': 'mg', 'higher_is': 'better'},
                         {'name': 'Calcium (mg)', 'key': 'calcium_mg', 'unit': 'mg', 'higher_is': 'better'},
-                        {'name': 'Vitamin A (µg)', 'key': 'vitamin_a_rae_ug', 'unit': 'µg', 'higher_is': 'better'},
-                        {'name': 'Vitamin C (mg)', 'key': 'vitamin_c_mg', 'unit': 'mg', 'higher_is': 'better'},
-                        {'name': 'Zinc (mg)', 'key': 'zinc_mg', 'unit': 'mg', 'higher_is': 'better'},
                     ]
                     
                     comparison = []
@@ -601,7 +491,6 @@ def compare_foods(request):
                     if not messages:
                         messages.append("💡 These foods have similar nutritional profiles.")
                     
-                    # AJAX response
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                         return JsonResponse({
                             'success': True,
@@ -634,6 +523,7 @@ def compare_foods(request):
             'comparison': None,
             'messages': ['Error loading compare page. Please try again.'],
         })
+
 def get_units(request):
     """Return available units for a food as JSON"""
     food_id = request.GET.get('food_id')
