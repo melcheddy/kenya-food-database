@@ -4,6 +4,41 @@
 
 {% block extra_css %}
 <style>
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.category-card {
+    background: white;
+    padding: 1rem;
+    border-radius: 16px;
+    text-align: center;
+    text-decoration: none;
+    color: #2c3e2f;
+    transition: all 0.2s;
+    border: 1px solid #e9ecef;
+}
+
+.category-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border-color: #2c5e2e;
+}
+
+.category-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.category-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
     .hero {
         text-align: center;
         padding: 3rem 1rem;
@@ -208,17 +243,47 @@
 </div>
 
 <h2 style="color: #2c3e2f; margin: 1rem 0;">📂 Browse by Category</h2>
-<div class="categories">
-    <a href="{% url 'search' %}?category=1" class="category-card">🌽 Cereals</a>
-    <a href="{% url 'search' %}?category=2" class="category-card">🥔 Roots & Tubers</a>
-    <a href="{% url 'search' %}?category=3" class="category-card">🫘 Legumes</a>
-    <a href="{% url 'search' %}?category=4" class="category-card">🥬 Vegetables</a>
-    <a href="{% url 'search' %}?category=5" class="category-card">🍎 Fruits</a>
-    <a href="{% url 'search' %}?category=6" class="category-card">🥩 Meat & Poultry</a>
-    <a href="{% url 'search' %}?category=7" class="category-card">🐟 Fish</a>
-    <a href="{% url 'search' %}?category=8" class="category-card">🥚 Eggs</a>
-    <a href="{% url 'search' %}?category=9" class="category-card">🥛 Dairy</a>
-    <a href="{% url 'search' %}?category=10" class="category-card">🫒 Fats & Oils</a>
+<div class="categories-grid">
+    <a href="{% url 'search' %}?category=1" class="category-card">
+        <span class="category-icon">🌾</span>
+        <span class="category-name">Cereals</span>
+    </a>
+    <a href="{% url 'search' %}?category=2" class="category-card">
+        <span class="category-icon">🥔</span>
+        <span class="category-name">Roots & Tubers</span>
+    </a>
+    <a href="{% url 'search' %}?category=3" class="category-card">
+        <span class="category-icon">🫘</span>
+        <span class="category-name">Legumes</span>
+    </a>
+    <a href="{% url 'search' %}?category=4" class="category-card">
+        <span class="category-icon">🥬</span>
+        <span class="category-name">Vegetables</span>
+    </a>
+    <a href="{% url 'search' %}?category=5" class="category-card">
+        <span class="category-icon">🍎</span>
+        <span class="category-name">Fruits</span>
+    </a>
+    <a href="{% url 'search' %}?category=6" class="category-card">
+        <span class="category-icon">🍗</span>
+        <span class="category-name">Meat & Poultry</span>
+    </a>
+    <a href="{% url 'search' %}?category=7" class="category-card">
+        <span class="category-icon">🐟</span>
+        <span class="category-name">Fish</span>
+    </a>
+    <a href="{% url 'search' %}?category=8" class="category-card">
+        <span class="category-icon">🥚</span>
+        <span class="category-name">Eggs</span>
+    </a>
+    <a href="{% url 'search' %}?category=9" class="category-card">
+        <span class="category-icon">🥛</span>
+        <span class="category-name">Dairy</span>
+    </a>
+    <a href="{% url 'search' %}?category=10" class="category-card">
+        <span class="category-icon">🫒</span>
+        <span class="category-name">Fats & Oils</span>
+    </a>
 </div>
 
 <div class="feature-box">

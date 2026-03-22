@@ -9,73 +9,146 @@
         margin: 0 auto;
         background: white;
         padding: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        border-radius: 28px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
-    h1 { color: #2c5e2e; margin-bottom: 0.5rem; }
-    .subtitle { color: #666; margin-bottom: 2rem; }
-    .form-group { margin-bottom: 1.5rem; }
-    label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
-    select, input {
+    
+    h1 {
+        color: #2c5e2e;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+    
+    .subtitle {
+        color: #666;
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e2f;
+    }
+    
+    /* Modern Styled Dropdown */
+    .styled-select {
+        position: relative;
         width: 100%;
-        padding: 12px;
-        border: 2px solid #e9ecef;
-        border-radius: 12px;
-        background: #faf7f2;
     }
-    select:focus, input:focus {
+    
+    .styled-select select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 16px;
+        background: #faf7f2;
+        font-size: 1rem;
+        appearance: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .styled-select select:focus {
         outline: none;
         border-color: #2c5e2e;
         background: white;
     }
+    
+    .styled-select::after {
+        content: "▼";
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+        pointer-events: none;
+        font-size: 0.75rem;
+    }
+    
     .food-search-box {
         width: 100%;
-        padding: 12px;
+        padding: 12px 16px;
         border: 2px solid #e9ecef;
-        border-radius: 12px;
+        border-radius: 16px;
+        background: #faf7f2;
         margin-bottom: 10px;
+        transition: all 0.2s;
     }
+    
+    .food-search-box:focus {
+        outline: none;
+        border-color: #2c5e2e;
+        background: white;
+    }
+    
     .food-select {
         width: 100%;
         padding: 12px;
         border: 2px solid #e9ecef;
-        border-radius: 12px;
+        border-radius: 16px;
         height: 150px;
+        background: #faf7f2;
     }
+    
     .selected-food {
         background: #e8f0e8;
-        padding: 12px;
-        border-radius: 12px;
+        padding: 12px 16px;
+        border-radius: 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-left: 4px solid #2c5e2e;
     }
+    
     .change-btn {
         background: #6c757d;
         color: white;
         border: none;
         padding: 6px 14px;
-        border-radius: 20px;
+        border-radius: 40px;
         cursor: pointer;
+        font-size: 0.8rem;
     }
+    
     .quick-buttons {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin-top: 10px;
+        margin-top: 12px;
     }
+    
     .quick-btn {
         background: #f0f0f0;
         border: none;
-        padding: 5px 12px;
-        border-radius: 20px;
+        padding: 6px 14px;
+        border-radius: 40px;
         font-size: 0.75rem;
         cursor: pointer;
+        transition: all 0.2s;
     }
-    .quick-btn:hover { background: #2c5e2e; color: white; }
-    .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .form-row .form-group { flex: 1; min-width: 150px; }
+    
+    .quick-btn:hover {
+        background: #2c5e2e;
+        color: white;
+    }
+    
+    .form-row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .form-row .form-group {
+        flex: 1;
+        min-width: 150px;
+    }
+    
     .calc-btn {
         width: 100%;
         padding: 14px;
@@ -87,55 +160,14 @@
         font-weight: 600;
         cursor: pointer;
         margin-top: 1rem;
+        transition: all 0.2s;
     }
-    .calc-btn:hover { background: #1e421f; }
-    .results {
-        margin-top: 2rem;
-        padding: 1.5rem;
-        background: #f8f9fa;
-        border-radius: 16px;
+    
+    .calc-btn:hover {
+        background: #1e421f;
+        transform: translateY(-2px);
     }
-    .result-header {
-        border-bottom: 2px solid #2c5e2e;
-        padding-bottom: 10px;
-        margin-bottom: 15px;
-    }
-    .nutrient-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1rem;
-    }
-    .nutrient-card {
-        background: white;
-        padding: 1rem;
-        border-radius: 12px;
-    }
-    .nutrient-title {
-        font-weight: 700;
-        color: #2c5e2e;
-        margin-bottom: 10px;
-        border-bottom: 1px solid #e9ecef;
-        padding-bottom: 5px;
-    }
-    .nutrient-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 6px 0;
-    }
-    .rda-badge {
-        background: #e3f2fd;
-        padding: 2px 8px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-    }
-    .alert-low {
-        background: #ffebee;
-        color: #c62828;
-        padding: 8px;
-        border-radius: 8px;
-        margin-top: 8px;
-        font-size: 0.8rem;
-    }
+    
     @media (max-width: 600px) {
         .calc-container { padding: 1rem; }
         .form-row { flex-direction: column; }
@@ -148,7 +180,7 @@
     <h1>🧮 Nutrient Calculator</h1>
     <p class="subtitle">Select a food and portion size</p>
     
-    <form method="POST">
+    <form method="POST" id="calculatorForm">
         {% csrf_token %}
         <input type="hidden" name="food_id" id="selectedFoodId" value="{% if food_selected %}{{ food_selected.id }}{% endif %}">
         
@@ -168,14 +200,16 @@
             
             <div id="foodArea" {% if food_selected %}style="display: none;"{% endif %}>
                 <input type="text" id="foodSearch" class="food-search-box" placeholder="Type food name...">
-                <select name="food_id" id="foodSelect" class="food-select" size="5">
-                    <option value="">-- Select a food --</option>
-                    {% for food in foods %}
-                    <option value="{{ food.id }}" data-name="{{ food.food_name|lower }}">
-                        {{ food.food_name }} ({{ food.category.name }})
-                    </option>
-                    {% endfor %}
-                </select>
+                <div class="styled-select">
+                    <select name="food_id" id="foodSelect" size="5">
+                        <option value="">-- Select a food --</option>
+                        {% for food in foods %}
+                        <option value="{{ food.id }}" data-name="{{ food.food_name|lower }}">
+                            {{ food.food_name }} ({{ food.category.name }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
         </div>
         
@@ -188,14 +222,16 @@
             
             <div class="form-group">
                 <label>3. Unit</label>
-                <select name="unit">
-                    <option value="grams" {% if unit == 'grams' %}selected{% endif %}>grams (g)</option>
-                    {% for conv in available_units %}
-                    <option value="{{ conv.unit_name }}" {% if unit == conv.unit_name %}selected{% endif %}>
-                        {{ conv.unit_name }} (1 = {{ conv.grams }}g)
-                    </option>
-                    {% endfor %}
-                </select>
+                <div class="styled-select">
+                    <select name="unit">
+                        <option value="grams" {% if unit == 'grams' %}selected{% endif %}>grams (g)</option>
+                        {% for conv in available_units %}
+                        <option value="{{ conv.unit_name }}" {% if unit == conv.unit_name %}selected{% endif %}>
+                            {{ conv.unit_name }} (1 = {{ conv.grams }}g)
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
                 
                 {% if available_units %}
                 <div class="quick-buttons">
@@ -215,10 +251,12 @@
         <div class="form-row">
             <div class="form-group">
                 <label>4. Gender</label>
-                <select name="gender">
-                    <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
-                    <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
-                </select>
+                <div class="styled-select">
+                    <select name="gender">
+                        <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
+                        <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
+                    </select>
+                </div>
             </div>
             
             <div class="form-group">
@@ -229,82 +267,10 @@
         
         <button type="submit" class="calc-btn">Calculate Nutrients →</button>
     </form>
-    
-    {% if result %}
-    <div class="results">
-        <div class="result-header">
-            <h3 style="margin:0;">{{ result.amount }} {{ result.unit }} {{ result.food_name }}</h3>
-            {% if result.unit != 'grams' %}
-            <small>({{ result.grams|floatformat:1 }} grams)</small>
-            {% endif %}
-        </div>
-        
-        <div class="nutrient-grid">
-            <div class="nutrient-card">
-                <div class="nutrient-title">🔥 Energy</div>
-                <div class="nutrient-row">
-                    <span>Energy:</span>
-                    <span><strong>{{ result.energy_kcal|floatformat:0 }} kcal</strong>
-                    {% if rda %}
-                    <span class="rda-badge">{{ result.energy_percent|floatformat:0 }}% RDA</span>
-                    {% endif %}
-                    </span>
-                </div>
-                {% if rda and result.energy_percent < 50 %}
-                <div class="alert-low">⚠️ Low energy intake</div>
-                {% endif %}
-            </div>
-            
-            <div class="nutrient-card">
-                <div class="nutrient-title">🥩 Protein & Carbs</div>
-                <div class="nutrient-row"><span>Protein:</span><span><strong>{{ result.protein_g|floatformat:1 }} g</strong></span></div>
-                <div class="nutrient-row"><span>Fat:</span><span><strong>{{ result.fat_g|floatformat:1 }} g</strong></span></div>
-                <div class="nutrient-row"><span>Carbs:</span><span><strong>{{ result.carbohydrate_g|floatformat:1 }} g</strong></span></div>
-                <div class="nutrient-row"><span>Fiber:</span><span><strong>{{ result.fiber_g|floatformat:1 }} g</strong></span></div>
-            </div>
-            
-            <div class="nutrient-card">
-                <div class="nutrient-title">⚡ Iron</div>
-                <div class="nutrient-row">
-                    <span>Iron:</span>
-                    <span><strong>{{ result.iron_mg|floatformat:2 }} mg</strong>
-                    {% if rda %}
-                    <span class="rda-badge">{{ result.iron_percent|floatformat:0 }}% RDA</span>
-                    {% endif %}
-                    </span>
-                </div>
-                {% if rda and result.iron_percent < 50 %}
-                <div class="alert-low">⚠️ Low iron. Try sukuma wiki, beans, or omena.</div>
-                {% endif %}
-                <div class="nutrient-row"><span>Calcium:</span><span><strong>{{ result.calcium_mg|floatformat:0 }} mg</strong></span></div>
-                <div class="nutrient-row"><span>Zinc:</span><span><strong>{{ result.zinc_mg|floatformat:2 }} mg</strong></span></div>
-            </div>
-            
-            <div class="nutrient-card">
-                <div class="nutrient-title">💊 Vitamins</div>
-                <div class="nutrient-row"><span>Vitamin A:</span><span><strong>{{ result.vitamin_a_rae_ug|floatformat:0 }} µg</strong></span></div>
-                <div class="nutrient-row"><span>Vitamin C:</span><span><strong>{{ result.vitamin_c_mg|floatformat:1 }} mg</strong></span></div>
-                <div class="nutrient-row"><span>Folate:</span><span><strong>{{ result.folate_ug|floatformat:0 }} µg</strong></span></div>
-            </div>
-        </div>
-        
-        {% if rda %}
-        <div style="margin-top: 15px; padding: 12px; background: #e8f0e8; border-radius: 12px;">
-            📊 Based on {{ gender }}, {{ age }} years
-        </div>
-        {% endif %}
-        
-        <!-- Share -->
-        <div style="margin-top: 20px; text-align: center;">
-            <a href="https://wa.me/?text={{ result.amount }}%20{{ result.unit }}%20{{ result.food_name|urlencode }}%20has%20{{ result.energy_kcal|floatformat:0 }}%20kcal%20and%20{{ result.iron_mg|floatformat:1 }}mg%20iron%20{{ request.build_absolute_uri|urlencode }}"
-               target="_blank" style="background:#25D366; color:white; padding:6px 14px; border-radius:50px; text-decoration:none; display:inline-block; margin:4px;">💬 WhatsApp</a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
-               target="_blank" style="background:#1877F2; color:white; padding:6px 14px; border-radius:50px; text-decoration:none; display:inline-block; margin:4px;">📘 Facebook</a>
-            <button onclick="copyLink()" style="background:#6c757d; color:white; border:none; padding:6px 14px; border-radius:50px; cursor:pointer;">🔗 Copy Link</button>
-        </div>
-    </div>
-    {% endif %}
 </div>
+
+<!-- Include Popup Component -->
+{% include 'foods/popup.html' %}
 
 <script>
     // Search filter
@@ -331,7 +297,8 @@
     window.resetFood = function() {
         document.getElementById('selectedFoodId').value = '';
         document.getElementById('foodArea').style.display = 'block';
-        document.querySelector('.selected-food')?.remove();
+        const selectedDiv = document.querySelector('.selected-food');
+        if (selectedDiv) selectedDiv.remove();
         document.querySelector('form').submit();
     };
     
@@ -347,9 +314,128 @@
         }
     };
     
-    function copyLink() {
-        navigator.clipboard.writeText(window.location.href);
-        alert('Link copied!');
+    // AJAX Form Submit
+    document.getElementById('calculatorForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                displayResultsModal(data);
+            } else {
+                alert(data.error || 'Error calculating');
+            }
+        } catch (error) {
+            alert('Network error. Please try again.');
+        }
+    });
+    
+    function displayResultsModal(data) {
+        const result = data.result;
+        const rda = data.rda;
+        
+        let html = `
+            <div class="result-header">
+                <h4 style="margin:0;">${result.amount} ${result.unit} ${result.food_name}</h4>
+                ${result.unit !== 'grams' ? `<small>(${result.grams.toFixed(1)} grams)</small>` : ''}
+            </div>
+            
+            <div class="nutrient-tabs">
+                <div class="nutrient-tab active" data-tab="summary" onclick="showNutrientTab('summary')">Summary</div>
+                <div class="nutrient-tab" data-tab="proximates" onclick="showNutrientTab('proximates')">Proximates</div>
+                <div class="nutrient-tab" data-tab="minerals" onclick="showNutrientTab('minerals')">Minerals</div>
+                <div class="nutrient-tab" data-tab="vitamins" onclick="showNutrientTab('vitamins')">Vitamins</div>
+            </div>
+            
+            <!-- Summary Tab -->
+            <div id="tab-summary" class="tab-content active">
+                <div class="nutrient-grid">
+                    <div class="nutrient-item">
+                        <span class="nutrient-name">🔥 Energy</span>
+                        <span class="nutrient-value">${result.energy_kcal.toFixed(0)} kcal</span>
+                    </div>
+                    <div class="nutrient-item">
+                        <span class="nutrient-name">🥩 Protein</span>
+                        <span class="nutrient-value">${result.protein_g.toFixed(1)} g</span>
+                    </div>
+                    <div class="nutrient-item">
+                        <span class="nutrient-name">⚡ Iron</span>
+                        <span class="nutrient-value">${result.iron_mg.toFixed(2)} mg</span>
+                    </div>
+                    <div class="nutrient-item">
+                        <span class="nutrient-name">🦴 Calcium</span>
+                        <span class="nutrient-value">${result.calcium_mg.toFixed(0)} mg</span>
+                    </div>
+                </div>
+                ${rda ? `
+                <div style="margin-top: 1rem;">
+                    <div class="nutrient-item" style="flex-direction: column; align-items: flex-start;">
+                        <span>📊 RDA: ${result.energy_percent.toFixed(0)}% of daily energy</span>
+                        <div class="rda-bar"><div class="rda-fill" style="width: ${Math.min(result.energy_percent, 100)}%"></div></div>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+            
+            <!-- Proximates Tab -->
+            <div id="tab-proximates" class="tab-content">
+                <div class="nutrient-grid">
+                    <div class="nutrient-item"><span class="nutrient-name">🔥 Energy</span><span class="nutrient-value">${result.energy_kcal.toFixed(0)} kcal</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">💧 Water</span><span class="nutrient-value">${result.water_g ? result.water_g.toFixed(1) : 'N/A'} g</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🥩 Protein</span><span class="nutrient-value">${result.protein_g.toFixed(1)} g</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🥑 Fat</span><span class="nutrient-value">${result.fat_g.toFixed(1)} g</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🌾 Carbs</span><span class="nutrient-value">${result.carbohydrate_g.toFixed(1)} g</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🌿 Fiber</span><span class="nutrient-value">${result.fiber_g.toFixed(1)} g</span></div>
+                </div>
+            </div>
+            
+            <!-- Minerals Tab -->
+            <div id="tab-minerals" class="tab-content">
+                <div class="nutrient-grid">
+                    <div class="nutrient-item"><span class="nutrient-name">⚡ Iron</span><span class="nutrient-value">${result.iron_mg.toFixed(2)} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🦴 Calcium</span><span class="nutrient-value">${result.calcium_mg.toFixed(0)} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🔋 Magnesium</span><span class="nutrient-value">${result.magnesium_mg ? result.magnesium_mg.toFixed(0) : 'N/A'} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🦷 Phosphorus</span><span class="nutrient-value">${result.phosphorus_mg ? result.phosphorus_mg.toFixed(0) : 'N/A'} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🍌 Potassium</span><span class="nutrient-value">${result.potassium_mg ? result.potassium_mg.toFixed(0) : 'N/A'} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🧂 Sodium</span><span class="nutrient-value">${result.sodium_mg ? result.sodium_mg.toFixed(0) : 'N/A'} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🔬 Zinc</span><span class="nutrient-value">${result.zinc_mg ? result.zinc_mg.toFixed(2) : 'N/A'} mg</span></div>
+                </div>
+            </div>
+            
+            <!-- Vitamins Tab -->
+            <div id="tab-vitamins" class="tab-content">
+                <div class="nutrient-grid">
+                    <div class="nutrient-item"><span class="nutrient-name">🥕 Vitamin A</span><span class="nutrient-value">${result.vitamin_a_rae_ug ? result.vitamin_a_rae_ug.toFixed(0) : 'N/A'} µg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🧬 Thiamin (B1)</span><span class="nutrient-value">${result.thiamin_mg ? result.thiamin_mg.toFixed(2) : 'N/A'} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">💛 Riboflavin (B2)</span><span class="nutrient-value">${result.riboflavin_mg ? result.riboflavin_mg.toFixed(2) : 'N/A'} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🌀 Niacin (B3)</span><span class="nutrient-value">${result.niacin_mg ? result.niacin_mg.toFixed(1) : 'N/A'} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🟢 Vitamin B6</span><span class="nutrient-value">${result.vitamin_b6_mg ? result.vitamin_b6_mg.toFixed(2) : 'N/A'} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🍃 Folate</span><span class="nutrient-value">${result.folate_ug ? result.folate_ug.toFixed(0) : 'N/A'} µg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🔴 Vitamin B12</span><span class="nutrient-value">${result.vitamin_b12_ug ? result.vitamin_b12_ug.toFixed(1) : 'N/A'} µg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🍊 Vitamin C</span><span class="nutrient-value">${result.vitamin_c_mg ? result.vitamin_c_mg.toFixed(1) : 'N/A'} mg</span></div>
+                </div>
+            </div>
+            
+            <div class="share-buttons">
+                <button class="share-btn share-wa" onclick="shareResults('whatsapp', '${result.amount} ${result.unit} ${result.food_name} has ${result.energy_kcal.toFixed(0)} kcal and ${result.iron_mg.toFixed(1)}mg iron', window.location.href)">💬 WhatsApp</button>
+                <button class="share-btn share-fb" onclick="shareResults('facebook', '', window.location.href)">📘 Facebook</button>
+                <button class="share-btn share-tw" onclick="shareResults('twitter', 'Check out this nutrition calculation', window.location.href)">𝕏 Twitter</button>
+                <button class="share-btn share-copy" onclick="shareResults('copy', '${result.amount} ${result.unit} ${result.food_name} - ${result.energy_kcal.toFixed(0)} kcal, ${result.iron_mg.toFixed(1)}mg iron', window.location.href)">🔗 Copy</button>
+            </div>
+        `;
+        
+        document.getElementById('modalBody').innerHTML = html;
+        document.getElementById('modalTitle').innerHTML = `📊 ${result.food_name}`;
+        openModal();
     }
 </script>
 {% endblock %}
