@@ -4,28 +4,6 @@
 
 {% block extra_css %}
 <style>
-.quick-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.quick-btn {
-    background: #f0f0f0;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.quick-btn:hover {
-    background: #2c5e2e;
-    color: white;
-}
-
     .recall-container {
         max-width: 800px;
         margin: 0 auto;
@@ -36,7 +14,7 @@
     }
     
     h1 {
-        color: #2c3e50;
+        color: #2c5e2e;
         font-size: 28px;
         font-weight: 600;
         margin-bottom: 5px;
@@ -221,6 +199,28 @@
         background: white;
     }
     
+    .quick-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    
+    .quick-btn {
+        background: #f0f0f0;
+        border: none;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .quick-btn:hover {
+        background: #2c5e2e;
+        color: white;
+    }
+    
     .remove-food {
         color: #dc3545;
         text-decoration: none;
@@ -255,58 +255,6 @@
         margin: 20px 0;
     }
     
-    .results {
-        margin-top: 30px;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 10px;
-    }
-    
-    .results h3 {
-        color: #2c3e50;
-        margin-bottom: 15px;
-    }
-    
-    .total-nutrients {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 15px;
-        margin-top: 15px;
-    }
-    
-    .nutrient-card {
-        background: white;
-        padding: 15px;
-        border-radius: 8px;
-        text-align: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    
-    .nutrient-value {
-        font-size: 24px;
-        font-weight: 700;
-        color: #2c5e2e;
-    }
-    
-    .nutrient-label {
-        color: #666;
-        font-size: 14px;
-        margin-top: 5px;
-    }
-    
-    /* RDI Grid Styles */
-    .rdi-grid {
-        display: grid;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-    
-    @media (min-width: 768px) {
-        .rdi-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
     @media (max-width: 480px) {
         .amount-unit-row {
             flex-direction: column;
@@ -333,7 +281,7 @@
         
         <!-- User Information -->
         <div class="user-info">
-            <input type="text" name="name" placeholder="Your name (optional)" value="{{ results.name|default:'' }}">
+            <input type="text" name="name" id="userName" placeholder="Your name (optional)" value="{{ results.name|default:'' }}">
             <input type="number" name="age" placeholder="Age (years)" value="{{ results.age|default:'' }}" min="0" max="120">
             <select name="gender">
                 <option value="">-- Select gender --</option>
@@ -378,229 +326,10 @@
         
         <button type="submit" class="calculate-recall-btn">Calculate Total Nutrients</button>
     </form>
-    
-    {% if results %}
-    <div class="results">
-        <h3>📊 Your 24-Hour Total</h3>
-        
-        <!-- Macronutrients -->
-        <div style="margin-bottom: 20px;">
-            <h4 style="color: #2c3e50; margin-bottom: 10px;">Energy & Protein</h4>
-            <div class="total-nutrients">
-                <div class="nutrient-card">
-                    <div class="nutrient-value">{{ results.total_energy|floatformat:0 }}</div>
-                    <div class="nutrient-label">Calories (kcal)</div>
-                </div>
-                <div class="nutrient-card">
-                    <div class="nutrient-value">{{ results.total_protein|floatformat:1 }}</div>
-                    <div class="nutrient-label">Protein (g)</div>
-                </div>
-                <div class="nutrient-card">
-                    <div class="nutrient-value">{{ results.total_iron|floatformat:1 }}</div>
-                    <div class="nutrient-label">Iron (mg)</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Hydration Section -->
-        <div style="margin-top: 25px; padding-top: 20px; border-top: 2px dashed #e9ecef;">
-            <h4 style="color: #2c3e50; margin-bottom: 15px;">💧 Hydration Analysis</h4>
-            
-            <div class="total-nutrients" style="grid-template-columns: repeat(2, 1fr);">
-                <div class="nutrient-card">
-                    <div class="nutrient-value">{{ results.total_fluid_ml|floatformat:0 }}</div>
-                    <div class="nutrient-label">Total Fluids (ml)</div>
-                </div>
-                <div class="nutrient-card">
-                    <div class="nutrient-value">{{ results.total_fluid_l|floatformat:1 }}</div>
-                    <div class="nutrient-label">Total (Liters)</div>
-                </div>
-            </div>
-            
-            <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <span style="color: #495057;">Target:</span>
-                    <span style="font-weight: 600;">{{ results.ai_liters }} Liters</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                    <span style="color: #495057;">You consumed:</span>
-                    <span style="font-weight: 600;">{{ results.fluid_percent|floatformat:0 }}% of target</span>
-                </div>
-                
-                <!-- Progress bar -->
-                <div style="background: #e9ecef; height: 10px; border-radius: 5px; overflow: hidden; margin-bottom: 15px;">
-                    <div style="background: 
-                        {% if results.fluid_percent < 80 %}#dc3545
-                        {% elif results.fluid_percent <= 120 %}#28a745
-                        {% else %}#17a2b8{% endif %}; 
-                        width: {% if results.fluid_percent > 100 %}100{% else %}{{ results.fluid_percent }}{% endif %}%; 
-                        height: 10px;">
-                    </div>
-                </div>
-                
-                <!-- Hydration message -->
-                <div style="padding: 12px; background: 
-                    {% if results.fluid_percent < 80 %}#f8d7da
-                    {% elif results.fluid_percent <= 120 %}#d4edda
-                    {% else %}#d1ecf1{% endif %}; 
-                    border-radius: 6px; color: 
-                    {% if results.fluid_percent < 80 %}#721c24
-                    {% elif results.fluid_percent <= 120 %}#155724
-                    {% else %}#0c5460{% endif %};">
-                    {{ results.hydration_message }}
-                </div>
-            </div>
-            
-            <p style="margin-top: 15px; color: #666; font-size: 13px; font-style: italic;">
-                Based on Adequate Intake (AI) standards for total water from all sources (drinks + food moisture)
-            </p>
-        </div>
-        
-        <!-- RDI Analysis -->
-        {% if results.rdi %}
-        <div style="margin-top: 30px; padding: 20px; background: #e8f0e8; border-radius: 16px;">
-            <h3 style="color: #2c5e2e; margin-bottom: 15px;">📊 RDI Analysis (Daily Needs)</h3>
-            <p style="margin-bottom: 15px; color: #666;">Based on: {{ results.gender }}, {{ results.age }} years</p>
-            
-            <div class="rdi-grid">
-                <!-- Energy -->
-                <div style="background: white; padding: 15px; border-radius: 12px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="font-weight: 600;">🔥 Energy</span>
-                        <span>{{ results.total_energy|floatformat:0 }} / {{ results.rdi.energy_kcal }} kcal</span>
-                    </div>
-                    <div style="background: #e9ecef; height: 10px; border-radius: 5px; overflow: hidden;">
-                        <div style="background: {% if results.rdi_percentages.energy_percent < 70 %}#dc3545{% elif results.rdi_percentages.energy_percent > 130 %}#ffc107{% else %}#28a745{% endif %}; 
-                                    width: {% if results.rdi_percentages.energy_percent > 100 %}100{% else %}{{ results.rdi_percentages.energy_percent }}{% endif %}%; 
-                                    height: 10px;">
-                        </div>
-                    </div>
-                    <div style="margin-top: 8px; font-size: 0.85rem;">
-                        {{ results.rdi_percentages.energy_percent|floatformat:0 }}% of daily needs
-                    </div>
-                </div>
-                
-                <!-- Protein -->
-                <div style="background: white; padding: 15px; border-radius: 12px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="font-weight: 600;">🥩 Protein</span>
-                        <span>{{ results.total_protein|floatformat:1 }} / {{ results.rdi.protein_g }} g</span>
-                    </div>
-                    <div style="background: #e9ecef; height: 10px; border-radius: 5px; overflow: hidden;">
-                        <div style="background: {% if results.rdi_percentages.protein_percent < 70 %}#dc3545{% else %}#28a745{% endif %}; 
-                                    width: {% if results.rdi_percentages.protein_percent > 100 %}100{% else %}{{ results.rdi_percentages.protein_percent }}{% endif %}%; 
-                                    height: 10px;">
-                        </div>
-                    </div>
-                    <div style="margin-top: 8px; font-size: 0.85rem;">
-                        {{ results.rdi_percentages.protein_percent|floatformat:0 }}% of daily needs
-                    </div>
-                </div>
-                
-                <!-- Iron -->
-                <div style="background: white; padding: 15px; border-radius: 12px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="font-weight: 600;">⚡ Iron</span>
-                        <span>{{ results.total_iron|floatformat:1 }} / {{ results.rdi.iron_mg }} mg</span>
-                    </div>
-                    <div style="background: #e9ecef; height: 10px; border-radius: 5px; overflow: hidden;">
-                        <div style="background: {% if results.rdi_percentages.iron_percent < 70 %}#dc3545{% else %}#28a745{% endif %}; 
-                                    width: {% if results.rdi_percentages.iron_percent > 100 %}100{% else %}{{ results.rdi_percentages.iron_percent }}{% endif %}%; 
-                                    height: 10px;">
-                        </div>
-                    </div>
-                    <div style="margin-top: 8px; font-size: 0.85rem;">
-                        {{ results.rdi_percentages.iron_percent|floatformat:0 }}% of daily needs
-                    </div>
-                </div>
-                
-                <!-- Calcium -->
-                <div style="background: white; padding: 15px; border-radius: 12px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="font-weight: 600;">🦴 Calcium</span>
-                        <span>{{ results.total_calcium|floatformat:0 }} / {{ results.rdi.calcium_mg }} mg</span>
-                    </div>
-                    <div style="background: #e9ecef; height: 10px; border-radius: 5px; overflow: hidden;">
-                        <div style="background: {% if results.rdi_percentages.calcium_percent < 70 %}#dc3545{% else %}#28a745{% endif %}; 
-                                    width: {% if results.rdi_percentages.calcium_percent > 100 %}100{% else %}{{ results.rdi_percentages.calcium_percent }}{% endif %}%; 
-                                    height: 10px;">
-                        </div>
-                    </div>
-                    <div style="margin-top: 8px; font-size: 0.85rem;">
-                        {{ results.rdi_percentages.calcium_percent|floatformat:0 }}% of daily needs
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Actionable Suggestions -->
-            <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 12px;">
-                <h4 style="color: #2c5e2e; margin-bottom: 12px;">💡 How to Improve</h4>
-                {% for msg in results.status_messages %}
-                <div style="margin-bottom: 12px; padding: 8px; background: 
-                    {% if msg.status == 'low' %}#ffebee{% elif msg.status == 'high' %}#fff3cd{% else %}#e8f5e9{% endif %}; 
-                    border-radius: 8px;">
-                    <p style="margin: 0; font-size: 0.9rem;">{{ msg.message }}</p>
-                    {% if msg.suggestions %}
-                    <div style="margin-top: 8px;">
-                        {% for suggestion in msg.suggestions %}
-                        <a href="{% url 'search' %}?q={{ suggestion }}" 
-                           style="display: inline-block; background: #f0f0f0; padding: 4px 12px; border-radius: 20px; margin: 4px; text-decoration: none; color: #2c5e2e; font-size: 0.8rem;">
-                            + {{ suggestion }}
-                        </a>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-        
-        <!-- Improvement Suggestions (Nutrient-based) -->
-        {% if results.improvements %}
-        <div style="margin-top: 30px; padding: 20px; background: #e8f4fd; border-radius: 12px;">
-            <h3 style="color: #2c3e50; margin-bottom: 15px;">💡 How to Improve Your Nutrition</h3>
-            {% for imp in results.improvements %}
-            <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 10px; border-left: 4px solid #667eea;">
-                <div style="font-weight: 600; color: #2c3e50;">
-                    🥩 {{ imp.nutrient }}: {{ imp.current|floatformat:1 }} / {{ imp.target }} target
-                </div>
-                <div style="margin-top: 10px;">
-                    <div style="font-size: 13px; color: #666; margin-bottom: 8px;">Try adding:</div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                        {% for suggestion in imp.suggestions %}
-                        <a href="{% url 'search' %}?q={{ suggestion.0 }}" 
-                           style="background: #f0f0f0; padding: 6px 14px; border-radius: 25px; text-decoration: none; color: #2c3e50; font-size: 13px;">
-                            ➕ {{ suggestion.0 }} — {{ suggestion.1 }}
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        
-        <!-- SHARE BUTTONS -->
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px dashed #e9ecef;">
-            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <a href="https://wa.me/?text=My%2024-hour%20nutrition%20summary%3A%20{{ results.total_energy|floatformat:0 }}%20kcal,%20{{ results.total_protein|floatformat:1 }}g%20protein,%20{{ results.total_iron|floatformat:1 }}mg%20iron.%20Track%20yours%20at%20Kenya%20Food%20Database%20{{ request.build_absolute_uri|urlencode }}"
-                   target="_blank" style="background:#25D366; color:white; padding:8px 16px; border-radius:40px; text-decoration:none; font-size:13px;">
-                    💬 Share on WhatsApp
-                </a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
-                   target="_blank" style="background:#1877F2; color:white; padding:8px 16px; border-radius:40px; text-decoration:none; font-size:13px;">
-                    📘 Facebook
-                </a>
-                <button onclick="copyLink()" style="background:#6c757d; color:white; border:none; padding:8px 16px; border-radius:40px; font-size:13px; cursor:pointer;">
-                    🔗 Copy Link
-                </button>
-            </div>
-            <p style="text-align: center; margin-top: 12px; font-size: 12px; color: #666;">📢 Share your nutrition summary</p>
-        </div>
-    </div>
-    {% endif %}
 </div>
+
+<!-- Include Popup Component -->
+{% include 'foods/popup.html' %}
 
 <script>
     let foodCounter = 0;
@@ -620,54 +349,54 @@
         }
     }
     
-function addFood(mealId) {
-    let container = document.getElementById(`foods-${mealId}`);
-    let foodId = `food_${mealId}_${foodCounter++}`;
-    
-    let foodDiv = document.createElement('div');
-    foodDiv.className = 'food-entry';
-    foodDiv.id = foodId;
-    foodDiv.innerHTML = `
-        <div class="food-search-area">
-            <input type="text" class="food-search-box" placeholder="Type food name..." onkeyup="searchFood(this, '${foodId}')">
-            <div class="food-results" id="results-${foodId}"></div>
-            <div class="selected-food" style="display: none;" id="selected-${foodId}">
-                <div class="selected-food-info">
-                    <div class="selected-food-name" id="selected-name-${foodId}"></div>
-                    <div class="selected-food-category" id="selected-cat-${foodId}"></div>
+    function addFood(mealId) {
+        let container = document.getElementById(`foods-${mealId}`);
+        let foodId = `food_${mealId}_${foodCounter++}`;
+        
+        let foodDiv = document.createElement('div');
+        foodDiv.className = 'food-entry';
+        foodDiv.id = foodId;
+        foodDiv.innerHTML = `
+            <div class="food-search-area">
+                <input type="text" class="food-search-box" placeholder="Type food name..." onkeyup="searchFood(this, '${foodId}')">
+                <div class="food-results" id="results-${foodId}"></div>
+                <div class="selected-food" style="display: none;" id="selected-${foodId}">
+                    <div class="selected-food-info">
+                        <div class="selected-food-name" id="selected-name-${foodId}"></div>
+                        <div class="selected-food-category" id="selected-cat-${foodId}"></div>
+                    </div>
+                    <button type="button" class="change-food-btn" onclick="changeFood('${foodId}')">Change</button>
                 </div>
-                <button type="button" class="change-food-btn" onclick="changeFood('${foodId}')">Change</button>
+                <input type="hidden" name="food_id_${mealId}[]" id="hidden-${foodId}" value="">
             </div>
-            <input type="hidden" name="food_id_${mealId}[]" id="hidden-${foodId}" value="">
-        </div>
-        <div class="amount-unit-row">
-            <input type="number" name="amount_${mealId}[]" class="amount-input" placeholder="Amount" step="0.1" min="0">
-            <select name="unit_${mealId}[]" class="unit-select">
-                <option value="grams">grams (g)</option>
-                <option value="cup">cup (240ml / 150g)</option>
-                <option value="tablespoon">tablespoon (15ml / 8-15g)</option>
-                <option value="teaspoon">teaspoon (5ml / 3-5g)</option>
-                <option value="small_plate">small plate (300g)</option>
-                <option value="medium_plate">medium plate (450g)</option>
-                <option value="large_plate">large plate (600g)</option>
-                <option value="bowl">bowl (350g)</option>
-                <option value="handful">handful (50g)</option>
-                <option value="piece">piece (50g)</option>
-                <option value="slice">slice (30g)</option>
-            </select>
-        </div>
-        <div class="quick-buttons">
-            <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'bowl', 350)">Bowl</button>
-            <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'plate', 400)">Plate</button>
-            <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'handful', 50)">Handful</button>
-            <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'piece', 50)">Piece</button>
-            <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'cup', 240)">Cup</button>
-        </div>
-        <a href="#" class="remove-food" onclick="removeFood('${foodId}'); return false;">Remove</a>
-    `;
-    
-    container.appendChild(foodDiv);
-}
+            <div class="amount-unit-row">
+                <input type="number" name="amount_${mealId}[]" class="amount-input" placeholder="Amount" step="0.1" min="0">
+                <select name="unit_${mealId}[]" class="unit-select">
+                    <option value="grams">grams (g)</option>
+                    <option value="cup">cup (240ml / 150g)</option>
+                    <option value="tablespoon">tablespoon (15ml / 8-15g)</option>
+                    <option value="teaspoon">teaspoon (5ml / 3-5g)</option>
+                    <option value="small_plate">small plate (300g)</option>
+                    <option value="medium_plate">medium plate (450g)</option>
+                    <option value="large_plate">large plate (600g)</option>
+                    <option value="bowl">bowl (350g)</option>
+                    <option value="handful">handful (50g)</option>
+                    <option value="piece">piece (50g)</option>
+                    <option value="slice">slice (30g)</option>
+                </select>
+            </div>
+            <div class="quick-buttons">
+                <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'bowl', 350)">Bowl</button>
+                <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'plate', 400)">Plate</button>
+                <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'handful', 50)">Handful</button>
+                <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'piece', 50)">Piece</button>
+                <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'cup', 240)">Cup</button>
+            </div>
+            <a href="#" class="remove-food" onclick="removeFood('${foodId}'); return false;">Remove</a>
+        `;
+        
+        container.appendChild(foodDiv);
+    }
     
     function searchFood(input, foodId) {
         let searchText = input.value.toLowerCase();
@@ -718,52 +447,46 @@ function addFood(mealId) {
         searchBox.value = '';
     }
     
-function loadUnits(foodId, foodIdStr) {
-    fetch(`/get-units/?food_id=${foodId}`)
-        .then(response => response.json())
-        .then(data => {
-            let unitSelect = document.querySelector(`#${foodIdStr} .unit-select`);
-            unitSelect.innerHTML = '<option value="grams">grams (g)</option>';
-            
-            if (data.units) {
-                data.units.forEach(unit => {
-                    let option = document.createElement('option');
-                    option.value = unit.name;
-                    option.textContent = `${unit.name} (1 = ${unit.grams}g)`;
-                    unitSelect.appendChild(option);
-                });
-            } else {
-                // Fallback units
-                addFallbackUnits(unitSelect);
-            }
-        })
-        .catch(error => {
-            console.error('Error loading units:', error);
-            let unitSelect = document.querySelector(`#${foodIdStr} .unit-select`);
-            addFallbackUnits(unitSelect);
-        });
-}
-
-function addFallbackUnits(unitSelect) {
-    const fallback = [
-        ['cup', 'cup (240ml / 150g)'],
-        ['tablespoon', 'tablespoon (15ml / 8-15g)'],
-        ['teaspoon', 'teaspoon (5ml / 3-5g)'],
-        ['small_plate', 'small plate (300g)'],
-        ['medium_plate', 'medium plate (450g)'],
-        ['large_plate', 'large plate (600g)'],
-        ['bowl', 'bowl (350g)'],
-        ['handful', 'handful (50g)'],
-        ['piece', 'piece (50g)'],
-        ['slice', 'slice (30g)']
-    ];
-    for (let [value, text] of fallback) {
-        let option = document.createElement('option');
-        option.value = value;
-        option.textContent = text;
-        unitSelect.appendChild(option);
+    function loadUnits(foodId, foodIdStr) {
+        let unitSelect = document.querySelector(`#${foodIdStr} .unit-select`);
+        unitSelect.innerHTML = '<option value="grams">grams (g)</option>';
+        // Add fallback units
+        const units = [
+            ['cup', 'cup (240ml / 150g)'],
+            ['tablespoon', 'tablespoon (15ml / 8-15g)'],
+            ['teaspoon', 'teaspoon (5ml / 3-5g)'],
+            ['small_plate', 'small plate (300g)'],
+            ['medium_plate', 'medium plate (450g)'],
+            ['large_plate', 'large plate (600g)'],
+            ['bowl', 'bowl (350g)'],
+            ['handful', 'handful (50g)'],
+            ['piece', 'piece (50g)'],
+            ['slice', 'slice (30g)']
+        ];
+        for (let [value, text] of units) {
+            let option = document.createElement('option');
+            option.value = value;
+            option.textContent = text;
+            unitSelect.appendChild(option);
+        }
     }
-}
+    
+    function setQuickMeasure(button, unit, grams) {
+        let foodEntry = button.closest('.food-entry');
+        let amountInput = foodEntry.querySelector('.amount-input');
+        let unitSelect = foodEntry.querySelector('.unit-select');
+        
+        amountInput.value = 1;
+        for (let i = 0; i < unitSelect.options.length; i++) {
+            if (unitSelect.options[i].value === unit) {
+                unitSelect.selectedIndex = i;
+                break;
+            }
+        }
+        
+        amountInput.style.border = "2px solid #28a745";
+        setTimeout(() => { amountInput.style.border = ""; }, 500);
+    }
     
     function addFluid() {
         let container = document.getElementById('fluids-container');
@@ -854,211 +577,164 @@ function addFallbackUnits(unitSelect) {
         document.getElementById(foodId).remove();
     }
     
+    // ===== AJAX FORM SUBMIT =====
+    const recallForm = document.getElementById('recallForm');
+    
+    if (recallForm) {
+        recallForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const userName = document.getElementById('userName').value || 'there';
+            
+            document.getElementById('modalTitle').innerHTML = '📋 Calculating...';
+            document.getElementById('modalBody').innerHTML = '<div class="loading">🔄 Analyzing your 24-hour intake...</div>';
+            openModal();
+            
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayRecallResults(data, userName);
+                } else {
+                    displayError(data.error || 'Error calculating your nutrition');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                displayError('Network error. Please try again.');
+            }
+        });
+    }
+    
+    function displayRecallResults(data, userName) {
+        const results = data.results;
+        
+        let html = `
+            <div class="greeting">
+                <h2>👋 Hi ${escapeHtml(userName)}!</h2>
+                <p style="margin: 0; color: #666;">Here's your 24-hour nutrition summary</p>
+            </div>
+            
+            <div class="nutrient-tabs">
+                <div class="nutrient-tab active" data-tab="summary" onclick="showNutrientTab('summary')">📊 Summary</div>
+                <div class="nutrient-tab" data-tab="nutrients" onclick="showNutrientTab('nutrients')">🥗 Nutrients</div>
+                <div class="nutrient-tab" data-tab="improvements" onclick="showNutrientTab('improvements')">💡 Improvements</div>
+                <div class="nutrient-tab" data-tab="hydration" onclick="showNutrientTab('hydration')">💧 Hydration</div>
+            </div>
+            
+            <!-- Summary Tab -->
+            <div id="tab-summary" class="tab-content active">
+                <div class="nutrient-grid">
+                    <div class="nutrient-item">
+                        <span class="nutrient-name">🔥 Energy</span>
+                        <span class="nutrient-value">${results.total_energy.toFixed(0)} kcal</span>
+                    </div>
+                    <div class="nutrient-item">
+                        <span class="nutrient-name">🥩 Protein</span>
+                        <span class="nutrient-value">${results.total_protein.toFixed(1)} g</span>
+                    </div>
+                    <div class="nutrient-item">
+                        <span class="nutrient-name">⚡ Iron</span>
+                        <span class="nutrient-value">${results.total_iron.toFixed(1)} mg</span>
+                    </div>
+                    <div class="nutrient-item">
+                        <span class="nutrient-name">🦴 Calcium</span>
+                        <span class="nutrient-value">${results.total_calcium ? results.total_calcium.toFixed(0) : 'N/A'} mg</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nutrients Tab -->
+            <div id="tab-nutrients" class="tab-content">
+                <div class="nutrient-grid">
+                    <div class="nutrient-item"><span class="nutrient-name">🔥 Energy</span><span class="nutrient-value">${results.total_energy.toFixed(0)} kcal</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🥩 Protein</span><span class="nutrient-value">${results.total_protein.toFixed(1)} g</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🥑 Fat</span><span class="nutrient-value">${results.total_fat ? results.total_fat.toFixed(1) : 'N/A'} g</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🌾 Carbs</span><span class="nutrient-value">${results.total_carbs ? results.total_carbs.toFixed(1) : 'N/A'} g</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🌿 Fiber</span><span class="nutrient-value">${results.total_fiber ? results.total_fiber.toFixed(1) : 'N/A'} g</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">⚡ Iron</span><span class="nutrient-value">${results.total_iron.toFixed(1)} mg</span></div>
+                    <div class="nutrient-item"><span class="nutrient-name">🦴 Calcium</span><span class="nutrient-value">${results.total_calcium ? results.total_calcium.toFixed(0) : 'N/A'} mg</span></div>
+                </div>
+            </div>
+            
+            <!-- Improvements Tab -->
+            <div id="tab-improvements" class="tab-content">
+                ${results.status_messages && results.status_messages.length > 0 ? 
+                    results.status_messages.map(msg => `
+                        <div class="insight-box" style="margin-bottom: 12px;">
+                            <p style="margin: 0;">${escapeHtml(msg.message)}</p>
+                            ${msg.suggestions ? `
+                                <div style="margin-top: 8px;">
+                                    ${msg.suggestions.map(s => `<a href="/search/?q=${encodeURIComponent(s)}" style="display: inline-block; background: #f0f0f0; padding: 4px 12px; border-radius: 20px; margin: 4px; text-decoration: none; color: #2c5e2e; font-size: 0.8rem;">➕ ${escapeHtml(s)}</a>`).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('') 
+                    : '<div class="insight-box"><p>✅ Great job! Your nutrition looks balanced.</p></div>'}
+            </div>
+            
+            <!-- Hydration Tab -->
+            <div id="tab-hydration" class="tab-content">
+                <div class="nutrient-grid">
+                    <div class="nutrient-item">
+                        <span class="nutrient-name">💧 Total Fluids</span>
+                        <span class="nutrient-value">${results.total_fluid_ml.toFixed(0)} ml (${results.total_fluid_l.toFixed(1)} L)</span>
+                    </div>
+                    <div class="nutrient-item">
+                        <span class="nutrient-name">🎯 Target</span>
+                        <span class="nutrient-value">${results.ai_liters} L</span>
+                    </div>
+                </div>
+                <div class="rda-bar" style="margin: 1rem 0;">
+                    <div class="rda-fill" style="width: ${Math.min(results.fluid_percent, 100)}%"></div>
+                </div>
+                <div class="insight-box">
+                    <p>${escapeHtml(results.hydration_message || '💧 Stay hydrated!')}</p>
+                </div>
+            </div>
+        `;
+        
+        // Share buttons
+        html += `
+            <div class="share-buttons">
+                <button class="share-btn share-wa" onclick="shareResults('whatsapp', 'My 24hr nutrition summary: ${results.total_energy.toFixed(0)} kcal, ${results.total_protein.toFixed(1)}g protein', window.location.href)">💬 WhatsApp</button>
+                <button class="share-btn share-fb" onclick="shareResults('facebook', '', window.location.href)">📘 Facebook</button>
+                <button class="share-btn share-copy" onclick="shareResults('copy', 'My 24hr nutrition summary: ${results.total_energy.toFixed(0)} kcal, ${results.total_protein.toFixed(1)}g protein', window.location.href)">🔗 Copy Link</button>
+            </div>
+        `;
+        
+        document.getElementById('modalBody').innerHTML = html;
+        document.getElementById('modalTitle').innerHTML = `📋 ${escapeHtml(userName)}'s Nutrition Summary`;
+        openModal();
+    }
+    
+    function displayError(message) {
+        document.getElementById('modalBody').innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <div style="font-size: 3rem;">😕</div>
+                <p style="color: #dc3545; margin-top: 1rem;">${escapeHtml(message)}</p>
+                <button onclick="closeModal()" style="margin-top: 1rem; padding: 8px 24px; background: #2c5e2e; color: white; border: none; border-radius: 50px; cursor: pointer;">Close</button>
+            </div>
+        `;
+        document.getElementById('modalTitle').innerHTML = '❌ Error';
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
     function copyLink() {
         navigator.clipboard.writeText(window.location.href);
-        alert('Link copied to clipboard!');
+        alert('Link copied!');
     }
-function setQuickMeasure(button, unit, grams) {
-    let foodEntry = button.closest('.food-entry');
-    let amountInput = foodEntry.querySelector('.amount-input');
-    let unitSelect = foodEntry.querySelector('.unit-select');
-    
-    amountInput.value = 1;
-    for (let i = 0; i < unitSelect.options.length; i++) {
-        if (unitSelect.options[i].value === unit) {
-            unitSelect.selectedIndex = i;
-            break;
-        }
-    }
-    
-    amountInput.style.border = "2px solid #28a745";
-    setTimeout(() => { amountInput.style.border = ""; }, 500);
-}
-
-function setQuickMeasure(button, unit, grams) {
-    let foodEntry = button.closest('.food-entry');
-    let amountInput = foodEntry.querySelector('.amount-input');
-    let unitSelect = foodEntry.querySelector('.unit-select');
-    
-    amountInput.value = 1;
-    for (let i = 0; i < unitSelect.options.length; i++) {
-        if (unitSelect.options[i].value === unit) {
-            unitSelect.selectedIndex = i;
-            break;
-        }
-    }
-    
-    amountInput.style.border = "2px solid #28a745";
-    setTimeout(() => { amountInput.style.border = ""; }, 500);
-}
-
-// ===== AJAX FORM SUBMIT FOR 24HR RECALL =====
-// This finds the form by its ID and intercepts the submit event
-const recallForm = document.getElementById('recallForm');
-
-if (recallForm) {
-    recallForm.addEventListener('submit', async function(e) {
-        // Stop the form from reloading the page
-        e.preventDefault();
-        
-        // Collect all form data (foods, fluids, user info)
-        const formData = new FormData(this);
-        
-        // Show loading indicator in modal
-        document.getElementById('modalTitle').innerHTML = '📋 Calculating...';
-        document.getElementById('modalBody').innerHTML = '<div class="loading">🔄 Analyzing your 24-hour intake...</div>';
-        openModal();
-        
-        try {
-            // Send data to server via POST
-            const response = await fetch(window.location.href, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'  // Tells Django to return JSON
-                }
-            });
-            
-            // Parse the JSON response
-            const data = await response.json();
-            
-            if (data.success) {
-                // Show results in popup
-                displayRecallResults(data);
-            } else {
-                displayError(data.error || 'Error calculating your nutrition');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            displayError('Network error. Please try again.');
-        }
-    });
-}
-
-// Function to display results in the popup
-function displayRecallResults(data) {
-    const results = data.results;
-    const userName = data.name || 'there';  // If no name entered, use "there"
-    
-    // Build the HTML for the popup
-    let html = `
-        <div class="greeting">
-            <h2>👋 Hi ${escapeHtml(userName)}!</h2>
-            <p style="margin: 0; color: #666;">Here's your 24-hour nutrition summary</p>
-        </div>
-        
-        <div class="nutrient-tabs">
-            <div class="nutrient-tab active" data-tab="summary" onclick="showNutrientTab('summary')">📊 Summary</div>
-            <div class="nutrient-tab" data-tab="nutrients" onclick="showNutrientTab('nutrients')">🥗 Nutrients</div>
-            <div class="nutrient-tab" data-tab="improvements" onclick="showNutrientTab('improvements')">💡 Improvements</div>
-            <div class="nutrient-tab" data-tab="hydration" onclick="showNutrientTab('hydration')">💧 Hydration</div>
-        </div>
-        
-        <!-- Summary Tab -->
-        <div id="tab-summary" class="tab-content active">
-            <div class="nutrient-grid">
-                <div class="nutrient-item">
-                    <span class="nutrient-name">🔥 Energy</span>
-                    <span class="nutrient-value">${results.total_energy.toFixed(0)} kcal</span>
-                </div>
-                <div class="nutrient-item">
-                    <span class="nutrient-name">🥩 Protein</span>
-                    <span class="nutrient-value">${results.total_protein.toFixed(1)} g</span>
-                </div>
-                <div class="nutrient-item">
-                    <span class="nutrient-name">⚡ Iron</span>
-                    <span class="nutrient-value">${results.total_iron.toFixed(1)} mg</span>
-                </div>
-                <div class="nutrient-item">
-                    <span class="nutrient-name">🦴 Calcium</span>
-                    <span class="nutrient-value">${results.total_calcium ? results.total_calcium.toFixed(0) : 'N/A'} mg</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Nutrients Tab -->
-        <div id="tab-nutrients" class="tab-content">
-            <div class="nutrient-grid">
-                <div class="nutrient-item"><span class="nutrient-name">🔥 Energy</span><span class="nutrient-value">${results.total_energy.toFixed(0)} kcal</span></div>
-                <div class="nutrient-item"><span class="nutrient-name">🥩 Protein</span><span class="nutrient-value">${results.total_protein.toFixed(1)} g</span></div>
-                <div class="nutrient-item"><span class="nutrient-name">🥑 Fat</span><span class="nutrient-value">${results.total_fat ? results.total_fat.toFixed(1) : 'N/A'} g</span></div>
-                <div class="nutrient-item"><span class="nutrient-name">🌾 Carbs</span><span class="nutrient-value">${results.total_carbs ? results.total_carbs.toFixed(1) : 'N/A'} g</span></div>
-                <div class="nutrient-item"><span class="nutrient-name">🌿 Fiber</span><span class="nutrient-value">${results.total_fiber ? results.total_fiber.toFixed(1) : 'N/A'} g</span></div>
-                <div class="nutrient-item"><span class="nutrient-name">⚡ Iron</span><span class="nutrient-value">${results.total_iron.toFixed(1)} mg</span></div>
-                <div class="nutrient-item"><span class="nutrient-name">🦴 Calcium</span><span class="nutrient-value">${results.total_calcium ? results.total_calcium.toFixed(0) : 'N/A'} mg</span></div>
-            </div>
-        </div>
-        
-        <!-- Improvements Tab -->
-        <div id="tab-improvements" class="tab-content">
-            ${results.status_messages && results.status_messages.length > 0 ? 
-                results.status_messages.map(msg => `
-                    <div class="insight-box" style="margin-bottom: 12px;">
-                        <p style="margin: 0;">${escapeHtml(msg.message)}</p>
-                        ${msg.suggestions ? `
-                            <div style="margin-top: 8px;">
-                                ${msg.suggestions.map(s => `<a href="/search/?q=${encodeURIComponent(s)}" style="display: inline-block; background: #f0f0f0; padding: 4px 12px; border-radius: 20px; margin: 4px; text-decoration: none; color: #2c5e2e; font-size: 0.8rem;">➕ ${escapeHtml(s)}</a>`).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-                `).join('') 
-                : '<div class="insight-box"><p>✅ Great job! Your nutrition looks balanced.</p></div>'}
-        </div>
-        
-        <!-- Hydration Tab -->
-        <div id="tab-hydration" class="tab-content">
-            <div class="nutrient-grid">
-                <div class="nutrient-item">
-                    <span class="nutrient-name">💧 Total Fluids</span>
-                    <span class="nutrient-value">${results.total_fluid_ml.toFixed(0)} ml (${results.total_fluid_l.toFixed(1)} L)</span>
-                </div>
-                <div class="nutrient-item">
-                    <span class="nutrient-name">🎯 Target</span>
-                    <span class="nutrient-value">${results.ai_liters} L</span>
-                </div>
-            </div>
-            <div class="rda-bar" style="margin: 1rem 0;">
-                <div class="rda-fill" style="width: ${Math.min(results.fluid_percent, 100)}%"></div>
-            </div>
-            <div class="insight-box">
-                <p>${escapeHtml(results.hydration_message || '💧 Stay hydrated!')}</p>
-            </div>
-        </div>
-    `;
-    
-    // Add share buttons
-    html += `
-        <div class="share-buttons">
-            <button class="share-btn share-wa" onclick="shareResults('whatsapp', 'My 24hr nutrition summary: ${results.total_energy.toFixed(0)} kcal, ${results.total_protein.toFixed(1)}g protein', window.location.href)">💬 WhatsApp</button>
-            <button class="share-btn share-fb" onclick="shareResults('facebook', '', window.location.href)">📘 Facebook</button>
-            <button class="share-btn share-copy" onclick="shareResults('copy', 'My 24hr nutrition summary: ${results.total_energy.toFixed(0)} kcal, ${results.total_protein.toFixed(1)}g protein', window.location.href)">🔗 Copy Link</button>
-        </div>
-    `;
-    
-    // Insert HTML into modal and show it
-    document.getElementById('modalBody').innerHTML = html;
-    document.getElementById('modalTitle').innerHTML = `📋 ${escapeHtml(userName)}'s Nutrition Summary`;
-    openModal();
-}
-
-// Helper function to prevent XSS (security)
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function displayError(message) {
-    document.getElementById('modalBody').innerHTML = `
-        <div style="text-align: center; padding: 2rem;">
-            <div style="font-size: 3rem;">😕</div>
-            <p style="color: #dc3545; margin-top: 1rem;">${escapeHtml(message)}</p>
-            <button onclick="closeModal()" style="margin-top: 1rem; padding: 8px 24px; background: #2c5e2e; color: white; border: none; border-radius: 50px; cursor: pointer;">Close</button>
-        </div>
-    `;
-    document.getElementById('modalTitle').innerHTML = '❌ Error';
-}
-
 </script>
 {% endblock %}
