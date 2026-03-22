@@ -601,7 +601,7 @@ def compare_foods(request):
                     if not messages:
                         messages.append("💡 These foods have similar nutritional profiles.")
                     
-                    # AJAX response
+                    # AJAX response — THIS MUST BE INSIDE THE TRY BLOCK
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                         return JsonResponse({
                             'success': True,
