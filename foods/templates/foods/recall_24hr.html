@@ -4,6 +4,28 @@
 
 {% block extra_css %}
 <style>
+.quick-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.quick-btn {
+    background: #f0f0f0;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-btn:hover {
+    background: #2c5e2e;
+    color: white;
+}
+
     .recall-container {
         max-width: 800px;
         margin: 0 auto;
@@ -620,10 +642,27 @@
             </div>
             <div class="amount-unit-row">
                 <input type="number" name="amount_${mealId}[]" class="amount-input" placeholder="Amount" step="0.1" min="0">
-                <select name="unit_${mealId}[]" class="unit-select">
-                    <option value="grams">grams (g)</option>
-                </select>
+<select name="unit_${mealId}[]" class="unit-select">
+    <option value="grams">grams (g)</option>
+    <option value="cup">cup (240ml / 150g)</option>
+    <option value="tablespoon">tablespoon (15ml / 8-15g)</option>
+    <option value="teaspoon">teaspoon (5ml / 3-5g)</option>
+    <option value="small_plate">small plate (300g)</option>
+    <option value="medium_plate">medium plate (450g)</option>
+    <option value="large_plate">large plate (600g)</option>
+    <option value="bowl">bowl (350g)</option>
+    <option value="handful">handful (50g)</option>
+    <option value="piece">piece (50g)</option>
+    <option value="slice">slice (30g)</option>
+</select>
             </div>
+        <div class="quick-buttons" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;">
+            <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'bowl', 350)">Bowl</button>
+            <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'plate', 400)">Plate</button>
+            <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'handful', 50)">Handful</button>
+            <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'piece', 50)">Piece</button>
+            <button type="button" class="quick-btn" onclick="setQuickMeasure(this, 'cup', 240)">Cup</button>
+        </div>
             <a href="#" class="remove-food" onclick="removeFood('${foodId}'); return false;">Remove</a>
         `;
         
@@ -679,10 +718,52 @@
         searchBox.value = '';
     }
     
-    function loadUnits(foodId, foodIdStr) {
-        let unitSelect = document.querySelector(`#${foodIdStr} .unit-select`);
-        unitSelect.innerHTML = '<option value="grams">grams (g)</option>';
+function loadUnits(foodId, foodIdStr) {
+    fetch(`/get-units/?food_id=${foodId}`)
+        .then(response => response.json())
+        .then(data => {
+            let unitSelect = document.querySelector(`#${foodIdStr} .unit-select`);
+            unitSelect.innerHTML = '<option value="grams">grams (g)</option>';
+            
+            if (data.units) {
+                data.units.forEach(unit => {
+                    let option = document.createElement('option');
+                    option.value = unit.name;
+                    option.textContent = `${unit.name} (1 = ${unit.grams}g)`;
+                    unitSelect.appendChild(option);
+                });
+            } else {
+                // Fallback units
+                addFallbackUnits(unitSelect);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading units:', error);
+            let unitSelect = document.querySelector(`#${foodIdStr} .unit-select`);
+            addFallbackUnits(unitSelect);
+        });
+}
+
+function addFallbackUnits(unitSelect) {
+    const fallback = [
+        ['cup', 'cup (240ml / 150g)'],
+        ['tablespoon', 'tablespoon (15ml / 8-15g)'],
+        ['teaspoon', 'teaspoon (5ml / 3-5g)'],
+        ['small_plate', 'small plate (300g)'],
+        ['medium_plate', 'medium plate (450g)'],
+        ['large_plate', 'large plate (600g)'],
+        ['bowl', 'bowl (350g)'],
+        ['handful', 'handful (50g)'],
+        ['piece', 'piece (50g)'],
+        ['slice', 'slice (30g)']
+    ];
+    for (let [value, text] of fallback) {
+        let option = document.createElement('option');
+        option.value = value;
+        option.textContent = text;
+        unitSelect.appendChild(option);
     }
+}
     
     function addFluid() {
         let container = document.getElementById('fluids-container');
@@ -777,5 +858,22 @@
         navigator.clipboard.writeText(window.location.href);
         alert('Link copied to clipboard!');
     }
+function setQuickMeasure(button, unit, grams) {
+    let foodEntry = button.closest('.food-entry');
+    let amountInput = foodEntry.querySelector('.amount-input');
+    let unitSelect = foodEntry.querySelector('.unit-select');
+    
+    amountInput.value = 1;
+    for (let i = 0; i < unitSelect.options.length; i++) {
+        if (unitSelect.options[i].value === unit) {
+            unitSelect.selectedIndex = i;
+            break;
+        }
+    }
+    
+    amountInput.style.border = "2px solid #28a745";
+    setTimeout(() => { amountInput.style.border = ""; }, 500);
+}
+
 </script>
 {% endblock %}
