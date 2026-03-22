@@ -160,7 +160,7 @@ def nutrient_calculator(request):
     if request.method == 'POST':
         food_id = request.POST.get('food_id')
         
-        # Handle "Change Food" — no food selected
+        # Handle no food selected (Change button)
         if not food_id:
             gender = request.POST.get('gender', 'female')
             try:
@@ -189,6 +189,7 @@ def nutrient_calculator(request):
             food_selected = Food.objects.get(id=food_id)
             available_units = UnitConversion.objects.filter(food=food_selected)
             
+            # Convert to grams
             grams = amount
             if unit != 'grams':
                 try:
@@ -197,37 +198,39 @@ def nutrient_calculator(request):
                 except UnitConversion.DoesNotExist:
                     grams = amount
             
-result = {
-    'food_name': food_selected.food_name,
-    'amount': amount,
-    'unit': unit,
-    'grams': grams,
-    # Proximates
-    'energy_kcal': (grams / 100) * food_selected.energy_kcal,
-    'protein_g': (grams / 100) * food_selected.protein_g,
-    'fat_g': (grams / 100) * food_selected.fat_g,
-    'carbohydrate_g': (grams / 100) * food_selected.carbohydrate_g,
-    'fiber_g': (grams / 100) * food_selected.fiber_g,
-    'water_g': (grams / 100) * food_selected.water_g,
-    # Minerals
-    'iron_mg': (grams / 100) * food_selected.iron_mg,
-    'calcium_mg': (grams / 100) * food_selected.calcium_mg,
-    'magnesium_mg': (grams / 100) * food_selected.magnesium_mg,
-    'phosphorus_mg': (grams / 100) * food_selected.phosphorus_mg,
-    'potassium_mg': (grams / 100) * food_selected.potassium_mg,
-    'sodium_mg': (grams / 100) * food_selected.sodium_mg,
-    'zinc_mg': (grams / 100) * food_selected.zinc_mg,
-    # Vitamins
-    'vitamin_a_rae_ug': (grams / 100) * food_selected.vitamin_a_rae_ug,
-    'thiamin_mg': (grams / 100) * food_selected.thiamin_mg,
-    'riboflavin_mg': (grams / 100) * food_selected.riboflavin_mg,
-    'niacin_mg': (grams / 100) * food_selected.niacin_mg,
-    'vitamin_b6_mg': (grams / 100) * food_selected.vitamin_b6_mg,
-    'folate_ug': (grams / 100) * food_selected.folate_ug,
-    'vitamin_b12_ug': (grams / 100) * food_selected.vitamin_b12_ug,
-    'vitamin_c_mg': (grams / 100) * food_selected.vitamin_c_mg,
-}
+            # Calculate nutrients — THIS IS YOUR RESULT DICTIONARY
+            result = {
+                'food_name': food_selected.food_name,
+                'amount': amount,
+                'unit': unit,
+                'grams': grams,
+                # Proximates
+                'energy_kcal': (grams / 100) * food_selected.energy_kcal,
+                'protein_g': (grams / 100) * food_selected.protein_g,
+                'fat_g': (grams / 100) * food_selected.fat_g,
+                'carbohydrate_g': (grams / 100) * food_selected.carbohydrate_g,
+                'fiber_g': (grams / 100) * food_selected.fiber_g,
+                'water_g': (grams / 100) * food_selected.water_g,
+                # Minerals
+                'iron_mg': (grams / 100) * food_selected.iron_mg,
+                'calcium_mg': (grams / 100) * food_selected.calcium_mg,
+                'magnesium_mg': (grams / 100) * food_selected.magnesium_mg,
+                'phosphorus_mg': (grams / 100) * food_selected.phosphorus_mg,
+                'potassium_mg': (grams / 100) * food_selected.potassium_mg,
+                'sodium_mg': (grams / 100) * food_selected.sodium_mg,
+                'zinc_mg': (grams / 100) * food_selected.zinc_mg,
+                # Vitamins
+                'vitamin_a_rae_ug': (grams / 100) * food_selected.vitamin_a_rae_ug,
+                'thiamin_mg': (grams / 100) * food_selected.thiamin_mg,
+                'riboflavin_mg': (grams / 100) * food_selected.riboflavin_mg,
+                'niacin_mg': (grams / 100) * food_selected.niacin_mg,
+                'vitamin_b6_mg': (grams / 100) * food_selected.vitamin_b6_mg,
+                'folate_ug': (grams / 100) * food_selected.folate_ug,
+                'vitamin_b12_ug': (grams / 100) * food_selected.vitamin_b12_ug,
+                'vitamin_c_mg': (grams / 100) * food_selected.vitamin_c_mg,
+            }
             
+            # Get RDA based on age and gender
             if age < 19:
                 if gender == 'female':
                     rda = {'energy_kcal': 2000, 'protein_g': 46, 'iron_mg': 15, 'calcium_mg': 1300}
@@ -244,6 +247,14 @@ result = {
             
         except Food.DoesNotExist:
             pass
+    
+    # Prepare AJAX response if needed
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'success': True,
+            'result': result,
+            'rda': rda,
+        })
     
     return render(request, 'foods/calculator.html', {
         'foods': foods,
