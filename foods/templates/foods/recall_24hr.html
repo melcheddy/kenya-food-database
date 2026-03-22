@@ -892,5 +892,173 @@ function setQuickMeasure(button, unit, grams) {
     setTimeout(() => { amountInput.style.border = ""; }, 500);
 }
 
+// ===== AJAX FORM SUBMIT FOR 24HR RECALL =====
+// This finds the form by its ID and intercepts the submit event
+const recallForm = document.getElementById('recallForm');
+
+if (recallForm) {
+    recallForm.addEventListener('submit', async function(e) {
+        // Stop the form from reloading the page
+        e.preventDefault();
+        
+        // Collect all form data (foods, fluids, user info)
+        const formData = new FormData(this);
+        
+        // Show loading indicator in modal
+        document.getElementById('modalTitle').innerHTML = '📋 Calculating...';
+        document.getElementById('modalBody').innerHTML = '<div class="loading">🔄 Analyzing your 24-hour intake...</div>';
+        openModal();
+        
+        try {
+            // Send data to server via POST
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'  // Tells Django to return JSON
+                }
+            });
+            
+            // Parse the JSON response
+            const data = await response.json();
+            
+            if (data.success) {
+                // Show results in popup
+                displayRecallResults(data);
+            } else {
+                displayError(data.error || 'Error calculating your nutrition');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            displayError('Network error. Please try again.');
+        }
+    });
+}
+
+// Function to display results in the popup
+function displayRecallResults(data) {
+    const results = data.results;
+    const userName = data.name || 'there';  // If no name entered, use "there"
+    
+    // Build the HTML for the popup
+    let html = `
+        <div class="greeting">
+            <h2>👋 Hi ${escapeHtml(userName)}!</h2>
+            <p style="margin: 0; color: #666;">Here's your 24-hour nutrition summary</p>
+        </div>
+        
+        <div class="nutrient-tabs">
+            <div class="nutrient-tab active" data-tab="summary" onclick="showNutrientTab('summary')">📊 Summary</div>
+            <div class="nutrient-tab" data-tab="nutrients" onclick="showNutrientTab('nutrients')">🥗 Nutrients</div>
+            <div class="nutrient-tab" data-tab="improvements" onclick="showNutrientTab('improvements')">💡 Improvements</div>
+            <div class="nutrient-tab" data-tab="hydration" onclick="showNutrientTab('hydration')">💧 Hydration</div>
+        </div>
+        
+        <!-- Summary Tab -->
+        <div id="tab-summary" class="tab-content active">
+            <div class="nutrient-grid">
+                <div class="nutrient-item">
+                    <span class="nutrient-name">🔥 Energy</span>
+                    <span class="nutrient-value">${results.total_energy.toFixed(0)} kcal</span>
+                </div>
+                <div class="nutrient-item">
+                    <span class="nutrient-name">🥩 Protein</span>
+                    <span class="nutrient-value">${results.total_protein.toFixed(1)} g</span>
+                </div>
+                <div class="nutrient-item">
+                    <span class="nutrient-name">⚡ Iron</span>
+                    <span class="nutrient-value">${results.total_iron.toFixed(1)} mg</span>
+                </div>
+                <div class="nutrient-item">
+                    <span class="nutrient-name">🦴 Calcium</span>
+                    <span class="nutrient-value">${results.total_calcium ? results.total_calcium.toFixed(0) : 'N/A'} mg</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Nutrients Tab -->
+        <div id="tab-nutrients" class="tab-content">
+            <div class="nutrient-grid">
+                <div class="nutrient-item"><span class="nutrient-name">🔥 Energy</span><span class="nutrient-value">${results.total_energy.toFixed(0)} kcal</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🥩 Protein</span><span class="nutrient-value">${results.total_protein.toFixed(1)} g</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🥑 Fat</span><span class="nutrient-value">${results.total_fat ? results.total_fat.toFixed(1) : 'N/A'} g</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🌾 Carbs</span><span class="nutrient-value">${results.total_carbs ? results.total_carbs.toFixed(1) : 'N/A'} g</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🌿 Fiber</span><span class="nutrient-value">${results.total_fiber ? results.total_fiber.toFixed(1) : 'N/A'} g</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">⚡ Iron</span><span class="nutrient-value">${results.total_iron.toFixed(1)} mg</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🦴 Calcium</span><span class="nutrient-value">${results.total_calcium ? results.total_calcium.toFixed(0) : 'N/A'} mg</span></div>
+            </div>
+        </div>
+        
+        <!-- Improvements Tab -->
+        <div id="tab-improvements" class="tab-content">
+            ${results.status_messages && results.status_messages.length > 0 ? 
+                results.status_messages.map(msg => `
+                    <div class="insight-box" style="margin-bottom: 12px;">
+                        <p style="margin: 0;">${escapeHtml(msg.message)}</p>
+                        ${msg.suggestions ? `
+                            <div style="margin-top: 8px;">
+                                ${msg.suggestions.map(s => `<a href="/search/?q=${encodeURIComponent(s)}" style="display: inline-block; background: #f0f0f0; padding: 4px 12px; border-radius: 20px; margin: 4px; text-decoration: none; color: #2c5e2e; font-size: 0.8rem;">➕ ${escapeHtml(s)}</a>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('') 
+                : '<div class="insight-box"><p>✅ Great job! Your nutrition looks balanced.</p></div>'}
+        </div>
+        
+        <!-- Hydration Tab -->
+        <div id="tab-hydration" class="tab-content">
+            <div class="nutrient-grid">
+                <div class="nutrient-item">
+                    <span class="nutrient-name">💧 Total Fluids</span>
+                    <span class="nutrient-value">${results.total_fluid_ml.toFixed(0)} ml (${results.total_fluid_l.toFixed(1)} L)</span>
+                </div>
+                <div class="nutrient-item">
+                    <span class="nutrient-name">🎯 Target</span>
+                    <span class="nutrient-value">${results.ai_liters} L</span>
+                </div>
+            </div>
+            <div class="rda-bar" style="margin: 1rem 0;">
+                <div class="rda-fill" style="width: ${Math.min(results.fluid_percent, 100)}%"></div>
+            </div>
+            <div class="insight-box">
+                <p>${escapeHtml(results.hydration_message || '💧 Stay hydrated!')}</p>
+            </div>
+        </div>
+    `;
+    
+    // Add share buttons
+    html += `
+        <div class="share-buttons">
+            <button class="share-btn share-wa" onclick="shareResults('whatsapp', 'My 24hr nutrition summary: ${results.total_energy.toFixed(0)} kcal, ${results.total_protein.toFixed(1)}g protein', window.location.href)">💬 WhatsApp</button>
+            <button class="share-btn share-fb" onclick="shareResults('facebook', '', window.location.href)">📘 Facebook</button>
+            <button class="share-btn share-copy" onclick="shareResults('copy', 'My 24hr nutrition summary: ${results.total_energy.toFixed(0)} kcal, ${results.total_protein.toFixed(1)}g protein', window.location.href)">🔗 Copy Link</button>
+        </div>
+    `;
+    
+    // Insert HTML into modal and show it
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('modalTitle').innerHTML = `📋 ${escapeHtml(userName)}'s Nutrition Summary`;
+    openModal();
+}
+
+// Helper function to prevent XSS (security)
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function displayError(message) {
+    document.getElementById('modalBody').innerHTML = `
+        <div style="text-align: center; padding: 2rem;">
+            <div style="font-size: 3rem;">😕</div>
+            <p style="color: #dc3545; margin-top: 1rem;">${escapeHtml(message)}</p>
+            <button onclick="closeModal()" style="margin-top: 1rem; padding: 8px 24px; background: #2c5e2e; color: white; border: none; border-radius: 50px; cursor: pointer;">Close</button>
+        </div>
+    `;
+    document.getElementById('modalTitle').innerHTML = '❌ Error';
+}
+
 </script>
 {% endblock %}
