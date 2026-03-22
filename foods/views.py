@@ -529,10 +529,7 @@ if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         'results': results,
     })
 
-def compare_foods(request):
-    """Compare two foods side by side"""
-    import traceback
-    try:
+
 def compare_foods(request):
     import traceback
     try:
