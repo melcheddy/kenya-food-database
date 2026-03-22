@@ -197,23 +197,36 @@ def nutrient_calculator(request):
                 except UnitConversion.DoesNotExist:
                     grams = amount
             
-            result = {
-                'food_name': food_selected.food_name,
-                'amount': amount,
-                'unit': unit,
-                'grams': grams,
-                'energy_kcal': (grams / 100) * food_selected.energy_kcal,
-                'protein_g': (grams / 100) * food_selected.protein_g,
-                'fat_g': (grams / 100) * food_selected.fat_g,
-                'carbohydrate_g': (grams / 100) * food_selected.carbohydrate_g,
-                'fiber_g': (grams / 100) * food_selected.fiber_g,
-                'iron_mg': (grams / 100) * food_selected.iron_mg,
-                'calcium_mg': (grams / 100) * food_selected.calcium_mg,
-                'vitamin_a_rae_ug': (grams / 100) * food_selected.vitamin_a_rae_ug,
-                'folate_ug': (grams / 100) * food_selected.folate_ug,
-                'vitamin_c_mg': (grams / 100) * food_selected.vitamin_c_mg,
-                'zinc_mg': (grams / 100) * food_selected.zinc_mg,
-            }
+result = {
+    'food_name': food_selected.food_name,
+    'amount': amount,
+    'unit': unit,
+    'grams': grams,
+    # Proximates
+    'energy_kcal': (grams / 100) * food_selected.energy_kcal,
+    'protein_g': (grams / 100) * food_selected.protein_g,
+    'fat_g': (grams / 100) * food_selected.fat_g,
+    'carbohydrate_g': (grams / 100) * food_selected.carbohydrate_g,
+    'fiber_g': (grams / 100) * food_selected.fiber_g,
+    'water_g': (grams / 100) * food_selected.water_g,
+    # Minerals
+    'iron_mg': (grams / 100) * food_selected.iron_mg,
+    'calcium_mg': (grams / 100) * food_selected.calcium_mg,
+    'magnesium_mg': (grams / 100) * food_selected.magnesium_mg,
+    'phosphorus_mg': (grams / 100) * food_selected.phosphorus_mg,
+    'potassium_mg': (grams / 100) * food_selected.potassium_mg,
+    'sodium_mg': (grams / 100) * food_selected.sodium_mg,
+    'zinc_mg': (grams / 100) * food_selected.zinc_mg,
+    # Vitamins
+    'vitamin_a_rae_ug': (grams / 100) * food_selected.vitamin_a_rae_ug,
+    'thiamin_mg': (grams / 100) * food_selected.thiamin_mg,
+    'riboflavin_mg': (grams / 100) * food_selected.riboflavin_mg,
+    'niacin_mg': (grams / 100) * food_selected.niacin_mg,
+    'vitamin_b6_mg': (grams / 100) * food_selected.vitamin_b6_mg,
+    'folate_ug': (grams / 100) * food_selected.folate_ug,
+    'vitamin_b12_ug': (grams / 100) * food_selected.vitamin_b12_ug,
+    'vitamin_c_mg': (grams / 100) * food_selected.vitamin_c_mg,
+}
             
             if age < 19:
                 if gender == 'female':
