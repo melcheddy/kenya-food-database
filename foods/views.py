@@ -601,7 +601,7 @@ def compare_foods(request):
                     if not messages:
                         messages.append("💡 These foods have similar nutritional profiles.")
                     
-                    # AJAX response — THIS MUST BE INSIDE THE TRY BLOCK
+                    # AJAX response
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                         return JsonResponse({
                             'success': True,
@@ -634,7 +634,6 @@ def compare_foods(request):
             'comparison': None,
             'messages': ['Error loading compare page. Please try again.'],
         })
-
 def get_units(request):
     """Return available units for a food as JSON"""
     food_id = request.GET.get('food_id')
