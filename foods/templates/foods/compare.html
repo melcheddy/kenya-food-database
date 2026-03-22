@@ -9,14 +9,14 @@
         margin: 0 auto;
         background: white;
         padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        border-radius: 28px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
     
     h1 {
-        color: #2c3e50;
+        color: #2c5e2e;
         font-size: 28px;
-        font-weight: 600;
+        font-weight: 700;
         margin-bottom: 5px;
     }
     
@@ -29,7 +29,7 @@
     .selection-area {
         background: #f8f9fa;
         padding: 25px;
-        border-radius: 10px;
+        border-radius: 20px;
         margin-bottom: 25px;
     }
     
@@ -48,46 +48,43 @@
     .food-label {
         display: block;
         margin-bottom: 8px;
-        color: #495057;
-        font-weight: 500;
+        color: #2c3e2f;
+        font-weight: 600;
     }
     
     .food-search-box {
         width: 100%;
-        padding: 12px;
-        border: 1px solid #ced4da;
-        border-radius: 8px;
-        font-size: 15px;
-        margin-bottom: 8px;
+        padding: 12px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 16px;
+        background: #faf7f2;
+        margin-bottom: 10px;
+        transition: all 0.2s;
     }
     
     .food-search-box:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: #2c5e2e;
+        background: white;
     }
     
     .food-select {
         width: 100%;
-        padding: 8px;
-        border: 1px solid #ced4da;
-        border-radius: 8px;
-        font-size: 14px;
+        padding: 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 16px;
         height: 150px;
-        background: white;
-    }
-    
-    .food-select option {
-        padding: 8px;
+        background: #faf7f2;
     }
     
     .selected-food-display {
+        background: #e8f0e8;
+        padding: 12px 16px;
+        border-radius: 16px;
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 10px;
-        padding: 12px;
-        background: #e3f2fd;
-        border: 1px solid #90caf9;
-        border-radius: 8px;
+        border-left: 4px solid #2c5e2e;
         margin-top: 8px;
     }
     
@@ -96,176 +93,42 @@
     }
     
     .selected-food-name {
-        font-weight: 600;
-        color: #1976d2;
+        font-weight: 700;
+        color: #2c5e2e;
     }
     
     .selected-food-category {
         font-size: 12px;
         color: #666;
-        margin-top: 2px;
     }
     
     .change-food-btn {
         background: #6c757d;
         color: white;
         border: none;
-        padding: 6px 12px;
-        border-radius: 6px;
+        padding: 6px 14px;
+        border-radius: 40px;
         cursor: pointer;
         font-size: 13px;
-        transition: background 0.2s;
-    }
-    
-    .change-food-btn:hover {
-        background: #5a6268;
     }
     
     .compare-btn {
         width: 100%;
         padding: 14px;
-        background: #667eea;
+        background: #2c5e2e;
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 50px;
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: all 0.2s;
         margin-top: 15px;
     }
     
     .compare-btn:hover {
-        background: #5a67d8;
-    }
-    
-    .vs-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 25px 0 20px;
-        padding: 0 10px;
-    }
-    
-    .food-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #2c3e50;
-        max-width: 45%;
-        text-align: center;
-    }
-    
-    .vs-badge {
-        background: #667eea;
-        color: white;
-        padding: 8px 20px;
-        border-radius: 30px;
-        font-weight: 700;
-        font-size: 16px;
-    }
-    
-    .comparison-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-    }
-    
-    .comparison-table th {
-        background: #f8f9fa;
-        padding: 12px;
-        text-align: left;
-        font-weight: 600;
-        color: #2c3e50;
-        border-bottom: 2px solid #dee2e6;
-    }
-    
-    .comparison-table td {
-        padding: 15px 12px;
-        border-bottom: 1px solid #e9ecef;
-        vertical-align: middle;
-    }
-    
-    .nutrient-name {
-        font-weight: 500;
-        color: #495057;
-        width: 30%;
-    }
-    
-    .value-col {
-        width: 30%;
-        padding: 0 10px;
-    }
-    
-    .value-box {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .value-number {
-        font-size: 16px;
-        font-weight: 600;
-    }
-    
-    .value-number.winner {
-        color: #28a745;
-    }
-    
-    .progress-bar-bg {
-        background: #e9ecef;
-        height: 8px;
-        border-radius: 4px;
-        overflow: hidden;
-        width: 100%;
-    }
-    
-    .progress-bar-fill {
-        height: 8px;
-        background: #667eea;
-        border-radius: 4px;
-    }
-    
-    .progress-bar-fill.winner {
-        background: #28a745;
-    }
-    
-    .winner-badge {
-        display: inline-block;
-        background: #28a745;
-        color: white;
-        padding: 3px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        margin-left: 8px;
-    }
-    
-    .insights-box {
-        margin-top: 30px;
-        padding: 20px;
-        background: #e8f4fd;
-        border-radius: 10px;
-        border-left: 4px solid #667eea;
-    }
-    
-    .insights-box h3 {
-        color: #2c3e50;
-        margin-bottom: 15px;
-        font-size: 18px;
-    }
-    
-    .insights-box ul {
-        list-style: none;
-        padding: 0;
-    }
-    
-    .insights-box li {
-        padding: 10px 0;
-        border-bottom: 1px dashed #b8daff;
-        color: #2c3e50;
-    }
-    
-    .insights-box li:last-child {
-        border-bottom: none;
+        background: #1e421f;
+        transform: translateY(-2px);
     }
     
     .helper-text {
@@ -281,21 +144,8 @@
             gap: 15px;
         }
         
-        .vs-header {
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .food-title {
-            max-width: 100%;
-        }
-        
-        .comparison-table td {
-            padding: 12px 8px;
-        }
-        
-        .value-box {
-            gap: 3px;
+        .compare-container {
+            padding: 1rem;
         }
     }
 </style>
@@ -311,163 +161,100 @@
             {% csrf_token %}
             
             <div class="food-row">
-                <!-- First Food Column -->
+                <!-- First Food -->
                 <div class="food-column">
                     <label class="food-label">First Food:</label>
-                    <input type="text" id="food1Search" class="food-search-box" placeholder="Type first food name..." value="{% if food1 %}{{ food1.food_name }}{% endif %}">
-                    
-                    <!-- Dropdown (hidden when food selected) -->
-                    <select name="food1" id="food1Select" class="food-select" size="4" required style="display: {% if food1 %}none{% else %}block{% endif %};">
+                    <input type="text" id="food1Search" class="food-search-box" placeholder="Type first food name...">
+                    <select name="food1" id="food1Select" class="food-select" size="5">
                         <option value="">-- Select first food --</option>
                         {% for food in foods %}
-                        <option value="{{ food.id }}" data-name="{{ food.food_name|lower }}" data-category="{{ food.category.name }}" {% if food1 and food1.id == food.id %}selected{% endif %}>
+                        <option value="{{ food.id }}" data-name="{{ food.food_name|lower }}" data-category="{{ food.category.name }}">
                             {{ food.food_name }} ({{ food.category.name }})
                         </option>
                         {% endfor %}
                     </select>
-                    
-                    <!-- Selected food display (shown when food selected) -->
-                    <div id="selectedFood1Display" class="selected-food-display" style="display: {% if food1 %}flex{% else %}none{% endif %};">
+                    <div id="selectedFood1Display" class="selected-food-display" style="display: none;">
                         <div class="selected-food-info">
-                            <div class="selected-food-name" id="selectedFood1Name">{% if food1 %}{{ food1.food_name }}{% endif %}</div>
-                            <div class="selected-food-category" id="selectedFood1Category">{% if food1 %}{{ food1.category.name }}{% endif %}</div>
+                            <div class="selected-food-name" id="selectedFood1Name"></div>
+                            <div class="selected-food-category" id="selectedFood1Category"></div>
                         </div>
                         <button type="button" class="change-food-btn" onclick="changeFood(1)">Change</button>
                     </div>
-                    
-                    <span class="helper-text">🔍 Type above to filter, then click to select</span>
+                    <span class="helper-text">🔍 Type above to filter, then click on a food to select it</span>
                 </div>
                 
-                <!-- Second Food Column -->
+                <!-- Second Food -->
                 <div class="food-column">
                     <label class="food-label">Second Food:</label>
-                    <input type="text" id="food2Search" class="food-search-box" placeholder="Type second food name..." value="{% if food2 %}{{ food2.food_name }}{% endif %}">
-                    
-                    <!-- Dropdown (hidden when food selected) -->
-                    <select name="food2" id="food2Select" class="food-select" size="4" required style="display: {% if food2 %}none{% else %}block{% endif %};">
+                    <input type="text" id="food2Search" class="food-search-box" placeholder="Type second food name...">
+                    <select name="food2" id="food2Select" class="food-select" size="5">
                         <option value="">-- Select second food --</option>
                         {% for food in foods %}
-                        <option value="{{ food.id }}" data-name="{{ food.food_name|lower }}" data-category="{{ food.category.name }}" {% if food2 and food2.id == food.id %}selected{% endif %}>
+                        <option value="{{ food.id }}" data-name="{{ food.food_name|lower }}" data-category="{{ food.category.name }}">
                             {{ food.food_name }} ({{ food.category.name }})
                         </option>
                         {% endfor %}
                     </select>
-                    
-                    <!-- Selected food display (shown when food selected) -->
-                    <div id="selectedFood2Display" class="selected-food-display" style="display: {% if food2 %}flex{% else %}none{% endif %};">
+                    <div id="selectedFood2Display" class="selected-food-display" style="display: none;">
                         <div class="selected-food-info">
-                            <div class="selected-food-name" id="selectedFood2Name">{% if food2 %}{{ food2.food_name }}{% endif %}</div>
-                            <div class="selected-food-category" id="selectedFood2Category">{% if food2 %}{{ food2.category.name }}{% endif %}</div>
+                            <div class="selected-food-name" id="selectedFood2Name"></div>
+                            <div class="selected-food-category" id="selectedFood2Category"></div>
                         </div>
                         <button type="button" class="change-food-btn" onclick="changeFood(2)">Change</button>
                     </div>
-                    
-                    <span class="helper-text">🔍 Type above to filter, then click to select</span>
+                    <span class="helper-text">🔍 Type above to filter, then click on a food to select it</span>
                 </div>
             </div>
             
             <button type="submit" class="compare-btn">Compare Foods →</button>
         </form>
     </div>
-    
-    {% if food1 and food2 %}
-    <div class="vs-header">
-        <div class="food-title">{{ food1.food_name }}</div>
-        <div class="vs-badge">VS</div>
-        <div class="food-title">{{ food2.food_name }}</div>
-    </div>
-    
-    <table class="comparison-table">
-        <thead>
-            <tr>
-                <th>Nutrient</th>
-                <th>{{ food1.food_name|truncatechars:20 }}</th>
-                <th>{{ food2.food_name|truncatechars:20 }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in comparison %}
-            <tr>
-                <td class="nutrient-name">{{ item.name }}</td>
-                
-                <!-- Food 1 Value -->
-                <td class="value-col">
-                    <div class="value-box">
-                        <span class="value-number {% if item.winner == 1 %}winner{% endif %}">
-                            {{ item.val1|floatformat:1 }} {{ item.unit }}
-                            {% if item.winner == 1 %}
-                            <span class="winner-badge">Winner</span>
-                            {% endif %}
-                        </span>
-                        <div class="progress-bar-bg">
-                            <div class="progress-bar-fill {% if item.winner == 1 %}winner{% endif %}" 
-                                 style="width: {{ item.pct1 }}%;"></div>
-                        </div>
-                    </div>
-                </td>
-                
-                <!-- Food 2 Value -->
-                <td class="value-col">
-                    <div class="value-box">
-                        <span class="value-number {% if item.winner == 2 %}winner{% endif %}">
-                            {{ item.val2|floatformat:1 }} {{ item.unit }}
-                            {% if item.winner == 2 %}
-                            <span class="winner-badge">Winner</span>
-                            {% endif %}
-                        </span>
-                        <div class="progress-bar-bg">
-                            <div class="progress-bar-fill {% if item.winner == 2 %}winner{% endif %}" 
-                                 style="width: {{ item.pct2 }}%;"></div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-    {% if messages %}
-    <div class="insights-box">
-        <h3>💡 Nutrition Insights</h3>
-        <ul>
-            {% for msg in messages %}
-            <li>{{ msg }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-    
-    {% endif %}
 </div>
 
+<!-- Include Popup Component -->
+{% include 'foods/popup.html' %}
+
 <script>
-    // All foods data from Django
+    // All foods data
     const allFoods = [
         {% for food in foods %}
         { id: {{ food.id }}, name: "{{ food.food_name|escapejs }}", category: "{{ food.category.name|escapejs }}" },
         {% endfor %}
     ];
     
-    // ===== FIRST FOOD FUNCTIONS =====
+    // DOM elements
     const food1Search = document.getElementById('food1Search');
     const food1Select = document.getElementById('food1Select');
     const selectedFood1Display = document.getElementById('selectedFood1Display');
     const selectedFood1Name = document.getElementById('selectedFood1Name');
     const selectedFood1Category = document.getElementById('selectedFood1Category');
     
-    // Search functionality for first food
+    const food2Search = document.getElementById('food2Search');
+    const food2Select = document.getElementById('food2Select');
+    const selectedFood2Display = document.getElementById('selectedFood2Display');
+    const selectedFood2Name = document.getElementById('selectedFood2Name');
+    const selectedFood2Category = document.getElementById('selectedFood2Category');
+    
+    // Search filtering for first food
     if (food1Search) {
         food1Search.addEventListener('keyup', function() {
-            let searchText = this.value.toLowerCase();
-            let options = food1Select.options;
-            
+            const text = this.value.toLowerCase();
+            const options = food1Select.options;
             for (let i = 0; i < options.length; i++) {
-                let foodName = options[i].getAttribute('data-name') || options[i].text.toLowerCase();
-                if (searchText.length > 0) {
-                    options[i].style.display = foodName.includes(searchText) ? 'block' : 'none';
-                } else {
-                    options[i].style.display = 'block';
-                }
+                const name = options[i].getAttribute('data-name') || options[i].text.toLowerCase();
+                options[i].style.display = name.includes(text) ? 'block' : 'none';
+            }
+        });
+    }
+    
+    // Search filtering for second food
+    if (food2Search) {
+        food2Search.addEventListener('keyup', function() {
+            const text = this.value.toLowerCase();
+            const options = food2Select.options;
+            for (let i = 0; i < options.length; i++) {
+                const name = options[i].getAttribute('data-name') || options[i].text.toLowerCase();
+                options[i].style.display = name.includes(text) ? 'block' : 'none';
             }
         });
     }
@@ -475,46 +262,18 @@
     // Select first food
     if (food1Select) {
         food1Select.addEventListener('change', function() {
-            let selectedOption = this.options[this.selectedIndex];
+            const selectedOption = this.options[this.selectedIndex];
             if (selectedOption.value) {
-                let foodId = selectedOption.value;
-                let foodName = selectedOption.text.split('(')[0].trim();
-                let category = selectedOption.getAttribute('data-category');
+                const foodId = selectedOption.value;
+                const foodName = selectedOption.text.split('(')[0].trim();
+                const category = selectedOption.getAttribute('data-category');
                 
-                // Update hidden select and display
                 selectedFood1Name.textContent = foodName;
                 selectedFood1Category.textContent = category;
-                
-                // Hide dropdown, show selected display
-                food1Select.style.display = 'none';
                 selectedFood1Display.style.display = 'flex';
-                
-                // Update search box
+                food1Select.style.display = 'none';
                 food1Search.value = foodName;
-            }
-        });
-    }
-    
-    // ===== SECOND FOOD FUNCTIONS =====
-    const food2Search = document.getElementById('food2Search');
-    const food2Select = document.getElementById('food2Select');
-    const selectedFood2Display = document.getElementById('selectedFood2Display');
-    const selectedFood2Name = document.getElementById('selectedFood2Name');
-    const selectedFood2Category = document.getElementById('selectedFood2Category');
-    
-    // Search functionality for second food
-    if (food2Search) {
-        food2Search.addEventListener('keyup', function() {
-            let searchText = this.value.toLowerCase();
-            let options = food2Select.options;
-            
-            for (let i = 0; i < options.length; i++) {
-                let foodName = options[i].getAttribute('data-name') || options[i].text.toLowerCase();
-                if (searchText.length > 0) {
-                    options[i].style.display = foodName.includes(searchText) ? 'block' : 'none';
-                } else {
-                    options[i].style.display = 'block';
-                }
+                food1Search.style.display = 'none';
             }
         });
     }
@@ -522,70 +281,183 @@
     // Select second food
     if (food2Select) {
         food2Select.addEventListener('change', function() {
-            let selectedOption = this.options[this.selectedIndex];
+            const selectedOption = this.options[this.selectedIndex];
             if (selectedOption.value) {
-                let foodId = selectedOption.value;
-                let foodName = selectedOption.text.split('(')[0].trim();
-                let category = selectedOption.getAttribute('data-category');
+                const foodId = selectedOption.value;
+                const foodName = selectedOption.text.split('(')[0].trim();
+                const category = selectedOption.getAttribute('data-category');
                 
-                // Update hidden select and display
                 selectedFood2Name.textContent = foodName;
                 selectedFood2Category.textContent = category;
-                
-                // Hide dropdown, show selected display
-                food2Select.style.display = 'none';
                 selectedFood2Display.style.display = 'flex';
-                
-                // Update search box
+                food2Select.style.display = 'none';
                 food2Search.value = foodName;
+                food2Search.style.display = 'none';
             }
         });
     }
     
-    // ===== CHANGE FOOD FUNCTIONS =====
-    window.changeFood = function(foodNumber) {
-        if (foodNumber === 1) {
-            // Reset first food
+    // Change food functions
+    window.changeFood = function(foodNum) {
+        if (foodNum === 1) {
             food1Select.style.display = 'block';
             selectedFood1Display.style.display = 'none';
             food1Search.value = '';
-            food1Select.value = '';
-            
-            // Show all options again
-            let options = food1Select.options;
+            food1Search.style.display = 'block';
+            const options = food1Select.options;
             for (let i = 0; i < options.length; i++) {
                 options[i].style.display = 'block';
             }
-        } else if (foodNumber === 2) {
-            // Reset second food
+        } else {
             food2Select.style.display = 'block';
             selectedFood2Display.style.display = 'none';
             food2Search.value = '';
-            food2Select.value = '';
-            
-            // Show all options again
-            let options = food2Select.options;
+            food2Search.style.display = 'block';
+            const options = food2Select.options;
             for (let i = 0; i < options.length; i++) {
                 options[i].style.display = 'block';
             }
         }
     };
     
-    // Clear search when food is selected via other means
-    if (food1Select) {
-        food1Select.addEventListener('change', function() {
-            if (food1Search) {
-                // Don't clear search value - it shows the selected food
+    // AJAX Form Submit
+    const compareForm = document.getElementById('compareForm');
+    
+    if (compareForm) {
+        compareForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get selected food IDs
+            const food1Selected = food1Select.value || (selectedFood1Display.style.display === 'flex' ? 
+                allFoods.find(f => f.name === selectedFood1Name.textContent)?.id : null);
+            const food2Selected = food2Select.value || (selectedFood2Display.style.display === 'flex' ? 
+                allFoods.find(f => f.name === selectedFood2Name.textContent)?.id : null);
+            
+            if (!food1Selected || !food2Selected) {
+                alert('Please select two foods to compare');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('food1', food1Selected);
+            formData.append('food2', food2Selected);
+            
+            // Show loading modal
+            document.getElementById('modalTitle').innerHTML = '📊 Comparing...';
+            document.getElementById('modalBody').innerHTML = '<div class="loading">🔄 Analyzing food comparison...</div>';
+            openModal();
+            
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayComparisonResults(data);
+                } else {
+                    displayError(data.error || 'Error comparing foods');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                displayError('Network error. Please try again.');
             }
         });
     }
     
-    if (food2Select) {
-        food2Select.addEventListener('change', function() {
-            if (food2Search) {
-                // Don't clear search value - it shows the selected food
-            }
-        });
+    function displayComparisonResults(data) {
+        const food1 = data.food1;
+        const food2 = data.food2;
+        const comparison = data.comparison;
+        const messages = data.messages || [];
+        
+        let html = `
+            <div class="greeting">
+                <h2>🔍 ${escapeHtml(food1.name)} vs ${escapeHtml(food2.name)}</h2>
+                <p style="margin: 0; color: #666;">Nutrient comparison per 100g</p>
+            </div>
+            
+            <div class="comparison-table" style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 12px; text-align: left;">Nutrient</th>
+                            <th style="padding: 12px; text-align: center;">${escapeHtml(food1.name)}</th>
+                            <th style="padding: 12px; text-align: center;">${escapeHtml(food2.name)}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        for (const item of comparison) {
+            const winner = item.winner === 1 ? '🏆 Winner' : (item.winner === 2 ? '🏆 Winner' : '');
+            const isWinner1 = item.winner === 1;
+            const isWinner2 = item.winner === 2;
+            
+            html += `
+                <tr style="border-bottom: 1px solid #e9ecef;">
+                    <td style="padding: 12px;"><strong>${escapeHtml(item.name)}</strong></td>
+                    <td style="padding: 12px; text-align: center; ${isWinner1 ? 'background: #e8f0e8; font-weight: bold;' : ''}">
+                        ${item.val1.toFixed(1)} ${item.unit}
+                        ${isWinner1 ? '<span style="color: #28a745; margin-left: 5px;">🏆</span>' : ''}
+                    </td>
+                    <td style="padding: 12px; text-align: center; ${isWinner2 ? 'background: #e8f0e8; font-weight: bold;' : ''}">
+                        ${item.val2.toFixed(1)} ${item.unit}
+                        ${isWinner2 ? '<span style="color: #28a745; margin-left: 5px;">🏆</span>' : ''}
+                    </td>
+                </tr>
+            `;
+        }
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        // Add insights
+        if (messages && messages.length > 0) {
+            html += `
+                <div class="insight-box" style="margin-top: 20px; background: #e8f0e8; padding: 16px; border-radius: 16px;">
+                    <h4 style="margin: 0 0 10px 0; color: #2c5e2e;">💡 Nutrition Insights</h4>
+                    ${messages.map(msg => `<p style="margin: 8px 0;">${escapeHtml(msg)}</p>`).join('')}
+                </div>
+            `;
+        }
+        
+        // Share buttons
+        html += `
+            <div class="share-buttons">
+                <button class="share-btn share-wa" onclick="shareResults('whatsapp', 'Compare: ${escapeHtml(food1.name)} vs ${escapeHtml(food2.name)}', window.location.href)">💬 WhatsApp</button>
+                <button class="share-btn share-fb" onclick="shareResults('facebook', '', window.location.href)">📘 Facebook</button>
+                <button class="share-btn share-copy" onclick="shareResults('copy', 'Compare: ${escapeHtml(food1.name)} vs ${escapeHtml(food2.name)}', window.location.href)">🔗 Copy Link</button>
+            </div>
+        `;
+        
+        document.getElementById('modalBody').innerHTML = html;
+        document.getElementById('modalTitle').innerHTML = `🔍 ${escapeHtml(food1.name)} vs ${escapeHtml(food2.name)}`;
+        openModal();
+    }
+    
+    function displayError(message) {
+        document.getElementById('modalBody').innerHTML = `
+            <div style="text-align: center; padding: 2rem;">
+                <div style="font-size: 3rem;">😕</div>
+                <p style="color: #dc3545; margin-top: 1rem;">${escapeHtml(message)}</p>
+                <button onclick="closeModal()" style="margin-top: 1rem; padding: 8px 24px; background: #2c5e2e; color: white; border: none; border-radius: 50px; cursor: pointer;">Close</button>
+            </div>
+        `;
+        document.getElementById('modalTitle').innerHTML = '❌ Error';
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 </script>
 {% endblock %}
