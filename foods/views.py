@@ -538,3 +538,65 @@ def get_units(request):
 
 def test(request):
     return HttpResponse("Server is reachable!")
+# ===== API ENDPOINTS =====
+def api_foods(request):
+    """Return all foods as JSON (for developers)"""
+    foods = Food.objects.all().values(
+        'id', 'food_name', 'category__name', 
+        'energy_kcal', 'protein_g', 'fat_g', 'carbohydrate_g', 
+        'fiber_g', 'iron_mg', 'calcium_mg', 'vitamin_a_rae_ug'
+    )[:50]  # Limit to 50 for performance
+    return JsonResponse(list(foods), safe=False)
+
+def api_food_detail(request, food_id):
+    """Return a single food with all nutrients as JSON"""
+    try:
+        food = Food.objects.get(id=food_id)
+        data = {
+            'id': food.id,
+            'name': food.food_name,
+            'category': food.category.name,
+            'kfct_code': food.kfct_code,
+            'energy_kcal': food.energy_kcal,
+            'protein_g': food.protein_g,
+            'fat_g': food.fat_g,
+            'carbohydrate_g': food.carbohydrate_g,
+            'fiber_g': food.fiber_g,
+            'water_g': food.water_g,
+            'iron_mg': food.iron_mg,
+            'calcium_mg': food.calcium_mg,
+            'magnesium_mg': food.magnesium_mg,
+            'phosphorus_mg': food.phosphorus_mg,
+            'potassium_mg': food.potassium_mg,
+            'sodium_mg': food.sodium_mg,
+            'zinc_mg': food.zinc_mg,
+            'vitamin_a_rae_ug': food.vitamin_a_rae_ug,
+            'thiamin_mg': food.thiamin_mg,
+            'riboflavin_mg': food.riboflavin_mg,
+            'niacin_mg': food.niacin_mg,
+            'vitamin_b6_mg': food.vitamin_b6_mg,
+            'folate_ug': food.folate_ug,
+            'vitamin_b12_ug': food.vitamin_b12_ug,
+            'vitamin_c_mg': food.vitamin_c_mg,
+        }
+        return JsonResponse(data)
+    except Food.DoesNotExist:
+        return JsonResponse({'error': 'Food not found'}, status=404)
+
+def api_search(request):
+    """Search foods by name"""
+    query = request.GET.get('q', '')
+    if query:
+        foods = Food.objects.filter(food_name__icontains=query).values(
+            'id', 'food_name', 'category__name', 'energy_kcal', 'protein_g', 'iron_mg'
+        )[:20]
+        return JsonResponse(list(foods), safe=False)
+    return JsonResponse([], safe=False)
+
+def api_categories(request):
+    """Return all categories with food counts"""
+    from django.db import models
+    categories = Category.objects.annotate(food_count=models.Count('foods')).values(
+        'id', 'name', 'food_count'
+    )
+    return JsonResponse(list(categories), safe=False)

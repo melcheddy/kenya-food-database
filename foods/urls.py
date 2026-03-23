@@ -10,4 +10,9 @@ urlpatterns = [
     path('compare/', views.compare_foods, name='compare'),
     path('test/', views.test),
     path('get-units/', views.get_units, name='get_units'),
+        # API Endpoints
+    path('api/foods/', views.api_foods, name='api_foods'),
+    path('api/food/<int:food_id>/', views.api_food_detail, name='api_food_detail'),
+    path('api/search/', views.api_search, name='api_search'),
+    path('api/categories/', views.api_categories, name='api_categories'),
 ]
