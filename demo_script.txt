@@ -1,0 +1,44 @@
+# KENYA FOOD DATABASE - DEMO SCRIPT (5 min)
+
+## 1. INTRODUCTION (30 sec)
+"I built a nutrition tool using the Kenya Food Composition Tables 2018. It has 628 Kenyan foods with complete nutrient data."
+
+## 2. SEARCH & FOOD DETAILS (1 min)
+- Go to: https://kenya-food-database.onrender.com
+- Search for "sukuma wiki"
+- Show the nutrient table: energy, protein, iron, vitamins
+- "It shows over 40 nutrients per 100g of food"
+
+## 3. NUTRIENT CALCULATOR (1 min)
+- Click "Calculator"
+- Select "maize meal sifted"
+- Click "2 cups" (quick button)
+- Click Calculate
+- Show popup with:
+  - Personalized greeting
+  - Energy: 704 kcal, Protein: 13.6g, Iron: 7.2mg
+  - RDA percentages: "15% of daily energy, 81% of daily iron"
+- "It calculates % of daily needs based on age and gender"
+
+## 4. 24-HOUR RECALL (1 min)
+- Click "24hr Recall"
+- Enter name: "Jane"
+- Add: 2 chapati, 1 cup milk
+- Click Calculate
+- Show popup with "Hi Jane!" and 4 tabs:
+  - Summary: Energy, protein, iron
+  - Nutrients: Full breakdown
+  - Improvements: Suggestions if low in nutrients
+  - Hydration: Water intake analysis
+- "Nutritionists can use this to assess patient diets"
+
+## 5. API (30 sec)
+- Show: https://kenya-food-database.onrender.com/api/foods/
+- "This API allows other apps like AfyaCare to use the food data"
+- Show search: /api/search/?q=maize
+
+## 6. SECURITY (30 sec)
+- "I added HTTPS, secure cookies, and HSTS to protect user data"
+
+## 7. QUESTION (30 sec)
+"Would this be useful for nutrition students or dietitians? What features would you add?"
