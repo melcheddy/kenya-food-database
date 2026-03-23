@@ -4,7 +4,7 @@ def add_traditional_foods(apps, schema_editor):
     Food = apps.get_model('foods', 'Food')
     Category = apps.get_model('foods', 'Category')
     
-    # Get or create categories
+    # Get or create categories (no IDs)
     beverages_cat, _ = Category.objects.get_or_create(name='beverages')
     mixed_dishes_cat, _ = Category.objects.get_or_create(name='mixed_dishes')
     misc_cat, _ = Category.objects.get_or_create(name='miscellaneous')
@@ -38,6 +38,7 @@ def add_traditional_foods(apps, schema_editor):
     ]
     
     for food_data in foods:
+        # Use get_or_create to avoid duplicate key errors
         Food.objects.get_or_create(
             food_name=food_data['food_name'],
             defaults=food_data
