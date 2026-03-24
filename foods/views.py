@@ -498,9 +498,6 @@ def compare_foods(request):
                 if not messages:
                     messages.append("💡 These foods have similar nutritional profiles.")
                 
-                                if not messages:
-                    messages.append("💡 These foods have similar nutritional profiles.")
-                
                 # ===== ADD THIS RIGHT HERE =====
                 # AJAX response for popup
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
