@@ -612,118 +612,178 @@
         });
     }
     
-    function displayRecallResults(data, userName) {
-        const results = data.results;
-        
-        let html = `
-            <div class="greeting">
-                <h2>👋 Hi ${escapeHtml(userName)}!</h2>
-                <p style="margin: 0; color: #666;">Here's your 24-hour nutrition summary</p>
-            </div>
-            
-            <div class="nutrient-tabs">
-                <div class="nutrient-tab active" data-tab="summary" onclick="showNutrientTab('summary')">📊 Summary</div>
-                <div class="nutrient-tab" data-tab="nutrients" onclick="showNutrientTab('nutrients')">🥗 Nutrients</div>
-                <div class="nutrient-tab" data-tab="improvements" onclick="showNutrientTab('improvements')">💡 Improvements</div>
-                <div class="nutrient-tab" data-tab="hydration" onclick="showNutrientTab('hydration')">💧 Hydration</div>
-            </div>
-            
-            <!-- Summary Tab -->
-            <div id="tab-summary" class="tab-content active">
-                <div class="nutrient-grid">
-                    <div class="nutrient-item">
-                        <span class="nutrient-name">🔥 Energy</span>
-                        <span class="nutrient-value">${results.total_energy.toFixed(0)} kcal</span>
-                    </div>
-                    <div class="nutrient-item">
-                        <span class="nutrient-name">🥩 Protein</span>
-                        <span class="nutrient-value">${results.total_protein.toFixed(1)} g</span>
-                    </div>
-                    <div class="nutrient-item">
-                        <span class="nutrient-name">⚡ Iron</span>
-                        <span class="nutrient-value">${results.total_iron.toFixed(1)} mg</span>
-                    </div>
-                    <div class="nutrient-item">
-                        <span class="nutrient-name">🦴 Calcium</span>
-                        <span class="nutrient-value">${results.total_calcium ? results.total_calcium.toFixed(0) : 'N/A'} mg</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Nutrients Tab -->
-            <div id="tab-nutrients" class="tab-content">
-                <div class="nutrient-grid">
-                    <div class="nutrient-item"><span class="nutrient-name">🔥 Energy</span><span class="nutrient-value">${results.total_energy.toFixed(0)} kcal</span></div>
-                    <div class="nutrient-item"><span class="nutrient-name">🥩 Protein</span><span class="nutrient-value">${results.total_protein.toFixed(1)} g</span></div>
-                    <div class="nutrient-item"><span class="nutrient-name">🥑 Fat</span><span class="nutrient-value">${results.total_fat ? results.total_fat.toFixed(1) : 'N/A'} g</span></div>
-                    <div class="nutrient-item"><span class="nutrient-name">🌾 Carbs</span><span class="nutrient-value">${results.total_carbs ? results.total_carbs.toFixed(1) : 'N/A'} g</span></div>
-                    <div class="nutrient-item"><span class="nutrient-name">🌿 Fiber</span><span class="nutrient-value">${results.total_fiber ? results.total_fiber.toFixed(1) : 'N/A'} g</span></div>
-                    <div class="nutrient-item"><span class="nutrient-name">⚡ Iron</span><span class="nutrient-value">${results.total_iron.toFixed(1)} mg</span></div>
-                    <div class="nutrient-item"><span class="nutrient-name">🦴 Calcium</span><span class="nutrient-value">${results.total_calcium ? results.total_calcium.toFixed(0) : 'N/A'} mg</span></div>
-                </div>
-            </div>
-            
-            <!-- Improvements Tab -->
-            <div id="tab-improvements" class="tab-content">
-                ${results.status_messages && results.status_messages.length > 0 ? 
-                    results.status_messages.map(msg => `
-                        <div class="insight-box" style="margin-bottom: 12px;">
-                            <p style="margin: 0;">${escapeHtml(msg.message)}</p>
-                            ${msg.suggestions ? `
-                                <div style="margin-top: 8px;">
-                                    ${msg.suggestions.map(s => `<a href="/search/?q=${encodeURIComponent(s)}" style="display: inline-block; background: #f0f0f0; padding: 4px 12px; border-radius: 20px; margin: 4px; text-decoration: none; color: #2c5e2e; font-size: 0.8rem;">➕ ${escapeHtml(s)}</a>`).join('')}
-                                </div>
-                            ` : ''}
+function displayRecallResults(data) {
+    const results = data.results;
+    const userName = data.name || 'there';
+    
+    // Build improvements HTML with ALL nutrients
+    let improvementsHtml = '';
+    
+    // Define all nutrients to check
+    const nutrients = [
+        { 
+            name: 'Iron', 
+            key: 'iron_percent', 
+            current: 'total_iron', 
+            target: 'iron_mg',
+            suggestions: ['sukuma wiki', 'beans', 'dagaa omena', 'whole maize flour', 'liver'],
+            message: 'iron-rich foods',
+            color: '#dc3545'
+        },
+        { 
+            name: 'Protein', 
+            key: 'protein_percent', 
+            current: 'total_protein', 
+            target: 'protein_g',
+            suggestions: ['beans', 'eggs', 'chicken', 'fish', 'milk', 'groundnuts'],
+            message: 'protein-rich foods',
+            color: '#dc3545'
+        },
+        { 
+            name: 'Energy', 
+            key: 'energy_percent', 
+            current: 'total_energy', 
+            target: 'energy_kcal',
+            suggestions: ['ugali', 'rice', 'chapati', 'sweet potato', 'cassava', 'maize'],
+            message: 'energy-dense foods',
+            color: '#ffc107'
+        },
+        { 
+            name: 'Calcium', 
+            key: 'calcium_percent', 
+            current: 'total_calcium', 
+            target: 'calcium_mg',
+            suggestions: ['milk', 'dagaa omena', 'amaranth leaves', 'sesame seeds', 'yogurt'],
+            message: 'calcium-rich foods',
+            color: '#dc3545'
+        },
+        { 
+            name: 'Fiber', 
+            key: 'fiber_percent', 
+            current: 'total_fiber', 
+            target: 'fiber_g',
+            suggestions: ['whole maize flour', 'beans', 'sukuma wiki', 'sweet potato', 'cassava'],
+            message: 'fiber-rich foods',
+            color: '#dc3545'
+        },
+        { 
+            name: 'Vitamin A', 
+            key: 'vitamin_a_percent', 
+            current: 'total_vitamin_a', 
+            target: 'vitamin_a_rae_ug',
+            suggestions: ['sukuma wiki', 'sweet potato orange', 'mango', 'carrots', 'pumpkin', 'pawpaw'],
+            message: 'vitamin A-rich foods',
+            color: '#dc3545'
+        },
+        { 
+            name: 'Vitamin C', 
+            key: 'vitamin_c_percent', 
+            current: 'total_vitamin_c', 
+            target: 'vitamin_c_mg',
+            suggestions: ['orange', 'mango', 'pawpaw', 'tomato', 'sukuma wiki', 'passion fruit'],
+            message: 'vitamin C-rich foods',
+            color: '#dc3545'
+        }
+    ];
+    
+    // Check each nutrient
+    for (const n of nutrients) {
+        const percent = results.rdi_percentages?.[n.key];
+        if (percent && percent < 70) {
+            const currentValue = results[n.current] || 0;
+            const targetValue = results.rdi?.[n.target] || 1;
+            improvementsHtml += `
+                <div style="margin-bottom: 15px; padding: 12px; background: #fff5f5; border-left: 4px solid ${n.color}; border-radius: 8px;">
+                    <p style="margin: 0; font-weight: 600;">⚠️ Low ${n.name}</p>
+                    <p style="margin: 5px 0; font-size: 0.9rem;">You consumed ${currentValue.toFixed(1)} / ${targetValue} target (${percent.toFixed(0)}%)</p>
+                    <div style="margin-top: 8px;">
+                        <span style="font-size: 0.85rem;">Try adding:</span>
+                        <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 6px;">
+                            ${n.suggestions.map(s => `<a href="/search/?q=${encodeURIComponent(s)}" style="display: inline-block; background: #e9ecef; padding: 4px 12px; border-radius: 20px; text-decoration: none; color: #2c5e2e; font-size: 0.8rem;">➕ ${s}</a>`).join('')}
                         </div>
-                    `).join('') 
-                    : '<div class="insight-box"><p>✅ Great job! Your nutrition looks balanced.</p></div>'}
-            </div>
-            
-            <!-- Hydration Tab -->
-            <div id="tab-hydration" class="tab-content">
-                <div class="nutrient-grid">
-                    <div class="nutrient-item">
-                        <span class="nutrient-name">💧 Total Fluids</span>
-                        <span class="nutrient-value">${results.total_fluid_ml.toFixed(0)} ml (${results.total_fluid_l.toFixed(1)} L)</span>
-                    </div>
-                    <div class="nutrient-item">
-                        <span class="nutrient-name">🎯 Target</span>
-                        <span class="nutrient-value">${results.ai_liters} L</span>
                     </div>
                 </div>
-                <div class="rda-bar" style="margin: 1rem 0;">
-                    <div class="rda-fill" style="width: ${Math.min(results.fluid_percent, 100)}%"></div>
-                </div>
-                <div class="insight-box">
-                    <p>${escapeHtml(results.hydration_message || '💧 Stay hydrated!')}</p>
-                </div>
-            </div>
-        `;
-        
-        // Share buttons
-        html += `
-            <div class="share-buttons">
-                <button class="share-btn share-wa" onclick="shareResults('whatsapp', 'My 24hr nutrition summary: ${results.total_energy.toFixed(0)} kcal, ${results.total_protein.toFixed(1)}g protein', window.location.href)">💬 WhatsApp</button>
-                <button class="share-btn share-fb" onclick="shareResults('facebook', '', window.location.href)">📘 Facebook</button>
-                <button class="share-btn share-copy" onclick="shareResults('copy', 'My 24hr nutrition summary: ${results.total_energy.toFixed(0)} kcal, ${results.total_protein.toFixed(1)}g protein', window.location.href)">🔗 Copy Link</button>
-            </div>
-        `;
-        
-        document.getElementById('modalBody').innerHTML = html;
-        document.getElementById('modalTitle').innerHTML = `📋 ${escapeHtml(userName)}'s Nutrition Summary`;
-        openModal();
+            `;
+        }
     }
     
-    function displayError(message) {
-        document.getElementById('modalBody').innerHTML = `
-            <div style="text-align: center; padding: 2rem;">
-                <div style="font-size: 3rem;">😕</div>
-                <p style="color: #dc3545; margin-top: 1rem;">${escapeHtml(message)}</p>
-                <button onclick="closeModal()" style="margin-top: 1rem; padding: 8px 24px; background: #2c5e2e; color: white; border: none; border-radius: 50px; cursor: pointer;">Close</button>
-            </div>
-        `;
-        document.getElementById('modalTitle').innerHTML = '❌ Error';
+    // If no deficiencies, show success message
+    if (!improvementsHtml) {
+        improvementsHtml = '<div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 4px solid #28a745;"><p style="margin: 0;">✅ Great job! Your nutrition looks balanced across all key nutrients.</p></div>';
     }
+    
+    // Build the rest of the modal
+    let html = `
+        <div class="greeting">
+            <h2>👋 Hi ${escapeHtml(userName)}!</h2>
+            <p style="margin: 0; color: #666;">Here's your 24-hour nutrition summary</p>
+        </div>
+        
+        <div class="nutrient-tabs">
+            <div class="nutrient-tab active" data-tab="summary" onclick="showNutrientTab('summary')">📊 Summary</div>
+            <div class="nutrient-tab" data-tab="nutrients" onclick="showNutrientTab('nutrients')">🥗 Nutrients</div>
+            <div class="nutrient-tab" data-tab="improvements" onclick="showNutrientTab('improvements')">💡 Improvements</div>
+            <div class="nutrient-tab" data-tab="hydration" onclick="showNutrientTab('hydration')">💧 Hydration</div>
+        </div>
+        
+        <!-- Summary Tab -->
+        <div id="tab-summary" class="tab-content active">
+            <div class="nutrient-grid">
+                <div class="nutrient-item"><span class="nutrient-name">🔥 Energy</span><span class="nutrient-value">${results.total_energy.toFixed(0)} kcal</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🥩 Protein</span><span class="nutrient-value">${results.total_protein.toFixed(1)} g</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">⚡ Iron</span><span class="nutrient-value">${results.total_iron.toFixed(1)} mg</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🦴 Calcium</span><span class="nutrient-value">${results.total_calcium ? results.total_calcium.toFixed(0) : 'N/A'} mg</span></div>
+            </div>
+        </div>
+        
+        <!-- Nutrients Tab -->
+        <div id="tab-nutrients" class="tab-content">
+            <div class="nutrient-grid">
+                <div class="nutrient-item"><span class="nutrient-name">🔥 Energy</span><span class="nutrient-value">${results.total_energy.toFixed(0)} kcal</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🥩 Protein</span><span class="nutrient-value">${results.total_protein.toFixed(1)} g</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🥑 Fat</span><span class="nutrient-value">${results.total_fat ? results.total_fat.toFixed(1) : 'N/A'} g</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🌾 Carbs</span><span class="nutrient-value">${results.total_carbs ? results.total_carbs.toFixed(1) : 'N/A'} g</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🌿 Fiber</span><span class="nutrient-value">${results.total_fiber ? results.total_fiber.toFixed(1) : 'N/A'} g</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">⚡ Iron</span><span class="nutrient-value">${results.total_iron.toFixed(1)} mg</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🦴 Calcium</span><span class="nutrient-value">${results.total_calcium ? results.total_calcium.toFixed(0) : 'N/A'} mg</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🥕 Vitamin A</span><span class="nutrient-value">${results.total_vitamin_a ? results.total_vitamin_a.toFixed(0) : 'N/A'} µg</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🍊 Vitamin C</span><span class="nutrient-value">${results.total_vitamin_c ? results.total_vitamin_c.toFixed(1) : 'N/A'} mg</span></div>
+            </div>
+        </div>
+        
+        <!-- Improvements Tab -->
+        <div id="tab-improvements" class="tab-content">
+            ${improvementsHtml}
+        </div>
+        
+        <!-- Hydration Tab -->
+        <div id="tab-hydration" class="tab-content">
+            <div class="nutrient-grid">
+                <div class="nutrient-item"><span class="nutrient-name">💧 Total Fluids</span><span class="nutrient-value">${results.total_fluid_ml.toFixed(0)} ml (${results.total_fluid_l.toFixed(1)} L)</span></div>
+                <div class="nutrient-item"><span class="nutrient-name">🎯 Target</span><span class="nutrient-value">${results.ai_liters} L</span></div>
+            </div>
+            <div class="rda-bar" style="margin: 1rem 0;">
+                <div class="rda-fill" style="width: ${Math.min(results.fluid_percent, 100)}%"></div>
+            </div>
+            <div class="insight-box">
+                <p>${escapeHtml(results.hydration_message || '💧 Stay hydrated!')}</p>
+            </div>
+        </div>
+    `;
+    
+    // Add share buttons
+    html += `
+        <div class="share-buttons">
+            <button class="share-btn share-wa" onclick="shareResults('whatsapp', 'My 24hr nutrition summary: ${results.total_energy.toFixed(0)} kcal, ${results.total_protein.toFixed(1)}g protein', window.location.href)">💬 WhatsApp</button>
+            <button class="share-btn share-fb" onclick="shareResults('facebook', '', window.location.href)">📘 Facebook</button>
+            <button class="share-btn share-copy" onclick="shareResults('copy', 'My 24hr nutrition summary: ${results.total_energy.toFixed(0)} kcal, ${results.total_protein.toFixed(1)}g protein', window.location.href)">🔗 Copy Link</button>
+        </div>
+    `;
+    
+    document.getElementById('modalBody').innerHTML = html;
+    document.getElementById('modalTitle').innerHTML = `📋 ${escapeHtml(userName)}'s Nutrition Summary`;
+    openModal();
+}
     
     function escapeHtml(text) {
         if (!text) return '';
