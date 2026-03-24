@@ -498,6 +498,24 @@ def compare_foods(request):
                 if not messages:
                     messages.append("💡 These foods have similar nutritional profiles.")
                 
+                                if not messages:
+                    messages.append("💡 These foods have similar nutritional profiles.")
+                
+                # ===== ADD THIS RIGHT HERE =====
+                # AJAX response for popup
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'food1': {'name': food1.food_name, 'id': food1.id},
+                        'food2': {'name': food2.food_name, 'id': food2.id},
+                        'comparison': comparison,
+                        'messages': messages,
+                    })
+                # ===== END OF ADDED CODE =====
+                
+            except Food.DoesNotExist:
+                pass
+
             except Food.DoesNotExist:
                 pass
     
