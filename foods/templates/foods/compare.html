@@ -320,53 +320,72 @@
         }
     };
     
-    // AJAX Form Submit
-    const compareForm = document.getElementById('compareForm');
-    
-    if (compareForm) {
-        compareForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Get selected food IDs
-            const food1Selected = food1Select.value || (selectedFood1Display.style.display === 'flex' ? 
-                allFoods.find(f => f.name === selectedFood1Name.textContent)?.id : null);
-            const food2Selected = food2Select.value || (selectedFood2Display.style.display === 'flex' ? 
-                allFoods.find(f => f.name === selectedFood2Name.textContent)?.id : null);
-            
-            if (!food1Selected || !food2Selected) {
-                alert('Please select two foods to compare');
-                return;
+// AJAX Form Submit
+const compareForm = document.getElementById('compareForm');
+
+// Get CSRF token from cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
             }
-            
-            const formData = new FormData();
-            formData.append('food1', food1Selected);
-            formData.append('food2', food2Selected);
-            
-            // Show loading modal
-            document.getElementById('modalTitle').innerHTML = '📊 Comparing...';
-            document.getElementById('modalBody').innerHTML = '<div class="loading">🔄 Analyzing food comparison...</div>';
-            openModal();
-            
-            try {
-                const response = await fetch(window.location.href, {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    displayComparisonResults(data);
-                } else {
-                    displayError(data.error || 'Error comparing foods');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                displayError('Network error. Please try again.');
-            }
-        });
+        }
     }
+    return cookieValue;
+}
+
+if (compareForm) {
+    compareForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Get selected food IDs
+        const food1Selected = food1Select.value || (selectedFood1Display.style.display === 'flex' ? 
+            allFoods.find(f => f.name === selectedFood1Name.textContent)?.id : null);
+        const food2Selected = food2Select.value || (selectedFood2Display.style.display === 'flex' ? 
+            allFoods.find(f => f.name === selectedFood2Name.textContent)?.id : null);
+        
+        if (!food1Selected || !food2Selected) {
+            alert('Please select two foods to compare');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('food1', food1Selected);
+        formData.append('food2', food2Selected);
+        
+        // Show loading modal
+        document.getElementById('modalTitle').innerHTML = '📊 Comparing...';
+        document.getElementById('modalBody').innerHTML = '<div class="loading">🔄 Analyzing food comparison...</div>';
+        openModal();
+        
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCookie('csrftoken')  // ADD THIS LINE
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                displayComparisonResults(data);
+            } else {
+                displayError(data.error || 'Error comparing foods');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            displayError('Network error. Please try again.');
+        }
+    });
+}
     
     function displayComparisonResults(data) {
         const food1 = data.food1;
