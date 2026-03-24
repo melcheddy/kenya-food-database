@@ -585,3 +585,17 @@ def api_categories(request):
         'id', 'name', 'food_count'
     )
     return JsonResponse(list(categories), safe=False)
+
+def create_admin(request):
+    """Emergency: Create admin user by visiting a URL"""
+    from django.contrib.auth.models import User
+    
+    username = 'admin123'
+    email = 'admin@example.com'
+    password = 'admin123'
+    
+    if not User.objects.filter(username=username).exists():
+        User.objects.create_superuser(username=username, email=email, password=password)
+        return HttpResponse(f"✅ Admin user created! Username: {username}, Password: {password}")
+    else:
+        return HttpResponse(f"⚠️ User '{username}' already exists. Try logging in.")

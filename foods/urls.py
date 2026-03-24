@@ -15,4 +15,5 @@ urlpatterns = [
     path('api/food/<int:food_id>/', views.api_food_detail, name='api_food_detail'),
     path('api/search/', views.api_search, name='api_search'),
     path('api/categories/', views.api_categories, name='api_categories'),
+    path('create-admin/', views.create_admin, name='create_admin'),
 ]
