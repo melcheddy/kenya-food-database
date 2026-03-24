@@ -4,6 +4,142 @@
 
 {% block extra_css %}
 <style>
+function showTooltip(event, message) {
+    const tooltip = document.createElement('div');
+    tooltip.textContent = message;
+    tooltip.style.position = 'fixed';
+    tooltip.style.bottom = '20px';
+    tooltip.style.left = '20px';
+    tooltip.style.right = '20px';
+    tooltip.style.background = '#2c3e2f';
+    tooltip.style.color = 'white';
+    tooltip.style.padding = '12px 16px';
+    tooltip.style.borderRadius = '12px';
+    tooltip.style.zIndex = '10000';
+    tooltip.style.fontSize = '14px';
+    tooltip.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    
+    document.body.appendChild(tooltip);
+    
+    setTimeout(() => {
+        tooltip.remove();
+    }, 3000);
+}
+
+    /* Tooltip Styles */
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.tooltip-container .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #2c3e2f;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+    font-weight: normal;
+    pointer-events: none;
+}
+
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: #6c757d;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 12px;
+    line-height: 18px;
+    margin-left: 6px;
+    cursor: help;
+}
+
+@media (max-width: 768px) {
+    .tooltip-container .tooltip-text {
+        width: 180px;
+        margin-left: -90px;
+        font-size: 11px;
+    }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+}
+    /* Tooltip Styles */
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.tooltip-container .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #2c3e2f;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 8px 12px;
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+    font-weight: normal;
+    pointer-events: none;
+}
+
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: #6c757d;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 12px;
+    line-height: 18px;
+    margin-left: 6px;
+    cursor: help;
+}
+
+/* Mobile touch tooltip */
+@media (max-width: 768px) {
+    .tooltip-container .tooltip-text {
+        width: 180px;
+        margin-left: -90px;
+        font-size: 11px;
+    }
+}
     .calc-container {
         max-width: 800px;
         margin: 0 auto;
@@ -186,86 +322,94 @@
         
         <!-- Food Selection -->
         <div class="form-group">
-            <label>1. Find Food</label>
-            
-            {% if food_selected %}
-            <div class="selected-food">
-                <div>
-                    <strong>{{ food_selected.food_name }}</strong><br>
-                    <small>{{ food_selected.category.name }}</small>
-                </div>
-                <button type="button" class="change-btn" onclick="resetFood()">Change</button>
-            </div>
-            {% endif %}
-            
-            <div id="foodArea" {% if food_selected %}style="display: none;"{% endif %}>
-                <input type="text" id="foodSearch" class="food-search-box" placeholder="Type food name...">
-                <div class="styled-select">
-                    <select name="food_id" id="foodSelect" size="5">
-                        <option value="">-- Select a food --</option>
-                        {% for food in foods %}
-                        <option value="{{ food.id }}" data-name="{{ food.food_name|lower }}">
-                            {{ food.food_name }} ({{ food.category.name }})
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
+            <!-- Food Selection -->
+<div class="form-group">
+    <label>1. Find Food</label>
+    
+    {% if food_selected %}
+    <div class="selected-food">
+        <div>
+            <strong>{{ food_selected.food_name }}</strong><br>
+            <small>{{ food_selected.category.name }}</small>
+        </div>
+        <button type="button" class="change-btn" onclick="resetFood()">Change</button>
+    </div>
+    {% endif %}
+    
+    <div id="foodArea" {% if food_selected %}style="display: none;"{% endif %}>
+        <input type="text" id="foodSearch" class="food-search-box" placeholder="Type food name...">
+        <div class="styled-select">
+            <select name="food_id" id="foodSelect" size="5">
+                <option value="">-- Select a food --</option>
+                {% for food in foods %}
+                <option value="{{ food.id }}" data-name="{{ food.food_name|lower }}">
+                    {{ food.food_name }} ({{ food.category.name }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Amount and Unit -->
+<div class="form-row">
+    <div class="form-group">
+        <label>2. Amount</label>
+        <input type="number" name="amount" value="{{ amount }}" step="0.1" min="0.1" required 
+               style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; background: #faf7f2;">
+    </div>
+    
+    <div class="form-group">
+        <label>
+            3. Unit
+            <span class="tooltip-icon" onclick="showTooltip(event, 'Units: grams (g), cups, tablespoons, plates, bowls, handfuls. Select the unit that matches how you measure your food. For example: 1 cup of rice ≈ 158g.')">?</span>
+        </label>
+        <div class="styled-select">
+            <select name="unit">
+                <option value="grams" {% if unit == 'grams' %}selected{% endif %}>grams (g)</option>
+                {% for conv in available_units %}
+                <option value="{{ conv.unit_name }}" {% if unit == conv.unit_name %}selected{% endif %}>
+                    {{ conv.unit_name }} (1 = {{ conv.grams }}g)
+                </option>
+                {% endfor %}
+            </select>
         </div>
         
-        <!-- Amount and Unit -->
-        <div class="form-row">
-            <div class="form-group">
-                <label>2. Amount</label>
-                <input type="number" name="amount" value="{{ amount }}" step="0.1" min="0.1" required 
-       style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; background: #faf7f2;">
-            </div>
-            
-            <div class="form-group">
-                <label>3. Unit</label>
-                <div class="styled-select">
-                    <select name="unit">
-                        <option value="grams" {% if unit == 'grams' %}selected{% endif %}>grams (g)</option>
-                        {% for conv in available_units %}
-                        <option value="{{ conv.unit_name }}" {% if unit == conv.unit_name %}selected{% endif %}>
-                            {{ conv.unit_name }} (1 = {{ conv.grams }}g)
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                {% if available_units %}
-                <div class="quick-buttons">
-                    {% for conv in available_units %}
-                        {% if conv.unit_name in 'cup,tablespoon,teaspoon,small_plate,medium_plate,large_plate,bowl,handful,piece,slice' %}
-                        <button type="button" class="quick-btn" onclick="setQuick('{{ conv.unit_name }}')">
-                            {{ conv.unit_name }}
-                        </button>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+        {% if available_units %}
+        <div class="quick-buttons">
+            {% for conv in available_units %}
+                {% if conv.unit_name in 'cup,tablespoon,teaspoon,small_plate,medium_plate,large_plate,bowl,handful,piece,slice' %}
+                <button type="button" class="quick-btn" onclick="setQuick('{{ conv.unit_name }}')">
+                    {{ conv.unit_name }}
+                </button>
                 {% endif %}
-            </div>
+            {% endfor %}
         </div>
-        
-        <!-- Gender and Age -->
-        <div class="form-row">
-            <div class="form-group">
-                <label>4. Gender</label>
-                <div class="styled-select">
-                    <select name="gender" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; background: #faf7f2;">
-                        <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
-                        <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>5. Age (years)</label>
-                <input type="number" name="age" value="{{ age }}" min="0" max="120" 
-       style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; background: #faf7f2;">
-            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Gender and Age -->
+<div class="form-row">
+    <div class="form-group">
+        <label>4. Gender</label>
+        <div class="styled-select">
+            <select name="gender" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; background: #faf7f2;">
+                <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
+                <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
+            </select>
         </div>
+    </div>
+    
+    <div class="form-group">
+        <label>
+            5. Age (years)
+            <span class="tooltip-icon" onclick="showTooltip(event, 'Age is used to calculate your personalized Recommended Daily Allowance (RDA). Nutrient needs vary by age — children, adults, and older adults have different requirements.')">?</span>
+        </label>
+        <input type="number" name="age" value="{{ age }}" min="0" max="120" 
+               style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; background: #faf7f2;">
+    </div>
+</div>
         
         <button type="submit" class="calc-btn">Calculate Nutrients →</button>
     </form>
@@ -426,6 +570,23 @@
                     <div class="nutrient-item"><span class="nutrient-name">🍊 Vitamin C</span><span class="nutrient-value">${result.vitamin_c_mg ? result.vitamin_c_mg.toFixed(1) : 'N/A'} mg</span></div>
                 </div>
             </div>
+        <div class="nutrient-grid">
+            ... (nutrient cards) ...
+        </div>
+        
+        <!-- RDA Reference -->
+        {% if rda %}
+        <div style="margin-top: 20px; padding: 12px 16px; background: #e8f0e8; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <span>📊 RDA Reference: {{ gender|title }}, {{ age }} years</span>
+            <span class="tooltip-icon" onclick="showTooltip(event, 'RDA = Recommended Daily Allowance. These percentages show how much of your daily nutrient needs this food provides. Values are based on standard guidelines from the Kenya Food Composition Tables and WHO/FAO recommendations.')">?</span>
+        </div>
+        {% endif %}
+        
+        <!-- Share -->
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="https://wa.me/?text=..." ...>💬 WhatsApp</a>
+            ...
+        </div>
             
             <div class="share-buttons">
                 <button class="share-btn share-wa" onclick="shareResults('whatsapp', '${result.amount} ${result.unit} ${result.food_name} has ${result.energy_kcal.toFixed(0)} kcal and ${result.iron_mg.toFixed(1)}mg iron', window.location.href)">💬 WhatsApp</button>
