@@ -614,3 +614,6 @@ def create_admin(request):
         return HttpResponse(f"✅ Admin user created! Username: {username}, Password: {password}")
     else:
         return HttpResponse(f"⚠️ User '{username}' already exists. Try logging in.")
+
+def health_check(request):
+    return HttpResponse("OK")
