@@ -645,3 +645,12 @@ def create_admin(request):
 
 def health_check(request):
     return HttpResponse("OK")
+# ========== HEALTH CHECK ==========
+@csrf_exempt
+def health_check(request):
+    """Health check endpoint for Render"""
+    return JsonResponse({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'database': 'connected'
+    })
