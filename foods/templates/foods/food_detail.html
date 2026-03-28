@@ -26,7 +26,6 @@
         font-size: 0.8rem;
     }
     
-    /* Section Headers */
     .section-header {
         display: flex;
         align-items: center;
@@ -48,7 +47,6 @@
         border-radius: 20px;
     }
     
-    /* Nutrient Grid */
     .nutrient-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -92,7 +90,6 @@
         letter-spacing: 0.3px;
     }
     
-    /* Calculator Box */
     .calculator-box {
         background: #f8f9fa;
         border-radius: 16px;
@@ -162,7 +159,6 @@
         font-size: 0.8rem;
     }
     
-    /* Swap Suggestions */
     .swap-section {
         margin-top: 1.5rem;
         padding: 1.25rem;
@@ -235,7 +231,7 @@
 <div class="food-header">
     <span class="category-badge">{{ food.category.name|default:"Kenyan Food" }}</span>
     <h1>{{ food.food_name }}</h1>
-    <p>Nutritional information per 100g</p>
+    <p>Nutritional information per 100g — Kenya Food Composition Tables 2018</p>
 </div>
 
 <!-- ========== MACRONUTRIENTS ========== -->
@@ -270,11 +266,6 @@
         <div class="nutrient-name">Dietary Fiber</div>
     </div>
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.sugar_g|floatformat:1|default:"0" }}</div>
-        <div class="nutrient-unit">g</div>
-        <div class="nutrient-name">Sugar</div>
-    </div>
-    <div class="nutrient-card">
         <div class="nutrient-value">{{ food.water_g|floatformat:0|default:"0" }}</div>
         <div class="nutrient-unit">g</div>
         <div class="nutrient-name">Water</div>
@@ -282,7 +273,7 @@
     <div class="nutrient-card">
         <div class="nutrient-value">{{ food.ash_g|floatformat:1|default:"0" }}</div>
         <div class="nutrient-unit">g</div>
-        <div class="nutrient-name">Ash</div>
+        <div class="nutrient-name">Ash (Minerals)</div>
     </div>
 </div>
 
@@ -327,21 +318,6 @@
         <div class="nutrient-unit">mg</div>
         <div class="nutrient-name">Zinc</div>
     </div>
-    <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.copper_mg|floatformat:2|default:"0" }}</div>
-        <div class="nutrient-unit">mg</div>
-        <div class="nutrient-name">Copper</div>
-    </div>
-    <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.manganese_mg|floatformat:2|default:"0" }}</div>
-        <div class="nutrient-unit">mg</div>
-        <div class="nutrient-name">Manganese</div>
-    </div>
-    <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.selenium_ug|floatformat:1|default:"0" }}</div>
-        <div class="nutrient-unit">µg</div>
-        <div class="nutrient-name">Selenium</div>
-    </div>
 </div>
 
 <!-- ========== VITAMINS ========== -->
@@ -350,16 +326,6 @@
     <span class="badge">Vital for Health</span>
 </div>
 <div class="nutrient-grid">
-    <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.vitamin_a_rae_ug|floatformat:0|default:"0" }}</div>
-        <div class="nutrient-unit">µg RAE</div>
-        <div class="nutrient-name">Vitamin A</div>
-    </div>
-    <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.vitamin_c_mg|floatformat:0|default:"0" }}</div>
-        <div class="nutrient-unit">mg</div>
-        <div class="nutrient-name">Vitamin C</div>
-    </div>
     <div class="nutrient-card">
         <div class="nutrient-value">{{ food.thiamin_mg|floatformat:2|default:"0" }}</div>
         <div class="nutrient-unit">mg</div>
@@ -376,47 +342,9 @@
         <div class="nutrient-name">Niacin (B3)</div>
     </div>
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.vitamin_b6_mg|floatformat:2|default:"0" }}</div>
-        <div class="nutrient-unit">mg</div>
-        <div class="nutrient-name">Vitamin B6</div>
-    </div>
-    <div class="nutrient-card">
         <div class="nutrient-value">{{ food.folate_ug|floatformat:0|default:"0" }}</div>
         <div class="nutrient-unit">µg</div>
         <div class="nutrient-name">Folate</div>
-    </div>
-    <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.vitamin_b12_ug|floatformat:1|default:"0" }}</div>
-        <div class="nutrient-unit">µg</div>
-        <div class="nutrient-name">Vitamin B12</div>
-    </div>
-</div>
-
-<!-- ========== FAT COMPOSITION ========== -->
-<div class="section-header">
-    <h2>🧈 Fat Composition</h2>
-    <span class="badge">Detailed Fat Profile</span>
-</div>
-<div class="nutrient-grid">
-    <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.saturated_fat_g|floatformat:1|default:"0" }}</div>
-        <div class="nutrient-unit">g</div>
-        <div class="nutrient-name">Saturated Fat</div>
-    </div>
-    <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.monounsaturated_fat_g|floatformat:1|default:"0" }}</div>
-        <div class="nutrient-unit">g</div>
-        <div class="nutrient-name">Monounsaturated</div>
-    </div>
-    <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.polyunsaturated_fat_g|floatformat:1|default:"0" }}</div>
-        <div class="nutrient-unit">g</div>
-        <div class="nutrient-name">Polyunsaturated</div>
-    </div>
-    <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.cholesterol_mg|floatformat:0|default:"0" }}</div>
-        <div class="nutrient-unit">mg</div>
-        <div class="nutrient-name">Cholesterol</div>
     </div>
 </div>
 
@@ -478,14 +406,12 @@
 </div>
 
 <script>
-    // Complete nutrient data for calculator
     const nutrientData = {
         energy_kcal: {{ food.energy_kcal|default:0|floatformat:2 }},
         protein_g: {{ food.protein_g|default:0|floatformat:2 }},
         fat_g: {{ food.fat_g|default:0|floatformat:2 }},
         carbohydrate_g: {{ food.carbohydrate_g|default:0|floatformat:2 }},
         fiber_g: {{ food.fiber_g|default:0|floatformat:2 }},
-        sugar_g: {{ food.sugar_g|default:0|floatformat:2 }},
         water_g: {{ food.water_g|default:0|floatformat:2 }},
         ash_g: {{ food.ash_g|default:0|floatformat:2 }},
         calcium_mg: {{ food.calcium_mg|default:0|floatformat:2 }},
@@ -495,34 +421,19 @@
         potassium_mg: {{ food.potassium_mg|default:0|floatformat:2 }},
         sodium_mg: {{ food.sodium_mg|default:0|floatformat:2 }},
         zinc_mg: {{ food.zinc_mg|default:0|floatformat:2 }},
-        copper_mg: {{ food.copper_mg|default:0|floatformat:2 }},
-        manganese_mg: {{ food.manganese_mg|default:0|floatformat:2 }},
-        selenium_ug: {{ food.selenium_ug|default:0|floatformat:2 }},
-        vitamin_a_rae_ug: {{ food.vitamin_a_rae_ug|default:0|floatformat:2 }},
-        vitamin_c_mg: {{ food.vitamin_c_mg|default:0|floatformat:2 }},
         thiamin_mg: {{ food.thiamin_mg|default:0|floatformat:2 }},
         riboflavin_mg: {{ food.riboflavin_mg|default:0|floatformat:2 }},
         niacin_mg: {{ food.niacin_mg|default:0|floatformat:2 }},
-        vitamin_b6_mg: {{ food.vitamin_b6_mg|default:0|floatformat:2 }},
-        folate_ug: {{ food.folate_ug|default:0|floatformat:2 }},
-        vitamin_b12_ug: {{ food.vitamin_b12_ug|default:0|floatformat:2 }},
-        saturated_fat_g: {{ food.saturated_fat_g|default:0|floatformat:2 }},
-        monounsaturated_fat_g: {{ food.monounsaturated_fat_g|default:0|floatformat:2 }},
-        polyunsaturated_fat_g: {{ food.polyunsaturated_fat_g|default:0|floatformat:2 }},
-        cholesterol_mg: {{ food.cholesterol_mg|default:0|floatformat:2 }}
+        folate_ug: {{ food.folate_ug|default:0|floatformat:2 }}
     };
     
     const nutrientNames = {
         energy_kcal: 'Energy', protein_g: 'Protein', fat_g: 'Fat',
-        carbohydrate_g: 'Carbohydrates', fiber_g: 'Fiber', sugar_g: 'Sugar',
-        water_g: 'Water', ash_g: 'Ash', calcium_mg: 'Calcium', iron_mg: 'Iron',
-        magnesium_mg: 'Magnesium', phosphorus_mg: 'Phosphorus', potassium_mg: 'Potassium',
-        sodium_mg: 'Sodium', zinc_mg: 'Zinc', copper_mg: 'Copper', manganese_mg: 'Manganese',
-        selenium_ug: 'Selenium', vitamin_a_rae_ug: 'Vitamin A', vitamin_c_mg: 'Vitamin C',
-        thiamin_mg: 'Thiamin B1', riboflavin_mg: 'Riboflavin B2', niacin_mg: 'Niacin B3',
-        vitamin_b6_mg: 'Vitamin B6', folate_ug: 'Folate', vitamin_b12_ug: 'Vitamin B12',
-        saturated_fat_g: 'Saturated Fat', monounsaturated_fat_g: 'Monounsaturated Fat',
-        polyunsaturated_fat_g: 'Polyunsaturated Fat', cholesterol_mg: 'Cholesterol'
+        carbohydrate_g: 'Carbohydrates', fiber_g: 'Fiber', water_g: 'Water',
+        ash_g: 'Ash', calcium_mg: 'Calcium', iron_mg: 'Iron', magnesium_mg: 'Magnesium',
+        phosphorus_mg: 'Phosphorus', potassium_mg: 'Potassium', sodium_mg: 'Sodium',
+        zinc_mg: 'Zinc', thiamin_mg: 'Thiamin B1', riboflavin_mg: 'Riboflavin B2',
+        niacin_mg: 'Niacin B3', folate_ug: 'Folate'
     };
     
     function calculateNutrition() {
