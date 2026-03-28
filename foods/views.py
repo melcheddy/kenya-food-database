@@ -646,8 +646,6 @@ def create_admin(request):
     else:
         return HttpResponse(f"⚠️ User '{username}' already exists. Try logging in.")
 
-def health_check(request):
-    return HttpResponse("OK")
 # ========== HEALTH CHECK ==========
 @csrf_exempt
 def health_check(request):
