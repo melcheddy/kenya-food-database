@@ -1,10 +1,13 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.db.models import Q, Count
+from django.views.decorators.csrf import csrf_exempt  # ← ADD THIS LINE
 from .models import Food, Category, UnitConversion, SearchQuery
 import json
+import os
+from datetime import datetime
 
 def home(request):
     """Homepage with search"""
