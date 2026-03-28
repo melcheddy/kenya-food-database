@@ -1,0 +1,13 @@
+{% extends 'foods/base.html' %}
+
+{% block title %}Error - Kenya Food Database{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 3rem;">
+    <h1>⚠️ Something Went Wrong</h1>
+    <p>We encountered an error while loading this food.</p>
+    <p><strong>Error:</strong> {{ error }}</p>
+    <p>Food ID: {{ food_id }}</p>
+    <a href="/" style="background: #2c5e2e; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">Return Home</a>
+</div>
+{% endblock %}

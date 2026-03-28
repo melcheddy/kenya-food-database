@@ -158,6 +158,15 @@ def food_detail(request, food_id):
         'swap_suggestions': swap_suggestions,
         'cost_tag': current_cost,
     })
+    except Exception as e:
+        print(f"ERROR in food_detail for ID {food_id}: {e}")
+        traceback.print_exc()
+        # Return a simple error page instead of crashing
+        return render(request, 'foods/error.html', {
+            'error': str(e),
+            'food_id': food_id
+        }, status=500)
+
 
 def nutrient_calculator(request):
     foods = Food.objects.all().order_by('food_name')
