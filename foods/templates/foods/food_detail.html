@@ -7,14 +7,15 @@
     .food-header {
         background: linear-gradient(135deg, #2c5e2e 0%, #3e7a41 100%);
         border-radius: 20px;
-        padding: 2rem;
+        padding: 1.5rem;
         color: white;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
     
     .food-header h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
         margin-bottom: 0.5rem;
+        word-break: break-word;
     }
     
     .food-header .category-badge {
@@ -22,22 +23,46 @@
         background: rgba(255,255,255,0.2);
         padding: 4px 12px;
         border-radius: 20px;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
     
+    /* Section Headers */
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 1.5rem 0 1rem 0;
+    }
+    
+    .section-header h2 {
+        font-size: 1.2rem;
+        color: #2c5e2e;
+        margin: 0;
+    }
+    
+    .section-header .badge {
+        background: #2c5e2e;
+        color: white;
+        font-size: 0.7rem;
+        padding: 2px 10px;
+        border-radius: 20px;
+    }
+    
+    /* Nutrient Grid */
     .nutrient-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1rem;
     }
     
     .nutrient-card {
         background: white;
-        padding: 1rem;
+        padding: 0.75rem;
         border-radius: 12px;
         text-align: center;
         border: 1px solid #e9ecef;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         transition: transform 0.2s;
     }
     
@@ -47,44 +72,49 @@
     }
     
     .nutrient-value {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: 700;
         color: #2c5e2e;
+        line-height: 1.2;
     }
     
     .nutrient-unit {
-        font-size: 0.75rem;
+        font-size: 0.65rem;
         color: #666;
     }
     
     .nutrient-name {
         color: #666;
-        font-size: 0.85rem;
-        margin-top: 0.5rem;
+        font-size: 0.7rem;
+        margin-top: 0.3rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
     }
     
+    /* Calculator Box */
     .calculator-box {
         background: #f8f9fa;
         border-radius: 16px;
-        padding: 1.5rem;
-        margin: 2rem 0;
+        padding: 1.25rem;
+        margin: 1.5rem 0;
     }
     
     .calculator-form {
         display: flex;
-        gap: 1rem;
+        gap: 0.75rem;
         flex-wrap: wrap;
-        align-items: flex-end;
+        margin-top: 1rem;
     }
     
     .form-group {
         flex: 1;
-        min-width: 120px;
+        min-width: 100px;
     }
     
     .form-group label {
         display: block;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: #666;
         margin-bottom: 0.25rem;
         text-transform: uppercase;
@@ -93,33 +123,31 @@
     
     .form-group input, .form-group select {
         width: 100%;
-        padding: 0.75rem;
+        padding: 0.6rem;
         border: 1px solid #ddd;
         border-radius: 8px;
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
     
     .calculate-btn {
         background: #2c5e2e;
         color: white;
-        padding: 0.75rem 1.5rem;
+        padding: 0.6rem 1.2rem;
         border: none;
         border-radius: 8px;
         font-weight: 600;
         cursor: pointer;
-        transition: background 0.2s;
-    }
-    
-    .calculate-btn:hover {
-        background: #1e421f;
+        align-self: flex-end;
     }
     
     .result-box {
-        margin-top: 1.5rem;
+        margin-top: 1rem;
         padding: 1rem;
         background: #e8f0e8;
         border-radius: 12px;
         display: none;
+        max-height: 400px;
+        overflow-y: auto;
     }
     
     .result-box.show {
@@ -129,29 +157,74 @@
     .result-row {
         display: flex;
         justify-content: space-between;
-        padding: 0.5rem 0;
+        padding: 0.4rem 0;
         border-bottom: 1px solid #c8dbc8;
+        font-size: 0.8rem;
     }
     
-    .result-row:last-child {
-        border-bottom: none;
+    /* Swap Suggestions */
+    .swap-section {
+        margin-top: 1.5rem;
+        padding: 1.25rem;
+        background: linear-gradient(135deg, #e8f0e8 0%, #d4e0d4 100%);
+        border-radius: 16px;
+        border-left: 4px solid #2c5e2e;
     }
     
-    @media (max-width: 600px) {
-        .calculator-form {
-            flex-direction: column;
-        }
-        
-        .form-group {
-            width: 100%;
-        }
-        
-        .calculate-btn {
-            width: 100%;
-        }
-        
+    .swap-item {
+        background: white;
+        padding: 0.75rem;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .swap-name {
+        font-weight: 600;
+        color: #2c5e2e;
+        font-size: 0.9rem;
+    }
+    
+    .swap-benefit {
+        color: #666;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+    
+    .swap-link {
+        background: #2c5e2e;
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    
+    .disclaimer {
+        margin-top: 1.5rem;
+        padding: 0.75rem;
+        background: #fff8e7;
+        border-radius: 12px;
+        border-left: 4px solid #f39c12;
+        font-size: 0.7rem;
+        color: #856404;
+    }
+    
+    @media (min-width: 600px) {
         .nutrient-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    @media (min-width: 900px) {
+        .nutrient-grid {
+            grid-template-columns: repeat(4, 1fr);
         }
     }
 </style>
@@ -165,65 +238,200 @@
     <p>Nutritional information per 100g</p>
 </div>
 
+<!-- ========== MACRONUTRIENTS ========== -->
+<div class="section-header">
+    <h2>📊 Macronutrients</h2>
+    <span class="badge">Energy & Building Blocks</span>
+</div>
 <div class="nutrient-grid">
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.energy_kcal|floatformat:0 }}</div>
+        <div class="nutrient-value">{{ food.energy_kcal|floatformat:0|default:"0" }}</div>
         <div class="nutrient-unit">kcal</div>
         <div class="nutrient-name">Energy</div>
     </div>
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.protein_g|floatformat:1 }}</div>
+        <div class="nutrient-value">{{ food.protein_g|floatformat:1|default:"0" }}</div>
         <div class="nutrient-unit">g</div>
         <div class="nutrient-name">Protein</div>
     </div>
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.fat_g|floatformat:1 }}</div>
+        <div class="nutrient-value">{{ food.fat_g|floatformat:1|default:"0" }}</div>
         <div class="nutrient-unit">g</div>
-        <div class="nutrient-name">Fat</div>
+        <div class="nutrient-name">Total Fat</div>
     </div>
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.carbohydrate_g|floatformat:1 }}</div>
+        <div class="nutrient-value">{{ food.carbohydrate_g|floatformat:1|default:"0" }}</div>
         <div class="nutrient-unit">g</div>
         <div class="nutrient-name">Carbohydrates</div>
     </div>
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.fiber_g|floatformat:1 }}</div>
+        <div class="nutrient-value">{{ food.fiber_g|floatformat:1|default:"0" }}</div>
         <div class="nutrient-unit">g</div>
-        <div class="nutrient-name">Fiber</div>
+        <div class="nutrient-name">Dietary Fiber</div>
     </div>
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.iron_mg|floatformat:1 }}</div>
-        <div class="nutrient-unit">mg</div>
-        <div class="nutrient-name">Iron</div>
+        <div class="nutrient-value">{{ food.sugar_g|floatformat:1|default:"0" }}</div>
+        <div class="nutrient-unit">g</div>
+        <div class="nutrient-name">Sugar</div>
     </div>
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.calcium_mg|floatformat:0 }}</div>
+        <div class="nutrient-value">{{ food.water_g|floatformat:0|default:"0" }}</div>
+        <div class="nutrient-unit">g</div>
+        <div class="nutrient-name">Water</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.ash_g|floatformat:1|default:"0" }}</div>
+        <div class="nutrient-unit">g</div>
+        <div class="nutrient-name">Ash</div>
+    </div>
+</div>
+
+<!-- ========== MINERALS ========== -->
+<div class="section-header">
+    <h2>🪨 Minerals</h2>
+    <span class="badge">Essential Elements</span>
+</div>
+<div class="nutrient-grid">
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.calcium_mg|floatformat:0|default:"0" }}</div>
         <div class="nutrient-unit">mg</div>
         <div class="nutrient-name">Calcium</div>
     </div>
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.vitamin_a_rae_ug|floatformat:0 }}</div>
+        <div class="nutrient-value">{{ food.iron_mg|floatformat:1|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Iron</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.magnesium_mg|floatformat:0|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Magnesium</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.phosphorus_mg|floatformat:0|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Phosphorus</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.potassium_mg|floatformat:0|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Potassium</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.sodium_mg|floatformat:0|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Sodium</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.zinc_mg|floatformat:1|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Zinc</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.copper_mg|floatformat:2|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Copper</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.manganese_mg|floatformat:2|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Manganese</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.selenium_ug|floatformat:1|default:"0" }}</div>
+        <div class="nutrient-unit">µg</div>
+        <div class="nutrient-name">Selenium</div>
+    </div>
+</div>
+
+<!-- ========== VITAMINS ========== -->
+<div class="section-header">
+    <h2>💊 Vitamins</h2>
+    <span class="badge">Vital for Health</span>
+</div>
+<div class="nutrient-grid">
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.vitamin_a_rae_ug|floatformat:0|default:"0" }}</div>
         <div class="nutrient-unit">µg RAE</div>
         <div class="nutrient-name">Vitamin A</div>
     </div>
     <div class="nutrient-card">
-        <div class="nutrient-value">{{ food.folate_ug|floatformat:0 }}</div>
+        <div class="nutrient-value">{{ food.vitamin_c_mg|floatformat:0|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Vitamin C</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.thiamin_mg|floatformat:2|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Thiamin (B1)</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.riboflavin_mg|floatformat:2|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Riboflavin (B2)</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.niacin_mg|floatformat:2|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Niacin (B3)</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.vitamin_b6_mg|floatformat:2|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Vitamin B6</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.folate_ug|floatformat:0|default:"0" }}</div>
         <div class="nutrient-unit">µg</div>
         <div class="nutrient-name">Folate</div>
     </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.vitamin_b12_ug|floatformat:1|default:"0" }}</div>
+        <div class="nutrient-unit">µg</div>
+        <div class="nutrient-name">Vitamin B12</div>
+    </div>
 </div>
 
+<!-- ========== FAT COMPOSITION ========== -->
+<div class="section-header">
+    <h2>🧈 Fat Composition</h2>
+    <span class="badge">Detailed Fat Profile</span>
+</div>
+<div class="nutrient-grid">
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.saturated_fat_g|floatformat:1|default:"0" }}</div>
+        <div class="nutrient-unit">g</div>
+        <div class="nutrient-name">Saturated Fat</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.monounsaturated_fat_g|floatformat:1|default:"0" }}</div>
+        <div class="nutrient-unit">g</div>
+        <div class="nutrient-name">Monounsaturated</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.polyunsaturated_fat_g|floatformat:1|default:"0" }}</div>
+        <div class="nutrient-unit">g</div>
+        <div class="nutrient-name">Polyunsaturated</div>
+    </div>
+    <div class="nutrient-card">
+        <div class="nutrient-value">{{ food.cholesterol_mg|floatformat:0|default:"0" }}</div>
+        <div class="nutrient-unit">mg</div>
+        <div class="nutrient-name">Cholesterol</div>
+    </div>
+</div>
+
+<!-- Calculator -->
 <div class="calculator-box">
-    <h3 style="color: #2c5e2e; margin-bottom: 1rem;">🧮 Calculate Your Portion</h3>
-    <p style="color: #666; margin-bottom: 1rem;">Enter how much you ate and see what you're actually consuming</p>
+    <h3>🧮 Calculate Your Portion</h3>
+    <p style="color: #666; font-size: 0.85rem;">Enter how much you ate and see what you're actually consuming</p>
     
     <div class="calculator-form">
         <div class="form-group">
-            <label>Amount</label>
+            <label>AMOUNT</label>
             <input type="number" id="amount" value="100" step="10">
         </div>
         <div class="form-group">
-            <label>Unit</label>
+            <label>UNIT</label>
             <select id="unit">
                 <option value="grams">grams (g)</option>
                 <option value="tablespoon">tablespoon</option>
@@ -236,147 +444,117 @@
     </div>
     
     <div id="resultBox" class="result-box">
-        <h4 style="margin-bottom: 1rem;">📊 Your Portion: <span id="displayGrams"></span></h4>
+        <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem;">📊 Your Portion: <span id="displayGrams"></span></h4>
         <div id="resultContent"></div>
     </div>
 </div>
 
-<!-- ========== ENHANCED SWAP SUGGESTIONS SECTION ========== -->
+<!-- Swap Suggestions -->
 {% if swap_suggestions %}
-<div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #e8f0e8 0%, #d4e0d4 100%); border-radius: 16px; border-left: 4px solid #2c5e2e; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-    <h3 style="color: #2c5e2e; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-        <span style="font-size: 1.3rem;">💡</span>
-        <span style="font-weight: 600;">Healthier Kenyan Swaps</span>
-        <span style="background: #2c5e2e; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px;">Better for you</span>
+<div class="swap-section">
+    <h3 style="color: #2c5e2e; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px;">
+        <span>💡</span> Healthier Kenyan Swaps
+        <span style="background: #2c5e2e; color: white; font-size: 0.6rem; padding: 2px 8px; border-radius: 20px;">Better for you</span>
     </h3>
-    <div style="display: grid; gap: 12px;">
-        {% for swap in swap_suggestions %}
-        <div style="background: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s;">
-            <div style="flex: 1;">
-                <div style="font-weight: 600; color: #2c3e2f; margin-bottom: 5px; font-size: 1rem;">
-                    🔄 Try <span style="color: #2c5e2e;">{{ swap.name }}</span>
-                </div>
-                <div style="color: #666; font-size: 0.85rem;">
-                    {{ swap.benefit }}
-                </div>
-            </div>
-            <a href="{% url 'food_detail' swap.id %}" 
-               style="background: #2c5e2e; color: white; padding: 8px 18px; border-radius: 30px; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: background 0.2s; white-space: nowrap;">
-                View Swap →
-            </a>
+    {% for swap in swap_suggestions %}
+    <div class="swap-item">
+        <div style="flex: 1;">
+            <div class="swap-name">🔄 Try {{ swap.name }}</div>
+            <div class="swap-benefit">{{ swap.benefit }}</div>
         </div>
-        {% endfor %}
+        <a href="{% url 'food_detail' swap.id %}" class="swap-link">View →</a>
     </div>
-    <p style="margin-top: 15px; color: #2c5e2e; font-size: 0.75rem; text-align: center; opacity: 0.8;">
+    {% endfor %}
+    <p style="margin-top: 0.75rem; font-size: 0.7rem; color: #2c5e2e; text-align: center;">
         🇰🇪 Small swaps can make a big difference in your daily nutrition!
     </p>
 </div>
 {% endif %}
-<!-- ========== END SWAP SUGGESTIONS ========== -->
 
-<div style="margin-top: 2rem; padding: 1rem; background: #fff8e7; border-radius: 12px; border-left: 4px solid #f39c12;">
-    <p style="margin: 0; font-size: 0.85rem; color: #856404;">
-        📊 <strong>Note:</strong> Values are based on the Kenya Food Composition Tables 2018 (FAO & Government of Kenya). 
-        Actual nutrient content may vary based on variety, growing conditions, and preparation method.
-    </p>
+<!-- Disclaimer -->
+<div class="disclaimer">
+    📊 <strong>Note:</strong> Values are based on the Kenya Food Composition Tables 2018 (FAO & Government of Kenya). 
+    Actual nutrient content may vary based on variety, growing conditions, and preparation method.
 </div>
 
 <script>
-    // Unit conversion data (based on your CSV)
-    const unitConversions = {
-        "maize_flour_refined": {"tablespoon": 8, "teaspoon": 2.5, "cup": 120, "piece": null},
-        "maize_flour_whole": {"tablespoon": 8, "teaspoon": 2.5, "cup": 120, "piece": null},
-        "rice_cooked": {"tablespoon": 15, "teaspoon": 5, "cup": 158, "piece": null},
-        "beans_raw": {"tablespoon": 12, "teaspoon": 4, "cup": 190, "piece": null},
-        "sukuma_wiki_raw": {"tablespoon": null, "teaspoon": null, "cup": 70, "piece": null},
-        "cabbage_raw": {"tablespoon": null, "teaspoon": null, "cup": 70, "piece": null},
-        "milk_whole": {"tablespoon": 15, "teaspoon": 5, "cup": 240, "piece": null},
-        "egg_whole_raw": {"tablespoon": null, "teaspoon": null, "cup": null, "piece": 50},
-        "chapati": {"tablespoon": null, "teaspoon": null, "cup": null, "piece": 60},
-        "groundnuts_raw": {"tablespoon": 9, "teaspoon": 3, "cup": 150, "piece": null}
+    // Complete nutrient data for calculator
+    const nutrientData = {
+        energy_kcal: {{ food.energy_kcal|default:0|floatformat:2 }},
+        protein_g: {{ food.protein_g|default:0|floatformat:2 }},
+        fat_g: {{ food.fat_g|default:0|floatformat:2 }},
+        carbohydrate_g: {{ food.carbohydrate_g|default:0|floatformat:2 }},
+        fiber_g: {{ food.fiber_g|default:0|floatformat:2 }},
+        sugar_g: {{ food.sugar_g|default:0|floatformat:2 }},
+        water_g: {{ food.water_g|default:0|floatformat:2 }},
+        ash_g: {{ food.ash_g|default:0|floatformat:2 }},
+        calcium_mg: {{ food.calcium_mg|default:0|floatformat:2 }},
+        iron_mg: {{ food.iron_mg|default:0|floatformat:2 }},
+        magnesium_mg: {{ food.magnesium_mg|default:0|floatformat:2 }},
+        phosphorus_mg: {{ food.phosphorus_mg|default:0|floatformat:2 }},
+        potassium_mg: {{ food.potassium_mg|default:0|floatformat:2 }},
+        sodium_mg: {{ food.sodium_mg|default:0|floatformat:2 }},
+        zinc_mg: {{ food.zinc_mg|default:0|floatformat:2 }},
+        copper_mg: {{ food.copper_mg|default:0|floatformat:2 }},
+        manganese_mg: {{ food.manganese_mg|default:0|floatformat:2 }},
+        selenium_ug: {{ food.selenium_ug|default:0|floatformat:2 }},
+        vitamin_a_rae_ug: {{ food.vitamin_a_rae_ug|default:0|floatformat:2 }},
+        vitamin_c_mg: {{ food.vitamin_c_mg|default:0|floatformat:2 }},
+        thiamin_mg: {{ food.thiamin_mg|default:0|floatformat:2 }},
+        riboflavin_mg: {{ food.riboflavin_mg|default:0|floatformat:2 }},
+        niacin_mg: {{ food.niacin_mg|default:0|floatformat:2 }},
+        vitamin_b6_mg: {{ food.vitamin_b6_mg|default:0|floatformat:2 }},
+        folate_ug: {{ food.folate_ug|default:0|floatformat:2 }},
+        vitamin_b12_ug: {{ food.vitamin_b12_ug|default:0|floatformat:2 }},
+        saturated_fat_g: {{ food.saturated_fat_g|default:0|floatformat:2 }},
+        monounsaturated_fat_g: {{ food.monounsaturated_fat_g|default:0|floatformat:2 }},
+        polyunsaturated_fat_g: {{ food.polyunsaturated_fat_g|default:0|floatformat:2 }},
+        cholesterol_mg: {{ food.cholesterol_mg|default:0|floatformat:2 }}
     };
     
-    // Nutrient data (per 100g)
-    const nutrientData = {
-        "energy_kcal": {{ food.energy_kcal|default:0 }},
-        "protein_g": {{ food.protein_g|default:0 }},
-        "fat_g": {{ food.fat_g|default:0 }},
-        "carbohydrate_g": {{ food.carbohydrate_g|default:0 }},
-        "fiber_g": {{ food.fiber_g|default:0 }},
-        "iron_mg": {{ food.iron_mg|default:0 }},
-        "calcium_mg": {{ food.calcium_mg|default:0 }},
-        "vitamin_a_rae_ug": {{ food.vitamin_a_rae_ug|default:0 }},
-        "folate_ug": {{ food.folate_ug|default:0 }}
+    const nutrientNames = {
+        energy_kcal: 'Energy', protein_g: 'Protein', fat_g: 'Fat',
+        carbohydrate_g: 'Carbohydrates', fiber_g: 'Fiber', sugar_g: 'Sugar',
+        water_g: 'Water', ash_g: 'Ash', calcium_mg: 'Calcium', iron_mg: 'Iron',
+        magnesium_mg: 'Magnesium', phosphorus_mg: 'Phosphorus', potassium_mg: 'Potassium',
+        sodium_mg: 'Sodium', zinc_mg: 'Zinc', copper_mg: 'Copper', manganese_mg: 'Manganese',
+        selenium_ug: 'Selenium', vitamin_a_rae_ug: 'Vitamin A', vitamin_c_mg: 'Vitamin C',
+        thiamin_mg: 'Thiamin B1', riboflavin_mg: 'Riboflavin B2', niacin_mg: 'Niacin B3',
+        vitamin_b6_mg: 'Vitamin B6', folate_ug: 'Folate', vitamin_b12_ug: 'Vitamin B12',
+        saturated_fat_g: 'Saturated Fat', monounsaturated_fat_g: 'Monounsaturated Fat',
+        polyunsaturated_fat_g: 'Polyunsaturated Fat', cholesterol_mg: 'Cholesterol'
     };
     
     function calculateNutrition() {
         const amount = parseFloat(document.getElementById('amount').value);
         const unit = document.getElementById('unit').value;
-        const foodName = "{{ food.food_name }}";
         
         let grams = amount;
         
-        // Convert if not grams
         if (unit !== 'grams') {
-            const conversions = unitConversions["{{ food.food_name|escapejs }}"];
-            if (conversions && conversions[unit]) {
-                grams = amount * conversions[unit];
-            } else {
-                alert(`Unit "${unit}" not available for this food. Using grams.`);
-                grams = amount;
-            }
+            const unitToGrams = {
+                'tablespoon': 15,
+                'teaspoon': 5,
+                'cup': 240,
+                'piece': 100
+            };
+            grams = amount * (unitToGrams[unit] || 1);
         }
         
         document.getElementById('displayGrams').innerHTML = `${grams.toFixed(1)}g`;
         
-        // Calculate each nutrient
         const factor = grams / 100;
-        const results = {};
+        let results = '';
+        
         for (const [key, value] of Object.entries(nutrientData)) {
-            results[key] = value * factor;
+            if (value !== null && value !== undefined && value !== 0) {
+                const calculated = (value * factor).toFixed(1);
+                const displayName = nutrientNames[key] || key.replace(/_/g, ' ');
+                results += `<div class="result-row"><span>${displayName}:</span><strong>${calculated}</strong></div>`;
+            }
         }
         
-        // Display results
-        const resultHtml = `
-            <div class="result-row">
-                <span>🔥 Energy:</span>
-                <strong>${results.energy_kcal.toFixed(1)} kcal</strong>
-            </div>
-            <div class="result-row">
-                <span>💪 Protein:</span>
-                <strong>${results.protein_g.toFixed(1)} g</strong>
-            </div>
-            <div class="result-row">
-                <span>🧈 Fat:</span>
-                <strong>${results.fat_g.toFixed(1)} g</strong>
-            </div>
-            <div class="result-row">
-                <span>🍚 Carbohydrates:</span>
-                <strong>${results.carbohydrate_g.toFixed(1)} g</strong>
-            </div>
-            <div class="result-row">
-                <span>🌾 Fiber:</span>
-                <strong>${results.fiber_g.toFixed(1)} g</strong>
-            </div>
-            <div class="result-row">
-                <span>🩸 Iron:</span>
-                <strong>${results.iron_mg.toFixed(1)} mg</strong>
-            </div>
-            <div class="result-row">
-                <span>🦴 Calcium:</span>
-                <strong>${results.calcium_mg.toFixed(0)} mg</strong>
-            </div>
-            <div class="result-row">
-                <span>👁️ Vitamin A:</span>
-                <strong>${results.vitamin_a_rae_ug.toFixed(0)} µg RAE</strong>
-            </div>
-            <div class="result-row">
-                <span>🥬 Folate:</span>
-                <strong>${results.folate_ug.toFixed(0)} µg</strong>
-            </div>
-        `;
-        
-        document.getElementById('resultContent').innerHTML = resultHtml;
+        document.getElementById('resultContent').innerHTML = results;
         document.getElementById('resultBox').classList.add('show');
     }
 </script>
