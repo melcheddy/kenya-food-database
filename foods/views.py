@@ -5,12 +5,26 @@ from .swap_suggestions import SWAP_SUGGESTIONS, NUTRIENT_SWAPS, get_cost_tag
 
 def home(request):
     """Homepage with search"""
-    return render(request, 'foods/home.html')
+    # Get top 10 most searched foods
+    from .models import SearchQuery
+    popular_searches = SearchQuery.objects.all().order_by('-count')[:10]
+    
+    return render(request, 'foods/home.html', {
+        'popular_searches': popular_searches,
+    })
 
 def search_foods(request):
-    """Search for foods by name"""
     query = request.GET.get('q', '')
     category_id = request.GET.get('category', '')
+    
+    # ===== TRACK SEARCH QUERY =====
+    if query:
+        from .models import SearchQuery
+        search_obj, created = SearchQuery.objects.get_or_create(query=query.lower())
+        if not created:
+            search_obj.count += 1
+            search_obj.save()
+    # ===== END TRACKING =====
     
     foods = Food.objects.all()
     

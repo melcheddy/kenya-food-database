@@ -172,3 +172,14 @@ class WaterIntake(models.Model):
     def to_glasses(self):
         """Convert to standard glasses (250ml)"""
         return round(self.amount_ml / 250, 1)
+class SearchQuery(models.Model):
+    """Track what users search for"""
+    query = models.CharField(max_length=255)
+    count = models.IntegerField(default=1)
+    last_searched = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.query} ({self.count} searches)"
+    
+    class Meta:
+        verbose_name_plural = "Search queries"
