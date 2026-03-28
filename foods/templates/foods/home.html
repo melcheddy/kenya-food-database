@@ -4,41 +4,6 @@
 
 {% block extra_css %}
 <style>
-.categories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 1rem;
-    margin: 2rem 0;
-}
-
-.category-card {
-    background: white;
-    padding: 1rem;
-    border-radius: 16px;
-    text-align: center;
-    text-decoration: none;
-    color: #2c3e2f;
-    transition: all 0.2s;
-    border: 1px solid #e9ecef;
-}
-
-.category-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    border-color: #2c5e2e;
-}
-
-.category-icon {
-    font-size: 2rem;
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-.category-name {
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
     .hero {
         text-align: center;
         padding: 3rem 1rem;
@@ -61,27 +26,28 @@
         margin: 0 auto;
     }
     
+    /* Prominent Search Section */
     .search-section {
-        background: white;
-        padding: 2rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border-radius: 20px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        padding: 2rem;
         margin-bottom: 2rem;
     }
     
     .search-form {
         display: flex;
         gap: 1rem;
-        margin: 1rem 0;
+        flex-wrap: wrap;
     }
     
     .search-input {
         flex: 1;
-        padding: 1rem;
+        padding: 1rem 1.5rem;
         border: 2px solid #e0e0e0;
         border-radius: 50px;
-        font-size: 1rem;
-        transition: border-color 0.3s;
+        font-size: 1.1rem;
+        background: white;
+        min-width: 200px;
     }
     
     .search-input:focus {
@@ -98,7 +64,8 @@
         font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
-        transition: background 0.3s;
+        white-space: nowrap;
+        transition: background 0.2s;
     }
     
     .search-button:hover {
@@ -133,9 +100,9 @@
         letter-spacing: 1px;
     }
     
-    .categories {
+    .categories-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 1rem;
         margin: 2rem 0;
     }
@@ -147,16 +114,25 @@
         text-align: center;
         text-decoration: none;
         color: #2c3e2f;
-        font-weight: 500;
-        transition: all 0.3s;
         border: 1px solid #e9ecef;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        transition: all 0.2s;
     }
     
     .category-card:hover {
         transform: translateY(-3px);
         box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         border-color: #2c5e2e;
+    }
+    
+    .category-icon {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .category-name {
+        font-size: 0.85rem;
+        font-weight: 500;
     }
     
     .feature-box {
@@ -183,6 +159,25 @@
         background: #1e421f;
     }
     
+    /* Popular Tags */
+    .popular-tag {
+        display: inline-block;
+        background: white;
+        padding: 8px 16px;
+        border-radius: 40px;
+        text-decoration: none;
+        color: #2c5e2e;
+        border: 1px solid #e0e0e0;
+        transition: all 0.2s;
+    }
+    
+    .popular-tag:hover {
+        background: #2c5e2e;
+        color: white;
+        border-color: #2c5e2e;
+        transform: translateY(-2px);
+    }
+    
     @media (max-width: 600px) {
         .hero h1 {
             font-size: 1.8rem;
@@ -206,7 +201,7 @@
             text-align: center;
         }
         
-        .categories {
+        .categories-grid {
             grid-template-columns: repeat(2, 1fr);
         }
     }
@@ -214,18 +209,22 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="hero">
     <h1>🇰🇪 Kenya Food Database</h1>
     <p>Discover the nutritional value of over 600 traditional Kenyan foods</p>
 </div>
 
+<!-- ========== PROMINENT SEARCH BAR ========== -->
 <div class="search-section">
-    <h2 style="color: #2c3e2f;">🔍 Find a Food</h2>
+    <h2 style="color: #2c5e2e; margin-bottom: 0.5rem;">🔍 Find Any Kenyan Food</h2>
+    <p style="color: #666; margin-bottom: 1.5rem;">Search by name — ugali, sukuma, beans, or any traditional food</p>
     <form action="{% url 'search' %}" method="GET" class="search-form">
-        <input type="text" name="q" class="search-input" placeholder="Search for ugali, sukuma, beans, or any Kenyan food..." required>
-        <button type="submit" class="search-button">Search Foods →</button>
+        <input type="text" name="q" class="search-input" placeholder="e.g., ugali, sukuma, maize, beans..." required>
+        <button type="submit" class="search-button">🔍 Search Foods →</button>
     </form>
 </div>
+<!-- ========== END SEARCH BAR ========== -->
 
 <div class="stats">
     <div class="stat">
@@ -242,49 +241,71 @@
     </div>
 </div>
 
-<h2 style="color: #2c3e2f; margin: 1rem 0;">📂 Browse by Category</h2>
+<h2 style="color: #2c3e2f; margin: 2rem 0 1rem;">📂 Browse by Category</h2>
+
 <div class="categories-grid">
     <a href="{% url 'search' %}?category=1" class="category-card">
-        <span class="category-icon">🌾</span>
-        <span class="category-name">Cereals</span>
+        <div class="category-icon">🌾</div>
+        <div class="category-name">Cereals</div>
     </a>
     <a href="{% url 'search' %}?category=2" class="category-card">
-        <span class="category-icon">🥔</span>
-        <span class="category-name">Roots & Tubers</span>
+        <div class="category-icon">🥔</div>
+        <div class="category-name">Roots & Tubers</div>
     </a>
     <a href="{% url 'search' %}?category=3" class="category-card">
-        <span class="category-icon">🫘</span>
-        <span class="category-name">Legumes</span>
+        <div class="category-icon">🫘</div>
+        <div class="category-name">Legumes</div>
     </a>
     <a href="{% url 'search' %}?category=4" class="category-card">
-        <span class="category-icon">🥬</span>
-        <span class="category-name">Vegetables</span>
+        <div class="category-icon">🥬</div>
+        <div class="category-name">Vegetables</div>
     </a>
     <a href="{% url 'search' %}?category=5" class="category-card">
-        <span class="category-icon">🍎</span>
-        <span class="category-name">Fruits</span>
+        <div class="category-icon">🍎</div>
+        <div class="category-name">Fruits</div>
     </a>
     <a href="{% url 'search' %}?category=6" class="category-card">
-        <span class="category-icon">🍗</span>
-        <span class="category-name">Meat & Poultry</span>
+        <div class="category-icon">🍗</div>
+        <div class="category-name">Meat & Poultry</div>
     </a>
     <a href="{% url 'search' %}?category=7" class="category-card">
-        <span class="category-icon">🐟</span>
-        <span class="category-name">Fish</span>
+        <div class="category-icon">🐟</div>
+        <div class="category-name">Fish</div>
     </a>
     <a href="{% url 'search' %}?category=8" class="category-card">
-        <span class="category-icon">🥚</span>
-        <span class="category-name">Eggs</span>
+        <div class="category-icon">🥚</div>
+        <div class="category-name">Eggs</div>
     </a>
     <a href="{% url 'search' %}?category=9" class="category-card">
-        <span class="category-icon">🥛</span>
-        <span class="category-name">Dairy</span>
+        <div class="category-icon">🥛</div>
+        <div class="category-name">Dairy</div>
     </a>
     <a href="{% url 'search' %}?category=10" class="category-card">
-        <span class="category-icon">🫒</span>
-        <span class="category-name">Fats & Oils</span>
+        <div class="category-icon">🫒</div>
+        <div class="category-name">Fats & Oils</div>
     </a>
 </div>
+
+<!-- ========== MOST SEARCHED SECTION ========== -->
+{% if popular_searches %}
+<div style="margin: 2rem 0; padding: 1.5rem; background: #f8f9fa; border-radius: 16px;">
+    <h3 style="color: #2c5e2e; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+        <span>🔥</span> Most Searched Foods
+    </h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+        {% for search in popular_searches %}
+        <a href="{% url 'search' %}?q={{ search.query }}" 
+           class="popular-tag"
+           style="display: inline-block; background: white; padding: 8px 16px; border-radius: 40px; text-decoration: none; color: #2c5e2e; border: 1px solid #e0e0e0; transition: all 0.2s;">
+            {{ search.query }}
+            <span style="background: #e0e0e0; color: #666; border-radius: 20px; padding: 2px 8px; margin-left: 6px; font-size: 0.7rem;">{{ search.count }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    <p style="margin-top: 1rem; font-size: 0.75rem; color: #666;">Based on what Kenyans are searching for</p>
+</div>
+{% endif %}
+<!-- ========== END MOST SEARCHED ========== -->
 
 <div class="feature-box">
     <h2 style="color: #2c3e2f;">🧮 Try the Nutrient Calculator</h2>
@@ -303,4 +324,5 @@
     <p>See how different Kenyan foods stack up against each other.</p>
     <a href="{% url 'compare' %}" class="feature-link">Compare Now →</a>
 </div>
+
 {% endblock %}
