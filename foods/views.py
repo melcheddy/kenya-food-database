@@ -1,7 +1,10 @@
-from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
-from .models import Food, Category, RDA, UnitConversion
-from .swap_suggestions import SWAP_SUGGESTIONS, NUTRIENT_SWAPS, get_cost_tag
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from django.db.models import Q, Count
+from .models import Food, Category, UnitConversion, SearchQuery
+import json
 
 def home(request):
     """Homepage with search"""
@@ -279,6 +282,172 @@ def nutrient_calculator(request):
         'available_units': available_units,
         'result': result,
         'rda': rda,
+    })
+
+def recall_24hr(request):
+    """24-hour dietary recall with searchable foods and fluids"""
+    foods = Food.objects.all().order_by('food_name')
+    
+    meals = [
+        {'id': 1, 'name': 'Breakfast'},
+        {'id': 2, 'name': 'Morning Snack'},
+        {'id': 3, 'name': 'Lunch'},
+        {'id': 4, 'name': 'Afternoon Snack'},
+        {'id': 5, 'name': 'Dinner'},
+        {'id': 6, 'name': 'Evening Snack'},
+    ]
+    
+    results = None
+    
+    if request.method == 'POST':
+        name = request.POST.get('name', '')
+        age = request.POST.get('age', '')
+        gender = request.POST.get('gender', 'female')
+        
+        total_energy = 0
+        total_protein = 0
+        total_iron = 0
+        total_fiber = 0
+        total_calcium = 0
+        total_vitamin_a = 0
+        total_fluid_ml = 0
+        
+        try:
+            age = int(age) if age else 30
+        except ValueError:
+            age = 30
+        
+        fluid_ids = request.POST.getlist('fluid_id[]')
+        fluid_amounts = request.POST.getlist('fluid_amount[]')
+        fluid_units = request.POST.getlist('fluid_unit[]')
+        
+        for i in range(len(fluid_ids)):
+            if fluid_ids[i] and fluid_amounts[i]:
+                try:
+                    amount = float(fluid_amounts[i])
+                    unit = fluid_units[i]
+                    
+                    if unit == 'ml':
+                        total_fluid_ml += amount
+                    elif unit == 'cup':
+                        total_fluid_ml += amount * 240
+                    elif unit == 'glass':
+                        total_fluid_ml += amount * 250
+                    elif unit == 'bottle':
+                        total_fluid_ml += amount * 500
+                except (ValueError, IndexError):
+                    pass
+        
+        for meal in meals:
+            meal_id = meal['id']
+            food_ids = request.POST.getlist(f'food_id_{meal_id}[]')
+            amounts = request.POST.getlist(f'amount_{meal_id}[]')
+            units = request.POST.getlist(f'unit_{meal_id}[]')
+            
+            for i in range(len(food_ids)):
+                if food_ids[i] and amounts[i]:
+                    try:
+                        food = Food.objects.get(id=food_ids[i])
+                        amount = float(amounts[i])
+                        unit = units[i] if i < len(units) else 'grams'
+                        
+                        grams = amount
+                        if unit != 'grams':
+                            try:
+                                conversion = UnitConversion.objects.get(food=food, unit_name=unit)
+                                grams = amount * conversion.grams
+                            except UnitConversion.DoesNotExist:
+                                grams = amount
+                        
+                        total_energy += (grams / 100) * food.energy_kcal
+                        total_protein += (grams / 100) * food.protein_g
+                        total_iron += (grams / 100) * food.iron_mg
+                        total_fiber += (grams / 100) * food.fiber_g
+                        total_calcium += (grams / 100) * food.calcium_mg
+                        total_vitamin_a += (grams / 100) * food.vitamin_a_rae_ug
+                        total_fluid_ml += (grams / 100) * food.water_g
+                        
+                    except (Food.DoesNotExist, ValueError):
+                        pass
+        
+        if age < 4:
+            ai_liters = 1.3
+        elif age < 9:
+            ai_liters = 1.7
+        elif age < 14:
+            ai_liters = 2.4 if gender == 'male' else 2.1
+        elif age < 19:
+            ai_liters = 3.3 if gender == 'male' else 2.3
+        else:
+            ai_liters = 3.7 if gender == 'male' else 2.7
+        
+        total_fluid_l = total_fluid_ml / 1000
+        fluid_percent = (total_fluid_l / ai_liters) * 100 if ai_liters > 0 else 0
+        
+        results = {
+            'total_energy': total_energy,
+            'total_protein': total_protein,
+            'total_iron': total_iron,
+            'total_fiber': total_fiber,
+            'total_calcium': total_calcium,
+            'total_vitamin_a': total_vitamin_a,
+            'total_fluid_ml': total_fluid_ml,
+            'total_fluid_l': total_fluid_l,
+            'ai_liters': ai_liters,
+            'fluid_percent': fluid_percent,
+            'name': name,
+            'age': age,
+            'gender': gender,
+        }
+        
+        if fluid_percent < 80:
+            results['hydration_message'] = '⚠️ You might be running low on fluids. Try to drink more water throughout the day.'
+        elif fluid_percent <= 120:
+            results['hydration_message'] = '✅ Great job! Your hydration is on point.'
+        else:
+            results['hydration_message'] = '💧 You\'re well hydrated!'
+        
+        # RDI analysis
+        if gender == 'female':
+            if age < 19:
+                rdi = {'energy_kcal': 2000, 'protein_g': 46, 'iron_mg': 15, 'calcium_mg': 1300}
+            else:
+                rdi = {'energy_kcal': 2100, 'protein_g': 46, 'iron_mg': 29, 'calcium_mg': 1000}
+        else:
+            if age < 19:
+                rdi = {'energy_kcal': 2400, 'protein_g': 52, 'iron_mg': 11, 'calcium_mg': 1300}
+            else:
+                rdi = {'energy_kcal': 2500, 'protein_g': 56, 'iron_mg': 11, 'calcium_mg': 1000}
+        
+        results['rdi'] = rdi
+        results['rdi_percentages'] = {
+            'energy_percent': (total_energy / rdi['energy_kcal']) * 100,
+            'protein_percent': (total_protein / rdi['protein_g']) * 100,
+            'iron_percent': (total_iron / rdi['iron_mg']) * 100,
+            'calcium_percent': (total_calcium / rdi['calcium_mg']) * 100,
+        }
+        
+        results['status_messages'] = []
+        
+        if results['rdi_percentages']['iron_percent'] < 70:
+            results['status_messages'].append({
+                'nutrient': 'Iron',
+                'status': 'low',
+                'message': f"⚠️ Your iron intake ({total_iron:.1f}mg) is only {results['rdi_percentages']['iron_percent']:.0f}% of daily needs.",
+                'suggestions': ['sukuma wiki', 'beans', 'dagaa omena']
+            })
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'results': results,
+                'name': name or 'there',
+            })
+    
+    return render(request, 'foods/recall_24hr.html', {
+        'foods': foods,
+        'meals': meals,
+        'results': results,
     })
 
 def compare_foods(request):
