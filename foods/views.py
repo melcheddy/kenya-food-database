@@ -51,80 +51,66 @@ def search_foods(request):
 
 def food_detail(request, food_id):
     """Show detailed nutrient information for a specific food"""
-    food = Food.objects.get(id=food_id)
+    try:
+        food = Food.objects.get(id=food_id)
 
-    if 'viewed_foods' not in request.session:
-        request.session['viewed_foods'] = []
-    
-    viewed = request.session['viewed_foods']
-    viewed.append(food.food_name)
-    request.session['viewed_foods'] = viewed[-10:]
-    
-    affordable_keywords = ['maize', 'beans', 'sukuma', 'cabbage', 'dagaa', 'omena', 
-                           'sweet potato', 'cassava', 'spinach', 'amaranth']
-    
-    affordable_count = 0
-    for food_name in viewed:
-        for kw in affordable_keywords:
-            if kw in food_name.lower():
-                affordable_count += 1
-                break
-    
-    is_budget_conscious = affordable_count >= 4
-    print(f"Budget-conscious: {is_budget_conscious} (viewed {affordable_count} affordable foods)")
-    
-    current_cost = get_cost_tag(food.food_name)
-    
-    swap_suggestions = []
-    food_name_lower = food.food_name.lower()
-    
-    for keyword, swaps in SWAP_SUGGESTIONS.items():
-        if keyword in food_name_lower:
-            for swap in swaps:
-                if isinstance(swap, dict):
-                    swap_name = swap.get('name', '')
-                    benefit = swap.get('benefit', '')
-                elif isinstance(swap, (list, tuple)) and len(swap) >= 2:
-                    swap_name = swap[0]
-                    benefit = swap[1]
-                else:
-                    continue
-                    
-                try:
-                    swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
-                    if swap_food and swap_food.id != food.id:
-                        swap_suggestions.append({
-                            'name': swap_food.food_name,
-                            'id': swap_food.id,
-                            'benefit': benefit
-                        })
-                except:
-                    pass
-    
-    if current_cost == 'high':
-        affordable_swaps = [
-            ('beans', 'Affordable plant protein — 1/4 the price of meat'),
-            ('sukuma wiki', 'Iron-rich vegetable, very affordable'),
-            ('dagaa omena', 'Calcium-rich fish, much cheaper than beef'),
-            ('whole maize flour', 'Nutritious staple, budget-friendly'),
-            ('cabbage', 'Vitamin-rich, very affordable'),
-        ]
-        for swap_name, benefit in affordable_swaps:
-            try:
-                swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
-                if swap_food and swap_food.id != food.id:
-                    if not any(s['id'] == swap_food.id for s in swap_suggestions):
-                        swap_suggestions.append({
-                            'name': swap_food.food_name,
-                            'id': swap_food.id,
-                            'benefit': f'💰 Affordable alternative — {benefit}'
-                        })
-            except:
-                pass
-    
-    if len(swap_suggestions) < 3:
-        if food.iron_mg < 2.0:
-            for swap_name, benefit in NUTRIENT_SWAPS['low_iron']:
+        if 'viewed_foods' not in request.session:
+            request.session['viewed_foods'] = []
+        
+        viewed = request.session['viewed_foods']
+        viewed.append(food.food_name)
+        request.session['viewed_foods'] = viewed[-10:]
+        
+        affordable_keywords = ['maize', 'beans', 'sukuma', 'cabbage', 'dagaa', 'omena', 
+                               'sweet potato', 'cassava', 'spinach', 'amaranth']
+        
+        affordable_count = 0
+        for food_name in viewed:
+            for kw in affordable_keywords:
+                if kw in food_name.lower():
+                    affordable_count += 1
+                    break
+        
+        is_budget_conscious = affordable_count >= 4
+        print(f"Budget-conscious: {is_budget_conscious} (viewed {affordable_count} affordable foods)")
+        
+        current_cost = get_cost_tag(food.food_name)
+        
+        swap_suggestions = []
+        food_name_lower = food.food_name.lower()
+        
+        for keyword, swaps in SWAP_SUGGESTIONS.items():
+            if keyword in food_name_lower:
+                for swap in swaps:
+                    if isinstance(swap, dict):
+                        swap_name = swap.get('name', '')
+                        benefit = swap.get('benefit', '')
+                    elif isinstance(swap, (list, tuple)) and len(swap) >= 2:
+                        swap_name = swap[0]
+                        benefit = swap[1]
+                    else:
+                        continue
+                        
+                    try:
+                        swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
+                        if swap_food and swap_food.id != food.id:
+                            swap_suggestions.append({
+                                'name': swap_food.food_name,
+                                'id': swap_food.id,
+                                'benefit': benefit
+                            })
+                    except:
+                        pass
+        
+        if current_cost == 'high':
+            affordable_swaps = [
+                ('beans', 'Affordable plant protein — 1/4 the price of meat'),
+                ('sukuma wiki', 'Iron-rich vegetable, very affordable'),
+                ('dagaa omena', 'Calcium-rich fish, much cheaper than beef'),
+                ('whole maize flour', 'Nutritious staple, budget-friendly'),
+                ('cabbage', 'Vitamin-rich, very affordable'),
+            ]
+            for swap_name, benefit in affordable_swaps:
                 try:
                     swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
                     if swap_food and swap_food.id != food.id:
@@ -132,41 +118,56 @@ def food_detail(request, food_id):
                             swap_suggestions.append({
                                 'name': swap_food.food_name,
                                 'id': swap_food.id,
-                                'benefit': f'🍳 High in iron — {benefit}'
+                                'benefit': f'💰 Affordable alternative — {benefit}'
                             })
                 except:
                     pass
         
-        if food.fiber_g < 3.0 and len(swap_suggestions) < 3:
-            for swap_name, benefit in NUTRIENT_SWAPS['low_fiber']:
-                try:
-                    swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
-                    if swap_food and swap_food.id != food.id:
-                        if not any(s['id'] == swap_food.id for s in swap_suggestions):
-                            swap_suggestions.append({
-                                'name': swap_food.food_name,
-                                'id': swap_food.id,
-                                'benefit': f'🌾 High in fiber — {benefit}'
-                            })
-                except:
-                    pass
-    
-    swap_suggestions = swap_suggestions[:3]
-    
-    return render(request, 'foods/food_detail.html', {
-        'food': food,
-        'swap_suggestions': swap_suggestions,
-        'cost_tag': current_cost,
-    })
+        if len(swap_suggestions) < 3:
+            if food.iron_mg < 2.0:
+                for swap_name, benefit in NUTRIENT_SWAPS['low_iron']:
+                    try:
+                        swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
+                        if swap_food and swap_food.id != food.id:
+                            if not any(s['id'] == swap_food.id for s in swap_suggestions):
+                                swap_suggestions.append({
+                                    'name': swap_food.food_name,
+                                    'id': swap_food.id,
+                                    'benefit': f'🍳 High in iron — {benefit}'
+                                })
+                    except:
+                        pass
+            
+            if food.fiber_g < 3.0 and len(swap_suggestions) < 3:
+                for swap_name, benefit in NUTRIENT_SWAPS['low_fiber']:
+                    try:
+                        swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
+                        if swap_food and swap_food.id != food.id:
+                            if not any(s['id'] == swap_food.id for s in swap_suggestions):
+                                swap_suggestions.append({
+                                    'name': swap_food.food_name,
+                                    'id': swap_food.id,
+                                    'benefit': f'🌾 High in fiber — {benefit}'
+                                })
+                    except:
+                        pass
+        
+        swap_suggestions = swap_suggestions[:3]
+        
+        return render(request, 'foods/food_detail.html', {
+            'food': food,
+            'swap_suggestions': swap_suggestions,
+            'cost_tag': current_cost,
+        })
+        
     except Exception as e:
         print(f"ERROR in food_detail for ID {food_id}: {e}")
+        import traceback
         traceback.print_exc()
-        # Return a simple error page instead of crashing
         return render(request, 'foods/error.html', {
             'error': str(e),
             'food_id': food_id
         }, status=500)
-
 
 def nutrient_calculator(request):
     foods = Food.objects.all().order_by('food_name')
