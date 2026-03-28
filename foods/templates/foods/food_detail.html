@@ -26,6 +26,32 @@
         font-size: 0.8rem;
     }
     
+    .calculate-button-container {
+        margin: 1rem 0 1.5rem 0;
+        text-align: center;
+    }
+    
+    .calculate-redirect-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #2c5e2e;
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .calculate-redirect-btn:hover {
+        background: #1e421f;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
     .section-header {
         display: flex;
         align-items: center;
@@ -88,75 +114,6 @@
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.3px;
-    }
-    
-    .calculator-box {
-        background: #f8f9fa;
-        border-radius: 16px;
-        padding: 1.25rem;
-        margin: 1.5rem 0;
-    }
-    
-    .calculator-form {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        margin-top: 1rem;
-    }
-    
-    .form-group {
-        flex: 1;
-        min-width: 100px;
-    }
-    
-    .form-group label {
-        display: block;
-        font-size: 0.7rem;
-        color: #666;
-        margin-bottom: 0.25rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .form-group input, .form-group select {
-        width: 100%;
-        padding: 0.6rem;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 0.9rem;
-    }
-    
-    .calculate-btn {
-        background: #2c5e2e;
-        color: white;
-        padding: 0.6rem 1.2rem;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        align-self: flex-end;
-    }
-    
-    .result-box {
-        margin-top: 1rem;
-        padding: 1rem;
-        background: #e8f0e8;
-        border-radius: 12px;
-        display: none;
-        max-height: 400px;
-        overflow-y: auto;
-    }
-    
-    .result-box.show {
-        display: block;
-    }
-    
-    .result-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.4rem 0;
-        border-bottom: 1px solid #c8dbc8;
-        font-size: 0.8rem;
     }
     
     .swap-section {
@@ -232,6 +189,14 @@
     <span class="category-badge">{{ food.category.name|default:"Kenyan Food" }}</span>
     <h1>{{ food.food_name }}</h1>
     <p>Nutritional information per 100g — Kenya Food Composition Tables 2018</p>
+</div>
+
+<!-- ========== CALCULATOR REDIRECT BUTTON ========== -->
+<div class="calculate-button-container">
+    <a href="{% url 'calculator' %}?food={{ food.food_name|urlencode }}" class="calculate-redirect-btn">
+        📊 Calculate This Food → 
+        <span style="font-size: 0.8rem;">(enter your portion)</span>
+    </a>
 </div>
 
 <!-- ========== MACRONUTRIENTS ========== -->
@@ -348,35 +313,6 @@
     </div>
 </div>
 
-<!-- Calculator -->
-<div class="calculator-box">
-    <h3>🧮 Calculate Your Portion</h3>
-    <p style="color: #666; font-size: 0.85rem;">Enter how much you ate and see what you're actually consuming</p>
-    
-    <div class="calculator-form">
-        <div class="form-group">
-            <label>AMOUNT</label>
-            <input type="number" id="amount" value="100" step="10">
-        </div>
-        <div class="form-group">
-            <label>UNIT</label>
-            <select id="unit">
-                <option value="grams">grams (g)</option>
-                <option value="tablespoon">tablespoon</option>
-                <option value="teaspoon">teaspoon</option>
-                <option value="cup">cup</option>
-                <option value="piece">piece</option>
-            </select>
-        </div>
-        <button class="calculate-btn" onclick="calculateNutrition()">Calculate →</button>
-    </div>
-    
-    <div id="resultBox" class="result-box">
-        <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem;">📊 Your Portion: <span id="displayGrams"></span></h4>
-        <div id="resultContent"></div>
-    </div>
-</div>
-
 <!-- Swap Suggestions -->
 {% if swap_suggestions %}
 <div class="swap-section">
@@ -404,70 +340,5 @@
     📊 <strong>Note:</strong> Values are based on the Kenya Food Composition Tables 2018 (FAO & Government of Kenya). 
     Actual nutrient content may vary based on variety, growing conditions, and preparation method.
 </div>
-
-<script>
-    const nutrientData = {
-        energy_kcal: {{ food.energy_kcal|default:0|floatformat:2 }},
-        protein_g: {{ food.protein_g|default:0|floatformat:2 }},
-        fat_g: {{ food.fat_g|default:0|floatformat:2 }},
-        carbohydrate_g: {{ food.carbohydrate_g|default:0|floatformat:2 }},
-        fiber_g: {{ food.fiber_g|default:0|floatformat:2 }},
-        water_g: {{ food.water_g|default:0|floatformat:2 }},
-        ash_g: {{ food.ash_g|default:0|floatformat:2 }},
-        calcium_mg: {{ food.calcium_mg|default:0|floatformat:2 }},
-        iron_mg: {{ food.iron_mg|default:0|floatformat:2 }},
-        magnesium_mg: {{ food.magnesium_mg|default:0|floatformat:2 }},
-        phosphorus_mg: {{ food.phosphorus_mg|default:0|floatformat:2 }},
-        potassium_mg: {{ food.potassium_mg|default:0|floatformat:2 }},
-        sodium_mg: {{ food.sodium_mg|default:0|floatformat:2 }},
-        zinc_mg: {{ food.zinc_mg|default:0|floatformat:2 }},
-        thiamin_mg: {{ food.thiamin_mg|default:0|floatformat:2 }},
-        riboflavin_mg: {{ food.riboflavin_mg|default:0|floatformat:2 }},
-        niacin_mg: {{ food.niacin_mg|default:0|floatformat:2 }},
-        folate_ug: {{ food.folate_ug|default:0|floatformat:2 }}
-    };
-    
-    const nutrientNames = {
-        energy_kcal: 'Energy', protein_g: 'Protein', fat_g: 'Fat',
-        carbohydrate_g: 'Carbohydrates', fiber_g: 'Fiber', water_g: 'Water',
-        ash_g: 'Ash', calcium_mg: 'Calcium', iron_mg: 'Iron', magnesium_mg: 'Magnesium',
-        phosphorus_mg: 'Phosphorus', potassium_mg: 'Potassium', sodium_mg: 'Sodium',
-        zinc_mg: 'Zinc', thiamin_mg: 'Thiamin B1', riboflavin_mg: 'Riboflavin B2',
-        niacin_mg: 'Niacin B3', folate_ug: 'Folate'
-    };
-    
-    function calculateNutrition() {
-        const amount = parseFloat(document.getElementById('amount').value);
-        const unit = document.getElementById('unit').value;
-        
-        let grams = amount;
-        
-        if (unit !== 'grams') {
-            const unitToGrams = {
-                'tablespoon': 15,
-                'teaspoon': 5,
-                'cup': 240,
-                'piece': 100
-            };
-            grams = amount * (unitToGrams[unit] || 1);
-        }
-        
-        document.getElementById('displayGrams').innerHTML = `${grams.toFixed(1)}g`;
-        
-        const factor = grams / 100;
-        let results = '';
-        
-        for (const [key, value] of Object.entries(nutrientData)) {
-            if (value !== null && value !== undefined && value !== 0) {
-                const calculated = (value * factor).toFixed(1);
-                const displayName = nutrientNames[key] || key.replace(/_/g, ' ');
-                results += `<div class="result-row"><span>${displayName}:</span><strong>${calculated}</strong></div>`;
-            }
-        }
-        
-        document.getElementById('resultContent').innerHTML = results;
-        document.getElementById('resultBox').classList.add('show');
-    }
-</script>
 
 {% endblock %}
