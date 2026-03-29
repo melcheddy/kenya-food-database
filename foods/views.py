@@ -9,6 +9,30 @@ import json
 import os
 from datetime import datetime
 
+def get_cost_tag(food_name):
+    """Determine if a food is affordable, medium, or high cost based on name"""
+    food_name_lower = food_name.lower()
+    
+    # Affordable foods
+    affordable_keywords = ['maize', 'beans', 'sukuma', 'cabbage', 'dagaa', 'omena', 
+                           'sweet potato', 'cassava', 'spinach', 'amaranth', 'millet',
+                           'sorghum', 'githeri', 'mukimo', 'chapati', 'ugali']
+    
+    # Expensive foods
+    expensive_keywords = ['beef', 'lamb', 'pork', 'chicken', 'fish', 'milk', 'cheese',
+                          'butter', 'ghee', 'yoghurt', 'sausage', 'pilau', 'biryani',
+                          'samosa', 'cake', 'biscuit', 'bread', 'soda', 'juice']
+    
+    for kw in affordable_keywords:
+        if kw in food_name_lower:
+            return 'low'
+    
+    for kw in expensive_keywords:
+        if kw in food_name_lower:
+            return 'high'
+    
+    return 'medium'
+
 def home(request):
     """Homepage with search"""
     # Get top 10 most searched foods
