@@ -611,6 +611,19 @@
         });
     }
     
+    function addHiddenFieldsFromForm() {
+        let html = '';
+        const form = document.getElementById('recallForm');
+        const formData = new FormData(form);
+        
+        for (let [key, value] of formData.entries()) {
+            if (key !== 'name' && key !== 'age' && key !== 'gender') {
+                html += `<input type="hidden" name="${escapeHtml(key)}" value="${escapeHtml(value)}">`;
+            }
+        }
+        return html;
+    }
+    
     function displayRecallResults(data, userName) {
         const results = data.results;
         
@@ -782,6 +795,21 @@
                 <div class="insight-box">
                     <p>${escapeHtml(results.hydration_message || '💧 Stay hydrated!')}</p>
                 </div>
+            </div>
+        `;
+        
+        // Add Excel Export Button
+        html += `
+            <div style="margin-top: 20px; text-align: center;">
+                <form method="POST" action="/export-recall/" id="exportRecallForm" style="display: inline;">
+                    <input type="hidden" name="name" value="${escapeHtml(userName)}">
+                    <input type="hidden" name="age" value="${results.age || ''}">
+                    <input type="hidden" name="gender" value="${results.gender || 'female'}">
+                    ${addHiddenFieldsFromForm()}
+                    <button type="submit" style="background: #2c5e2e; color: white; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-size: 14px; font-weight: 500; margin-bottom: 15px;">
+                        📊 Download Excel Report
+                    </button>
+                </form>
             </div>
         `;
         
