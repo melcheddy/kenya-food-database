@@ -33,6 +33,73 @@ def get_cost_tag(food_name):
     
     return 'medium'
 
+# ========== SWAP SUGGESTIONS ==========
+SWAP_SUGGESTIONS = {
+    'maize': [
+        {'name': 'whole maize flour', 'benefit': '3x more fiber and iron than refined maize'},
+        {'name': 'sorghum', 'benefit': 'Higher iron content, good for anemia prevention'},
+        {'name': 'finger millet (wimbi)', 'benefit': 'Rich in calcium and iron'}
+    ],
+    'rice': [
+        {'name': 'brown rice', 'benefit': 'More fiber, B vitamins, and minerals'},
+        {'name': 'sorghum', 'benefit': 'Higher iron and protein content'},
+        {'name': 'finger millet', 'benefit': 'Excellent calcium source'}
+    ],
+    'beans': [
+        {'name': 'green grams (ndengu)', 'benefit': 'Easier to digest, rich in iron'},
+        {'name': 'lentils', 'benefit': 'Cook faster, high in folate and iron'},
+        {'name': 'soybeans', 'benefit': 'Complete protein, high iron content'}
+    ],
+    'sukuma': [
+        {'name': 'amaranth (terere)', 'benefit': 'Higher iron and calcium than sukuma'},
+        {'name': 'spider plant (saget)', 'benefit': 'Rich in iron and protein'},
+        {'name': 'kale (kanzera)', 'benefit': 'Similar nutrients, different taste'}
+    ],
+    'chapati': [
+        {'name': 'whole wheat chapati', 'benefit': 'More fiber and minerals'},
+        {'name': 'multigrain chapati', 'benefit': 'Added nutrients from millet and sorghum'},
+        {'name': 'ugali with sukuma', 'benefit': 'Complete meal with more nutrients'}
+    ],
+    'beef': [
+        {'name': 'fish (omena/dagaa)', 'benefit': 'Lower fat, rich in calcium and iron'},
+        {'name': 'beans', 'benefit': 'Affordable plant protein with iron'},
+        {'name': 'chicken without skin', 'benefit': 'Lower saturated fat'}
+    ],
+    'milk': [
+        {'name': 'fermented milk (maziwa lala)', 'benefit': 'Easier digestion, probiotics'},
+        {'name': 'fortified milk', 'benefit': 'Added vitamin A and D'},
+        {'name': 'yoghurt', 'benefit': 'Probiotics, easier digestion'}
+    ],
+    'oil': [
+        {'name': 'red palm oil', 'benefit': 'Rich in vitamin A'},
+        {'name': 'olive oil', 'benefit': 'Heart-healthy monounsaturated fats'},
+        {'name': 'use less oil', 'benefit': 'Reduce calories and fat intake'}
+    ]
+}
+
+# ========== NUTRIENT SWAPS ==========
+NUTRIENT_SWAPS = {
+    'low_iron': [
+        ('sukuma wiki', 'Excellent iron source, affordable'),
+        ('beans', 'Rich in iron and protein'),
+        ('dagaa omena', 'High iron and calcium'),
+        ('amaranth (terere)', 'Very high iron content'),
+        ('beef liver', 'Concentrated iron source')
+    ],
+    'low_fiber': [
+        ('whole maize flour', '3x more fiber than refined'),
+        ('beans', 'Excellent fiber source'),
+        ('sweet potato', 'Good fiber content'),
+        ('githeri', 'Mixed maize and beans for fiber')
+    ],
+    'low_calcium': [
+        ('dagaa omena', 'Eaten with bones for calcium'),
+        ('milk', 'Excellent calcium source'),
+        ('amaranth (terere)', 'High calcium leafy green'),
+        ('finger millet (wimbi)', 'Rich in calcium')
+    ]
+}
+
 def home(request):
     """Homepage with search"""
     # Get top 10 most searched foods
