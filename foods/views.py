@@ -739,16 +739,17 @@ def recall_24hr(request):
 def export_recall_excel(request):
     """Export 24-hour recall results as Excel file for nutritionists"""
     try:
-        # Get the data from POST or session
         if request.method == 'POST':
+            from .models import Food, UnitConversion
+            from datetime import datetime
+            import openpyxl
+            from openpyxl.styles import Font, PatternFill, Alignment
+            from django.http import HttpResponse
+            
             # Get form data
             name = request.POST.get('name', '')
             age = request.POST.get('age', '')
             gender = request.POST.get('gender', 'female')
-            
-            # Process meals and fluids (same as recall_24hr function)
-            from .models import Food, UnitConversion
-            from datetime import datetime
             
             try:
                 age = int(age) if age else 30
@@ -765,7 +766,6 @@ def export_recall_excel(request):
             total_vitamin_a = 0
             total_fluid_ml = 0
             
-            # Track individual foods for detailed report
             food_items = []
             
             # Process meals
@@ -851,8 +851,6 @@ def export_recall_excel(request):
                             ml = amount * 250
                         elif unit == 'bottle':
                             ml = amount * 500
-                        else:
-                            ml = amount
                         
                         total_fluid_ml += ml
                         
@@ -899,18 +897,16 @@ def export_recall_excel(request):
             total_fluid_l = total_fluid_ml / 1000
             fluid_percent = (total_fluid_l / ai_liters) * 100 if ai_liters > 0 else 0
             
-            # Create Excel workbook
+            # Create workbook
             wb = openpyxl.Workbook()
             
             # ========== SHEET 1: SUMMARY ==========
             ws_summary = wb.active
             ws_summary.title = "Nutrition Summary"
             
-            # Title
-            ws_summary.merge_cells('A1:F1')
+            # Title (without using merge - use simple cells)
             ws_summary['A1'] = "24-HOUR DIETARY RECALL REPORT"
             ws_summary['A1'].font = Font(bold=True, size=16)
-            ws_summary['A1'].alignment = Alignment(horizontal="center")
             
             # Patient info
             ws_summary['A3'] = "Patient Information"
@@ -929,10 +925,10 @@ def export_recall_excel(request):
             ws_summary['A9'].font = Font(bold=True, size=12, color="2c5e2e")
             
             nutrients = [
-                ('Energy (kcal)', total_energy, rda['energy_kcal'], (total_energy/rda['energy_kcal'])*100),
-                ('Protein (g)', total_protein, rda['protein_g'], (total_protein/rda['protein_g'])*100),
-                ('Iron (mg)', total_iron, rda['iron_mg'], (total_iron/rda['iron_mg'])*100),
-                ('Calcium (mg)', total_calcium, rda['calcium_mg'], (total_calcium/rda['calcium_mg'])*100),
+                ('Energy (kcal)', total_energy, rda['energy_kcal'], (total_energy/rda['energy_kcal'])*100 if rda['energy_kcal'] > 0 else 0),
+                ('Protein (g)', total_protein, rda['protein_g'], (total_protein/rda['protein_g'])*100 if rda['protein_g'] > 0 else 0),
+                ('Iron (mg)', total_iron, rda['iron_mg'], (total_iron/rda['iron_mg'])*100 if rda['iron_mg'] > 0 else 0),
+                ('Calcium (mg)', total_calcium, rda['calcium_mg'], (total_calcium/rda['calcium_mg'])*100 if rda['calcium_mg'] > 0 else 0),
                 ('Fat (g)', total_fat, 'N/A', 0),
                 ('Carbohydrates (g)', total_carbs, 'N/A', 0),
                 ('Fiber (g)', total_fiber, 'N/A', 0),
@@ -940,8 +936,8 @@ def export_recall_excel(request):
             ]
             
             row = 10
-            for name, value, target, percent in nutrients:
-                ws_summary[f'A{row}'] = name
+            for nutrient_name, value, target, percent in nutrients:
+                ws_summary[f'A{row}'] = nutrient_name
                 ws_summary[f'B{row}'] = f"{value:.1f}"
                 if target != 'N/A':
                     ws_summary[f'C{row}'] = f"Target: {target}"
@@ -951,24 +947,28 @@ def export_recall_excel(request):
                 row += 1
             
             # Hydration
-            ws_summary[f'A{row+1}'] = "Hydration"
-            ws_summary[f'A{row+1}'].font = Font(bold=True, size=12, color="2c5e2e")
-            ws_summary[f'A{row+2}'] = "Total Fluids:"
-            ws_summary[f'B{row+2}'] = f"{total_fluid_ml:.0f} ml ({total_fluid_l:.1f} L)"
-            ws_summary[f'A{row+3}'] = "Daily Target:"
-            ws_summary[f'B{row+3}'] = f"{ai_liters} L"
-            ws_summary[f'A{row+4}'] = "Status:"
+            row += 1
+            ws_summary[f'A{row}'] = "Hydration"
+            ws_summary[f'A{row}'].font = Font(bold=True, size=12, color="2c5e2e")
+            row += 1
+            ws_summary[f'A{row}'] = "Total Fluids:"
+            ws_summary[f'B{row}'] = f"{total_fluid_ml:.0f} ml ({total_fluid_l:.1f} L)"
+            row += 1
+            ws_summary[f'A{row}'] = "Daily Target:"
+            ws_summary[f'B{row}'] = f"{ai_liters} L"
+            row += 1
+            ws_summary[f'A{row}'] = "Status:"
             if fluid_percent < 80:
-                ws_summary[f'B{row+4}'] = "⚠️ Low hydration - drink more water"
-                ws_summary[f'B{row+4}'].font = Font(color="dc3545")
+                ws_summary[f'B{row}'] = "⚠️ Low hydration - drink more water"
+                ws_summary[f'B{row}'].font = Font(color="dc3545")
             elif fluid_percent <= 120:
-                ws_summary[f'B{row+4}'] = "✅ Well hydrated"
-                ws_summary[f'B{row+4}'].font = Font(color="28a745")
+                ws_summary[f'B{row}'] = "✅ Well hydrated"
+                ws_summary[f'B{row}'].font = Font(color="28a745")
             else:
-                ws_summary[f'B{row+4}'] = "💧 Well hydrated"
+                ws_summary[f'B{row}'] = "💧 Well hydrated"
             
             # Recommendations
-            row += 6
+            row += 2
             ws_summary[f'A{row}'] = "Recommendations"
             ws_summary[f'A{row}'].font = Font(bold=True, size=12, color="2c5e2e")
             row += 1
@@ -997,32 +997,27 @@ def export_recall_excel(request):
                 ws_summary[f'A{row}'] = "✅ Good balance! Keep up the healthy eating habits."
                 ws_summary[f'A{row}'].font = Font(color="28a745")
             
-            # Auto-adjust columns
-            for column in ws_summary.columns:
+            # Auto-adjust columns (NO MERGED CELLS)
+            for col in ['A', 'B', 'C', 'D']:
                 max_length = 0
-                column_letter = column[0].column_letter
-                for cell in column:
-                    try:
-                        if len(str(cell.value)) > max_length:
-                            max_length = len(str(cell.value))
-                    except:
-                        pass
+                for row_num in range(1, row + 10):
+                    cell_value = ws_summary[f'{col}{row_num}'].value
+                    if cell_value and len(str(cell_value)) > max_length:
+                        max_length = len(str(cell_value))
                 adjusted_width = min(max_length + 2, 40)
-                ws_summary.column_dimensions[column_letter].width = adjusted_width
+                ws_summary.column_dimensions[col].width = adjusted_width
             
             # ========== SHEET 2: FOODS LOGGED ==========
             ws_foods = wb.create_sheet("Foods Logged")
             
             if food_items:
-                # Headers
                 headers = ['Meal', 'Food', 'Amount', 'Unit', 'Grams', 'Energy (kcal)', 'Protein (g)', 'Iron (mg)', 'Calcium (mg)']
-                for col, header in enumerate(headers, 1):
-                    cell = ws_foods.cell(row=1, column=col, value=header)
+                for col_idx, header in enumerate(headers, 1):
+                    cell = ws_foods.cell(row=1, column=col_idx, value=header)
                     cell.font = Font(bold=True, color="FFFFFF")
                     cell.fill = PatternFill(start_color="2c5e2e", end_color="2c5e2e", fill_type="solid")
                     cell.alignment = Alignment(horizontal="center")
                 
-                # Data rows
                 for row_idx, item in enumerate(food_items, 2):
                     ws_foods.cell(row=row_idx, column=1, value=item['meal'])
                     ws_foods.cell(row=row_idx, column=2, value=item['food'])
@@ -1035,25 +1030,22 @@ def export_recall_excel(request):
                     ws_foods.cell(row=row_idx, column=9, value=f"{item['calcium']:.0f}")
                 
                 # Auto-adjust columns
-                for column in ws_foods.columns:
+                for col_idx in range(1, 10):
                     max_length = 0
-                    column_letter = column[0].column_letter
-                    for cell in column:
-                        try:
-                            if len(str(cell.value)) > max_length:
-                                max_length = len(str(cell.value))
-                        except:
-                            pass
+                    for row_num in range(1, len(food_items) + 2):
+                        cell_value = ws_foods.cell(row=row_num, column=col_idx).value
+                        if cell_value and len(str(cell_value)) > max_length:
+                            max_length = len(str(cell_value))
                     adjusted_width = min(max_length + 2, 30)
-                    ws_foods.column_dimensions[column_letter].width = adjusted_width
+                    ws_foods.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = adjusted_width
             
             # ========== SHEET 3: FLUIDS LOGGED ==========
             ws_fluids = wb.create_sheet("Fluids Logged")
             
             if fluid_items:
                 headers = ['Beverage', 'Amount', 'Unit', 'Milliliters (ml)']
-                for col, header in enumerate(headers, 1):
-                    cell = ws_fluids.cell(row=1, column=col, value=header)
+                for col_idx, header in enumerate(headers, 1):
+                    cell = ws_fluids.cell(row=1, column=col_idx, value=header)
                     cell.font = Font(bold=True, color="FFFFFF")
                     cell.fill = PatternFill(start_color="17a2b8", end_color="17a2b8", fill_type="solid")
                     cell.alignment = Alignment(horizontal="center")
@@ -1064,21 +1056,19 @@ def export_recall_excel(request):
                     ws_fluids.cell(row=row_idx, column=3, value=item['unit'])
                     ws_fluids.cell(row=row_idx, column=4, value=f"{item['ml']:.0f}")
                 
-                for column in ws_fluids.columns:
+                # Auto-adjust columns
+                for col_idx in range(1, 5):
                     max_length = 0
-                    column_letter = column[0].column_letter
-                    for cell in column:
-                        try:
-                            if len(str(cell.value)) > max_length:
-                                max_length = len(str(cell.value))
-                        except:
-                            pass
+                    for row_num in range(1, len(fluid_items) + 2):
+                        cell_value = ws_fluids.cell(row=row_num, column=col_idx).value
+                        if cell_value and len(str(cell_value)) > max_length:
+                            max_length = len(str(cell_value))
                     adjusted_width = min(max_length + 2, 25)
-                    ws_fluids.column_dimensions[column_letter].width = adjusted_width
+                    ws_fluids.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = adjusted_width
             
             # Create response
             response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            filename = f"nutrition_recall_{name.replace(' ', '_') if name else 'report'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+            filename = f"nutrition_recall_{name.replace(' ', '_') if name else 'report'}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
             response['Content-Disposition'] = f'attachment; filename="{filename}"'
             
             wb.save(response)
@@ -1090,7 +1080,7 @@ def export_recall_excel(request):
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return HttpResponse(f"Error exporting recall data: {e}", status=500)
+        return HttpResponse(f"Error exporting recall data: {str(e)}", status=500)
 
 def compare_foods(request):
     import traceback
