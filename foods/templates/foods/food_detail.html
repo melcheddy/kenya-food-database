@@ -197,6 +197,12 @@
         📊 Calculate This Food → 
         <span style="font-size: 0.8rem;">(enter your portion)</span>
     </a>
+    
+    <!-- Excel Export Button -->
+    <a href="{% url 'export_food_excel' food.id %}" 
+       style="display: inline-flex; align-items: center; gap: 8px; background: #1e6f3f; color: white; padding: 0.8rem 1.5rem; border-radius: 50px; text-decoration: none; font-weight: 500; transition: all 0.2s;">
+        📥 Download Excel File
+    </a>
 </div>
 
 <!-- ========== MACRONUTRIENTS ========== -->
