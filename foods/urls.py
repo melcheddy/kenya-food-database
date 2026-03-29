@@ -18,4 +18,5 @@ urlpatterns = [
     path('create-admin/', views.create_admin, name='create_admin'),
     path('health/', views.health_check, name='health_check'),
     path('export/<int:food_id>/', views.export_food_excel, name='export_food_excel'),
+    path('export-recall/', views.export_recall_excel, name='export_recall_excel'),
 ]

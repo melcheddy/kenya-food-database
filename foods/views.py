@@ -736,6 +736,362 @@ def recall_24hr(request):
         'results': results,
     })
 
+def export_recall_excel(request):
+    """Export 24-hour recall results as Excel file for nutritionists"""
+    try:
+        # Get the data from POST or session
+        if request.method == 'POST':
+            # Get form data
+            name = request.POST.get('name', '')
+            age = request.POST.get('age', '')
+            gender = request.POST.get('gender', 'female')
+            
+            # Process meals and fluids (same as recall_24hr function)
+            from .models import Food, UnitConversion
+            from datetime import datetime
+            
+            try:
+                age = int(age) if age else 30
+            except ValueError:
+                age = 30
+            
+            total_energy = 0
+            total_protein = 0
+            total_fat = 0
+            total_carbs = 0
+            total_fiber = 0
+            total_iron = 0
+            total_calcium = 0
+            total_vitamin_a = 0
+            total_fluid_ml = 0
+            
+            # Track individual foods for detailed report
+            food_items = []
+            
+            # Process meals
+            meals = [
+                {'id': 1, 'name': 'Breakfast'},
+                {'id': 2, 'name': 'Morning Snack'},
+                {'id': 3, 'name': 'Lunch'},
+                {'id': 4, 'name': 'Afternoon Snack'},
+                {'id': 5, 'name': 'Dinner'},
+                {'id': 6, 'name': 'Evening Snack'},
+            ]
+            
+            for meal in meals:
+                meal_id = meal['id']
+                food_ids = request.POST.getlist(f'food_id_{meal_id}[]')
+                amounts = request.POST.getlist(f'amount_{meal_id}[]')
+                units = request.POST.getlist(f'unit_{meal_id}[]')
+                
+                for i in range(len(food_ids)):
+                    if food_ids[i] and amounts[i]:
+                        try:
+                            food = Food.objects.get(id=food_ids[i])
+                            amount = float(amounts[i])
+                            unit = units[i] if i < len(units) else 'grams'
+                            
+                            grams = amount
+                            if unit != 'grams':
+                                try:
+                                    conversion = UnitConversion.objects.get(food=food, unit_name=unit)
+                                    grams = amount * conversion.grams
+                                except UnitConversion.DoesNotExist:
+                                    pass
+                            
+                            energy = (grams / 100) * food.energy_kcal
+                            protein = (grams / 100) * food.protein_g
+                            fat = (grams / 100) * food.fat_g
+                            carbs = (grams / 100) * food.carbohydrate_g
+                            fiber = (grams / 100) * food.fiber_g
+                            iron = (grams / 100) * food.iron_mg
+                            calcium = (grams / 100) * food.calcium_mg
+                            vitamin_a = (grams / 100) * food.vitamin_a_rae_ug
+                            
+                            total_energy += energy
+                            total_protein += protein
+                            total_fat += fat
+                            total_carbs += carbs
+                            total_fiber += fiber
+                            total_iron += iron
+                            total_calcium += calcium
+                            total_vitamin_a += vitamin_a
+                            total_fluid_ml += (grams / 100) * food.water_g
+                            
+                            food_items.append({
+                                'meal': meal['name'],
+                                'food': food.food_name,
+                                'amount': amount,
+                                'unit': unit,
+                                'grams': grams,
+                                'energy': energy,
+                                'protein': protein,
+                                'iron': iron,
+                                'calcium': calcium
+                            })
+                        except (Food.DoesNotExist, ValueError):
+                            pass
+            
+            # Process fluids
+            fluid_ids = request.POST.getlist('fluid_id[]')
+            fluid_amounts = request.POST.getlist('fluid_amount[]')
+            fluid_units = request.POST.getlist('fluid_unit[]')
+            
+            fluid_items = []
+            for i in range(len(fluid_ids)):
+                if fluid_ids[i] and fluid_amounts[i]:
+                    try:
+                        amount = float(fluid_amounts[i])
+                        unit = fluid_units[i]
+                        
+                        ml = amount
+                        if unit == 'cup':
+                            ml = amount * 240
+                        elif unit == 'glass':
+                            ml = amount * 250
+                        elif unit == 'bottle':
+                            ml = amount * 500
+                        else:
+                            ml = amount
+                        
+                        total_fluid_ml += ml
+                        
+                        fluid_name = "Water"
+                        if fluid_ids[i] != '9991':
+                            fluid_map = {'9992': 'Black Tea', '9993': 'Milk Tea', '9994': 'Coffee',
+                                        '9995': 'Orange Juice', '9996': 'Soda', '9997': 'Fermented Milk',
+                                        '9998': 'Yogurt Drink', '9999': 'Fresh Juice'}
+                            fluid_name = fluid_map.get(fluid_ids[i], 'Beverage')
+                        
+                        fluid_items.append({
+                            'fluid': fluid_name,
+                            'amount': amount,
+                            'unit': unit,
+                            'ml': ml
+                        })
+                    except (ValueError, IndexError):
+                        pass
+            
+            # Calculate RDA
+            if age < 19:
+                if gender == 'female':
+                    rda = {'energy_kcal': 2000, 'protein_g': 46, 'iron_mg': 15, 'calcium_mg': 1300}
+                else:
+                    rda = {'energy_kcal': 2400, 'protein_g': 52, 'iron_mg': 11, 'calcium_mg': 1300}
+            else:
+                if gender == 'female':
+                    rda = {'energy_kcal': 2100, 'protein_g': 46, 'iron_mg': 29, 'calcium_mg': 1000}
+                else:
+                    rda = {'energy_kcal': 2500, 'protein_g': 56, 'iron_mg': 11, 'calcium_mg': 1000}
+            
+            # Calculate AI for fluids
+            if age < 4:
+                ai_liters = 1.3
+            elif age < 9:
+                ai_liters = 1.7
+            elif age < 14:
+                ai_liters = 2.4 if gender == 'male' else 2.1
+            elif age < 19:
+                ai_liters = 3.3 if gender == 'male' else 2.3
+            else:
+                ai_liters = 3.7 if gender == 'male' else 2.7
+            
+            total_fluid_l = total_fluid_ml / 1000
+            fluid_percent = (total_fluid_l / ai_liters) * 100 if ai_liters > 0 else 0
+            
+            # Create Excel workbook
+            wb = openpyxl.Workbook()
+            
+            # ========== SHEET 1: SUMMARY ==========
+            ws_summary = wb.active
+            ws_summary.title = "Nutrition Summary"
+            
+            # Title
+            ws_summary.merge_cells('A1:F1')
+            ws_summary['A1'] = "24-HOUR DIETARY RECALL REPORT"
+            ws_summary['A1'].font = Font(bold=True, size=16)
+            ws_summary['A1'].alignment = Alignment(horizontal="center")
+            
+            # Patient info
+            ws_summary['A3'] = "Patient Information"
+            ws_summary['A3'].font = Font(bold=True, size=12, color="2c5e2e")
+            ws_summary['A4'] = "Name:"
+            ws_summary['B4'] = name or "Not provided"
+            ws_summary['A5'] = "Age:"
+            ws_summary['B5'] = age
+            ws_summary['A6'] = "Gender:"
+            ws_summary['B6'] = "Female" if gender == 'female' else "Male"
+            ws_summary['A7'] = "Date:"
+            ws_summary['B7'] = datetime.now().strftime('%Y-%m-%d %H:%M')
+            
+            # Total Nutrients
+            ws_summary['A9'] = "Total Nutrients"
+            ws_summary['A9'].font = Font(bold=True, size=12, color="2c5e2e")
+            
+            nutrients = [
+                ('Energy (kcal)', total_energy, rda['energy_kcal'], (total_energy/rda['energy_kcal'])*100),
+                ('Protein (g)', total_protein, rda['protein_g'], (total_protein/rda['protein_g'])*100),
+                ('Iron (mg)', total_iron, rda['iron_mg'], (total_iron/rda['iron_mg'])*100),
+                ('Calcium (mg)', total_calcium, rda['calcium_mg'], (total_calcium/rda['calcium_mg'])*100),
+                ('Fat (g)', total_fat, 'N/A', 0),
+                ('Carbohydrates (g)', total_carbs, 'N/A', 0),
+                ('Fiber (g)', total_fiber, 'N/A', 0),
+                ('Vitamin A (µg)', total_vitamin_a, 'N/A', 0),
+            ]
+            
+            row = 10
+            for name, value, target, percent in nutrients:
+                ws_summary[f'A{row}'] = name
+                ws_summary[f'B{row}'] = f"{value:.1f}"
+                if target != 'N/A':
+                    ws_summary[f'C{row}'] = f"Target: {target}"
+                    ws_summary[f'D{row}'] = f"{percent:.0f}%"
+                    if percent < 70:
+                        ws_summary[f'D{row}'].font = Font(color="dc3545", bold=True)
+                row += 1
+            
+            # Hydration
+            ws_summary[f'A{row+1}'] = "Hydration"
+            ws_summary[f'A{row+1}'].font = Font(bold=True, size=12, color="2c5e2e")
+            ws_summary[f'A{row+2}'] = "Total Fluids:"
+            ws_summary[f'B{row+2}'] = f"{total_fluid_ml:.0f} ml ({total_fluid_l:.1f} L)"
+            ws_summary[f'A{row+3}'] = "Daily Target:"
+            ws_summary[f'B{row+3}'] = f"{ai_liters} L"
+            ws_summary[f'A{row+4}'] = "Status:"
+            if fluid_percent < 80:
+                ws_summary[f'B{row+4}'] = "⚠️ Low hydration - drink more water"
+                ws_summary[f'B{row+4}'].font = Font(color="dc3545")
+            elif fluid_percent <= 120:
+                ws_summary[f'B{row+4}'] = "✅ Well hydrated"
+                ws_summary[f'B{row+4}'].font = Font(color="28a745")
+            else:
+                ws_summary[f'B{row+4}'] = "💧 Well hydrated"
+            
+            # Recommendations
+            row += 6
+            ws_summary[f'A{row}'] = "Recommendations"
+            ws_summary[f'A{row}'].font = Font(bold=True, size=12, color="2c5e2e")
+            row += 1
+            
+            has_recommendations = False
+            if total_iron < rda['iron_mg'] * 0.7:
+                ws_summary[f'A{row}'] = "⚠️ Low Iron Intake"
+                ws_summary[f'B{row}'] = "Try adding: beans, sukuma wiki, dagaa omena, whole maize flour"
+                ws_summary[f'B{row}'].font = Font(color="dc3545")
+                row += 1
+                has_recommendations = True
+            if total_calcium < rda['calcium_mg'] * 0.7:
+                ws_summary[f'A{row}'] = "⚠️ Low Calcium Intake"
+                ws_summary[f'B{row}'] = "Try adding: milk, dagaa omena, amaranth leaves, sesame seeds"
+                ws_summary[f'B{row}'].font = Font(color="dc3545")
+                row += 1
+                has_recommendations = True
+            if total_fiber < 20:
+                ws_summary[f'A{row}'] = "⚠️ Low Fiber Intake"
+                ws_summary[f'B{row}'] = "Try adding: whole grains, beans, vegetables"
+                ws_summary[f'B{row}'].font = Font(color="dc3545")
+                row += 1
+                has_recommendations = True
+            
+            if not has_recommendations:
+                ws_summary[f'A{row}'] = "✅ Good balance! Keep up the healthy eating habits."
+                ws_summary[f'A{row}'].font = Font(color="28a745")
+            
+            # Auto-adjust columns
+            for column in ws_summary.columns:
+                max_length = 0
+                column_letter = column[0].column_letter
+                for cell in column:
+                    try:
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(str(cell.value))
+                    except:
+                        pass
+                adjusted_width = min(max_length + 2, 40)
+                ws_summary.column_dimensions[column_letter].width = adjusted_width
+            
+            # ========== SHEET 2: FOODS LOGGED ==========
+            ws_foods = wb.create_sheet("Foods Logged")
+            
+            if food_items:
+                # Headers
+                headers = ['Meal', 'Food', 'Amount', 'Unit', 'Grams', 'Energy (kcal)', 'Protein (g)', 'Iron (mg)', 'Calcium (mg)']
+                for col, header in enumerate(headers, 1):
+                    cell = ws_foods.cell(row=1, column=col, value=header)
+                    cell.font = Font(bold=True, color="FFFFFF")
+                    cell.fill = PatternFill(start_color="2c5e2e", end_color="2c5e2e", fill_type="solid")
+                    cell.alignment = Alignment(horizontal="center")
+                
+                # Data rows
+                for row_idx, item in enumerate(food_items, 2):
+                    ws_foods.cell(row=row_idx, column=1, value=item['meal'])
+                    ws_foods.cell(row=row_idx, column=2, value=item['food'])
+                    ws_foods.cell(row=row_idx, column=3, value=item['amount'])
+                    ws_foods.cell(row=row_idx, column=4, value=item['unit'])
+                    ws_foods.cell(row=row_idx, column=5, value=f"{item['grams']:.1f}")
+                    ws_foods.cell(row=row_idx, column=6, value=f"{item['energy']:.1f}")
+                    ws_foods.cell(row=row_idx, column=7, value=f"{item['protein']:.1f}")
+                    ws_foods.cell(row=row_idx, column=8, value=f"{item['iron']:.1f}")
+                    ws_foods.cell(row=row_idx, column=9, value=f"{item['calcium']:.0f}")
+                
+                # Auto-adjust columns
+                for column in ws_foods.columns:
+                    max_length = 0
+                    column_letter = column[0].column_letter
+                    for cell in column:
+                        try:
+                            if len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                            pass
+                    adjusted_width = min(max_length + 2, 30)
+                    ws_foods.column_dimensions[column_letter].width = adjusted_width
+            
+            # ========== SHEET 3: FLUIDS LOGGED ==========
+            ws_fluids = wb.create_sheet("Fluids Logged")
+            
+            if fluid_items:
+                headers = ['Beverage', 'Amount', 'Unit', 'Milliliters (ml)']
+                for col, header in enumerate(headers, 1):
+                    cell = ws_fluids.cell(row=1, column=col, value=header)
+                    cell.font = Font(bold=True, color="FFFFFF")
+                    cell.fill = PatternFill(start_color="17a2b8", end_color="17a2b8", fill_type="solid")
+                    cell.alignment = Alignment(horizontal="center")
+                
+                for row_idx, item in enumerate(fluid_items, 2):
+                    ws_fluids.cell(row=row_idx, column=1, value=item['fluid'])
+                    ws_fluids.cell(row=row_idx, column=2, value=item['amount'])
+                    ws_fluids.cell(row=row_idx, column=3, value=item['unit'])
+                    ws_fluids.cell(row=row_idx, column=4, value=f"{item['ml']:.0f}")
+                
+                for column in ws_fluids.columns:
+                    max_length = 0
+                    column_letter = column[0].column_letter
+                    for cell in column:
+                        try:
+                            if len(str(cell.value)) > max_length:
+                                max_length = len(str(cell.value))
+                        except:
+                            pass
+                    adjusted_width = min(max_length + 2, 25)
+                    ws_fluids.column_dimensions[column_letter].width = adjusted_width
+            
+            # Create response
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            filename = f"nutrition_recall_{name.replace(' ', '_') if name else 'report'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            wb.save(response)
+            return response
+            
+        else:
+            return HttpResponse("Invalid request method", status=400)
+            
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return HttpResponse(f"Error exporting recall data: {e}", status=500)
+
 def compare_foods(request):
     import traceback
     foods = Food.objects.all().order_by('food_name')
