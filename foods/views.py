@@ -8,6 +8,9 @@ from .models import Food, Category, UnitConversion, SearchQuery
 import json
 import os
 from datetime import datetime
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from django.http import HttpResponse
 
 def get_cost_tag(food_name):
     """Determine if a food is affordable, medium, or high cost based on name"""
@@ -259,6 +262,185 @@ def food_detail(request, food_id):
             'error': str(e),
             'food_id': food_id
         }, status=500)
+          
+def export_food_excel(request, food_id):
+    """Export a single food's nutrient data as Excel file for nutritionists"""
+    try:
+        food = Food.objects.get(id=food_id)
+        
+        # Create a new workbook and select active sheet
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = f"{food.food_name[:25]} Nutrition"
+        
+        # Define styles
+        header_font = Font(bold=True, color="FFFFFF", size=12)
+        header_fill = PatternFill(start_color="2c5e2e", end_color="2c5e2e", fill_type="solid")
+        header_alignment = Alignment(horizontal="center", vertical="center")
+        
+        category_font = Font(bold=True, size=11, color="2c5e2e")
+        border = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+        
+        # ========== FOOD INFO SECTION ==========
+        ws.merge_cells('A1:C1')
+        cell = ws['A1']
+        cell.value = f"🇰🇪 Kenya Food Composition Database"
+        cell.font = Font(bold=True, size=14)
+        cell.alignment = Alignment(horizontal="center")
+        
+        ws.merge_cells('A2:C2')
+        cell = ws['A2']
+        cell.value = f"{food.food_name}"
+        cell.font = Font(bold=True, size=12, italic=True)
+        cell.alignment = Alignment(horizontal="center")
+        
+        # Category
+        ws['A4'] = "Category:"
+        ws['B4'] = food.category.name if food.category else "Kenyan Food"
+        ws['A4'].font = Font(bold=True)
+        
+        # ========== NUTRIENT TABLE ==========
+        ws['A6'] = "Nutrient"
+        ws['B6'] = "Value per 100g"
+        ws['C6'] = "Unit"
+        
+        # Apply header styles
+        for col in ['A6', 'B6', 'C6']:
+            ws[col].font = header_font
+            ws[col].fill = header_fill
+            ws[col].alignment = header_alignment
+            ws[col].border = border
+        
+        # Define all nutrients to export (only those with data)
+        nutrients = [
+            ('🔥 Energy', food.energy_kcal, 'kcal'),
+            ('💪 Protein', food.protein_g, 'g'),
+            ('🧈 Total Fat', food.fat_g, 'g'),
+            ('🍚 Carbohydrates', food.carbohydrate_g, 'g'),
+            ('🌾 Dietary Fiber', food.fiber_g, 'g'),
+            ('💧 Water', food.water_g, 'g'),
+            ('🧂 Ash (Minerals)', food.ash_g, 'g'),
+            ('🦴 Calcium', food.calcium_mg, 'mg'),
+            ('🩸 Iron', food.iron_mg, 'mg'),
+            ('✨ Magnesium', food.magnesium_mg, 'mg'),
+            ('🦷 Phosphorus', food.phosphorus_mg, 'mg'),
+            ('🍌 Potassium', food.potassium_mg, 'mg'),
+            ('🧂 Sodium', food.sodium_mg, 'mg'),
+            ('⚡ Zinc', food.zinc_mg, 'mg'),
+            ('💊 Thiamin (B1)', food.thiamin_mg, 'mg'),
+            ('💊 Riboflavin (B2)', food.riboflavin_mg, 'mg'),
+            ('💊 Niacin (B3)', food.niacin_mg, 'mg'),
+            ('🌿 Folate', food.folate_ug, 'µg'),
+        ]
+        
+        # Write data rows
+        row = 7
+        for name, value, unit in nutrients:
+            # Format value
+            if value is None or value == 0:
+                formatted_value = '0'
+            elif value < 1:
+                formatted_value = f'{value:.2f}'
+            else:
+                formatted_value = f'{value:.1f}'
+            
+            ws[f'A{row}'] = name
+            ws[f'B{row}'] = formatted_value
+            ws[f'C{row}'] = unit
+            
+            # Apply borders
+            for col in ['A', 'B', 'C']:
+                ws[f'{col}{row}'].border = border
+            
+            row += 1
+        
+        # ========== SUMMARY SECTION ==========
+        row += 1
+        ws[f'A{row}'] = "📊 SUMMARY"
+        ws[f'A{row}'].font = Font(bold=True, size=12, color="2c5e2e")
+        row += 1
+        
+        # RDA Note
+        ws[f'A{row}'] = "Recommended Daily Allowance (RDA) Note:"
+        ws[f'A{row}'].font = Font(bold=True, italic=True)
+        row += 1
+        ws[f'A{row}'] = "RDA values vary by age, gender, and physiological state (pregnancy, lactation)."
+        ws[f'A{row}'].font = Font(size=9, color="666666")
+        
+        row += 2
+        ws[f'A{row}'] = "💡 TYPICAL RDA FOR ADULT WOMAN (19-50 yrs):"
+        ws[f'A{row}'].font = Font(bold=True)
+        row += 1
+        ws[f'A{row}'] = "Energy: 2100 kcal"
+        ws[f'B{row}'] = "Iron: 29 mg"
+        ws[f'C{row}'] = "Calcium: 1000 mg"
+        row += 1
+        ws[f'A{row}'] = "Protein: 46 g"
+        ws[f'B{row}'] = "Folate: 400 µg"
+        ws[f'C{row}'] = "Fiber: 25 g"
+        
+        row += 2
+        ws[f'A{row}'] = "💡 TYPICAL RDA FOR ADULT MAN (19-50 yrs):"
+        ws[f'A{row}'].font = Font(bold=True)
+        row += 1
+        ws[f'A{row}'] = "Energy: 2500 kcal"
+        ws[f'B{row}'] = "Iron: 11 mg"
+        ws[f'C{row}'] = "Calcium: 1000 mg"
+        row += 1
+        ws[f'A{row}'] = "Protein: 56 g"
+        ws[f'B{row}'] = "Folate: 400 µg"
+        ws[f'C{row}'] = "Fiber: 30 g"
+        
+        # ========== FOOTER SECTION ==========
+        row += 2
+        ws.merge_cells(f'A{row}:C{row}')
+        ws[f'A{row}'] = "📊 Data Source: Kenya Food Composition Tables 2018 (FAO / Ministry of Health)"
+        ws[f'A{row}'].font = Font(size=9, italic=True, color="2c5e2e")
+        ws[f'A{row}'].alignment = Alignment(horizontal="center")
+        
+        row += 1
+        ws.merge_cells(f'A{row}:C{row}')
+        ws[f'A{row}'] = f"📅 Exported: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        ws[f'A{row}'].font = Font(size=9)
+        ws[f'A{row}'].alignment = Alignment(horizontal="center")
+        
+        row += 1
+        ws.merge_cells(f'A{row}:C{row}')
+        ws[f'A{row}'] = "⚠️ Note: Values are averages. Actual nutrient content may vary by variety, season, and preparation."
+        ws[f'A{row}'].font = Font(size=8, color="856404")
+        ws[f'A{row}'].alignment = Alignment(horizontal="center")
+        
+        # Auto-adjust column widths
+        for column in ws.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = min(max_length + 2, 40)
+            ws.column_dimensions[column_letter].width = adjusted_width
+        
+        # Create HTTP response
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        filename = f"{food.food_name.replace(' ', '_')}_nutrition.xlsx"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        # Save workbook to response
+        wb.save(response)
+        return response
+        
+    except Food.DoesNotExist:
+        return HttpResponse(f"Food with ID {food_id} not found", status=404)
+    except Exception as e:
+        return HttpResponse(f"Error exporting data: {e}", status=500)
 
 def nutrient_calculator(request):
     foods = Food.objects.all().order_by('food_name')
