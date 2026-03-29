@@ -268,7 +268,7 @@ def export_food_excel(request, food_id):
     try:
         food = Food.objects.get(id=food_id)
         
-        # Create a new workbook and select active sheet
+        # Create a new workbook
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = f"{food.food_name[:25]} Nutrition"
@@ -286,23 +286,17 @@ def export_food_excel(request, food_id):
             bottom=Side(style='thin')
         )
         
-        # ========== FOOD INFO SECTION ==========
-        ws.merge_cells('A1:C1')
-        cell = ws['A1']
-        cell.value = f"🇰🇪 Kenya Food Composition Database"
-        cell.font = Font(bold=True, size=14)
-        cell.alignment = Alignment(horizontal="center")
+        # ========== FOOD INFO SECTION (NO MERGED CELLS) ==========
+        ws['A1'] = "🇰🇪 Kenya Food Composition Database"
+        ws['A1'].font = Font(bold=True, size=14)
         
-        ws.merge_cells('A2:C2')
-        cell = ws['A2']
-        cell.value = f"{food.food_name}"
-        cell.font = Font(bold=True, size=12, italic=True)
-        cell.alignment = Alignment(horizontal="center")
+        ws['A2'] = food.food_name
+        ws['A2'].font = Font(bold=True, size=12, italic=True)
         
         # Category
         ws['A4'] = "Category:"
-        ws['B4'] = food.category.name if food.category else "Kenyan Food"
         ws['A4'].font = Font(bold=True)
+        ws['B4'] = food.category.name if food.category else "Kenyan Food"
         
         # ========== NUTRIENT TABLE ==========
         ws['A6'] = "Nutrient"
@@ -316,7 +310,7 @@ def export_food_excel(request, food_id):
             ws[col].alignment = header_alignment
             ws[col].border = border
         
-        # Define all nutrients to export (only those with data)
+        # Define all nutrients
         nutrients = [
             ('🔥 Energy', food.energy_kcal, 'kcal'),
             ('💪 Protein', food.protein_g, 'g'),
@@ -398,48 +392,40 @@ def export_food_excel(request, food_id):
         
         # ========== FOOTER SECTION ==========
         row += 2
-        ws.merge_cells(f'A{row}:C{row}')
         ws[f'A{row}'] = "📊 Data Source: Kenya Food Composition Tables 2018 (FAO / Ministry of Health)"
         ws[f'A{row}'].font = Font(size=9, italic=True, color="2c5e2e")
-        ws[f'A{row}'].alignment = Alignment(horizontal="center")
         
         row += 1
-        ws.merge_cells(f'A{row}:C{row}')
         ws[f'A{row}'] = f"📅 Exported: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
         ws[f'A{row}'].font = Font(size=9)
-        ws[f'A{row}'].alignment = Alignment(horizontal="center")
         
         row += 1
-        ws.merge_cells(f'A{row}:C{row}')
         ws[f'A{row}'] = "⚠️ Note: Values are averages. Actual nutrient content may vary by variety, season, and preparation."
         ws[f'A{row}'].font = Font(size=8, color="856404")
-        ws[f'A{row}'].alignment = Alignment(horizontal="center")
         
-        # Auto-adjust column widths
-        for column in ws.columns:
+        # Auto-adjust column widths (NO MERGED CELLS)
+        for col in ['A', 'B', 'C']:
             max_length = 0
-            column_letter = column[0].column_letter
-            for cell in column:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                except:
-                    pass
-            adjusted_width = min(max_length + 2, 40)
-            ws.column_dimensions[column_letter].width = adjusted_width
+            for row_num in range(1, row + 5):
+                cell_value = ws[f'{col}{row_num}'].value
+                if cell_value and len(str(cell_value)) > max_length:
+                    max_length = len(str(cell_value))
+            adjusted_width = min(max_length + 2, 50)
+            ws.column_dimensions[col].width = adjusted_width
         
         # Create HTTP response
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         filename = f"{food.food_name.replace(' ', '_')}_nutrition.xlsx"
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         
-        # Save workbook to response
         wb.save(response)
         return response
         
     except Food.DoesNotExist:
         return HttpResponse(f"Food with ID {food_id} not found", status=404)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return HttpResponse(f"Error exporting data: {e}", status=500)
 
 def nutrient_calculator(request):
