@@ -9,285 +9,291 @@
         box-sizing: border-box;
     }
     
+    /* ========== NEW MODERN COLOR VARIABLES ========== */
+    :root {
+        --primary: #2A9D8F;
+        --primary-dark: #21867A;
+        --primary-light: #6BC9B8;
+        --secondary: #E9C46A;
+        --accent: #F4A261;
+        --accent-dark: #E76F51;
+        --dark: #264653;
+        --light: #E8F4F2;
+        --white: #FFFFFF;
+        --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+        --shadow-md: 0 8px 20px rgba(0,0,0,0.08);
+        --shadow-lg: 0 16px 40px rgba(0,0,0,0.12);
+        --radius-sm: 8px;
+        --radius-md: 16px;
+        --radius-lg: 24px;
+    }
+    
+    /* Updated Hero with Gradient */
     .hero {
         text-align: center;
-        padding: 2rem 1rem;
-        background: linear-gradient(135deg, #2c5e2e 0%, #3e7a41 100%);
-        border-radius: 20px;
+        padding: 3rem 1.5rem;
+        background: linear-gradient(135deg, #2A9D8F 0%, #264653 100%);
+        border-radius: var(--radius-lg);
         color: white;
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
     }
     
     .hero h1 {
-        font-size: 1.8rem;
+        font-size: 2rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
-        word-break: break-word;
     }
     
     .hero p {
-        font-size: 1rem;
+        font-size: 1.1rem;
         opacity: 0.95;
         max-width: 600px;
         margin: 0 auto;
-        padding: 0 0.5rem;
     }
     
-    /* Prominent Search Section */
+    /* Search Section - More Modern */
     .search-section {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-radius: 20px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .search-section h2 {
-        font-size: 1.3rem;
-        margin-bottom: 0.5rem;
-        word-break: break-word;
-    }
-    
-    .search-section p {
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
     }
     
     .search-form {
         display: flex;
         gap: 0.75rem;
         flex-wrap: wrap;
-        width: 100%;
+        background: white;
+        border-radius: 60px;
+        padding: 0.3rem;
+        box-shadow: var(--shadow-md);
     }
     
     .search-input {
         flex: 1;
-        padding: 0.875rem 1rem;
-        border: 2px solid #e0e0e0;
-        border-radius: 50px;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-radius: 60px;
         font-size: 1rem;
         background: white;
-        min-width: 0;
-        width: 100%;
     }
     
     .search-input:focus {
         outline: none;
-        border-color: #2c5e2e;
     }
     
     .search-button {
-        padding: 0.875rem 1.5rem;
-        background: #2c5e2e;
+        padding: 0.875rem 2rem;
+        background: var(--primary);
         color: white;
         border: none;
-        border-radius: 50px;
-        font-size: 0.95rem;
+        border-radius: 60px;
+        font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
-        white-space: nowrap;
-        transition: background 0.2s;
+        transition: all 0.3s ease;
     }
     
     .search-button:hover {
-        background: #1e421f;
+        background: var(--primary-dark);
+        transform: translateY(-2px);
     }
     
+    /* Stats Cards - More Modern */
     .stats {
         display: flex;
         justify-content: space-around;
         flex-wrap: wrap;
-        gap: 1rem;
-        margin: 1.5rem 0;
-        padding: 1rem;
-        background: #f8f5f0;
-        border-radius: 20px;
+        gap: 1.5rem;
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
     }
     
     .stat {
         text-align: center;
         flex: 1;
-        min-width: 80px;
     }
     
     .stat-number {
-        font-size: 1.8rem;
+        font-size: 2rem;
         font-weight: 700;
-        color: #2c5e2e;
+        color: var(--primary);
     }
     
     .stat-label {
         color: #666;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
     
+    /* Category Cards - More Modern with Hover Effects */
     .categories-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-        margin: 1.5rem 0;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
     }
     
     .category-card {
         background: white;
-        padding: 0.75rem;
-        border-radius: 12px;
+        padding: 1rem;
+        border-radius: var(--radius-md);
         text-align: center;
         text-decoration: none;
-        color: #2c3e2f;
-        border: 1px solid #e9ecef;
-        transition: all 0.2s;
+        color: var(--dark);
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .category-card:hover {
+        transform: translateY(-4px);
+        background: var(--primary);
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .category-card:hover .category-name {
+        color: white;
     }
     
     .category-icon {
-        font-size: 1.5rem;
+        font-size: 2rem;
         display: block;
-        margin-bottom: 0.25rem;
-    }
-    
-    .category-name {
-        font-size: 0.7rem;
-        font-weight: 500;
-    }
-    
-    .feature-box {
-        background: #f8f5f0;
-        border-radius: 20px;
-        padding: 1.25rem;
-        text-align: center;
-        margin: 1.25rem 0;
-    }
-    
-    .feature-box h2 {
-        font-size: 1.2rem;
         margin-bottom: 0.5rem;
     }
     
-    .feature-box p {
-        font-size: 0.85rem;
-    }
-    
-    .feature-link {
-        display: inline-block;
-        margin-top: 0.75rem;
-        padding: 0.6rem 1.5rem;
-        background: #2c5e2e;
-        color: white;
-        text-decoration: none;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        transition: background 0.3s;
-    }
-    
-    /* Popular Tags */
-    .popular-tag {
-        display: inline-block;
-        background: white;
-        padding: 6px 12px;
-        border-radius: 40px;
-        text-decoration: none;
-        color: #2c5e2e;
-        border: 1px solid #e0e0e0;
-        transition: all 0.2s;
+    .category-name {
         font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--dark);
+        transition: color 0.3s ease;
     }
     
-    .popular-tag span {
-        font-size: 0.65rem;
-    }
-    
-    /* Most Searched Section */
+    /* Most Searched Section - Modern */
     .most-searched {
-        margin: 1.5rem 0;
-        padding: 1rem;
-        background: #f8f9fa;
-        border-radius: 16px;
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: white;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
     }
     
     .most-searched h3 {
-        font-size: 1.1rem;
-        margin-bottom: 0.75rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
     }
     
     .tags-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 0.75rem;
     }
     
-    /* Tablet and Desktop */
+    .popular-tag {
+        display: inline-block;
+        background: var(--light);
+        padding: 8px 16px;
+        border-radius: 40px;
+        text-decoration: none;
+        color: var(--primary);
+        transition: all 0.3s ease;
+        font-size: 0.85rem;
+    }
+    
+    .popular-tag:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Feature Boxes - More Modern */
+    .feature-box {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        text-align: center;
+        margin: 1.5rem 0;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+    
+    .feature-box:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .feature-box h2 {
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-link {
+        display: inline-block;
+        margin-top: 0.75rem;
+        padding: 0.7rem 1.8rem;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-link:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    /* Special background for recall box */
+    .feature-box.recall-box {
+        background: linear-gradient(135deg, #E8F4F2 0%, #D4E4E0 100%);
+    }
+    
+    /* Responsive */
     @media (min-width: 768px) {
         .hero {
-            padding: 3rem 1rem;
+            padding: 4rem 2rem;
         }
-        
         .hero h1 {
             font-size: 2.5rem;
         }
-        
-        .hero p {
-            font-size: 1.2rem;
-        }
-        
         .categories-grid {
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 1rem;
         }
-        
         .category-icon {
-            font-size: 2rem;
-        }
-        
-        .category-name {
-            font-size: 0.85rem;
-        }
-        
-        .feature-box {
-            padding: 2rem;
-        }
-        
-        .feature-box h2 {
-            font-size: 1.5rem;
-        }
-        
-        .most-searched {
-            padding: 1.5rem;
+            font-size: 2.2rem;
         }
     }
     
-    /* Portrait Mobile Specific */
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
         .search-form {
             flex-direction: column;
+            border-radius: var(--radius-md);
+            background: transparent;
+            padding: 0;
+            gap: 0.75rem;
         }
-        
+        .search-input {
+            border-radius: 60px;
+            border: 1px solid #ddd;
+        }
         .search-button {
             width: 100%;
-            white-space: normal;
         }
-        
         .stats {
-            flex-direction: row;
-            flex-wrap: wrap;
+            gap: 0.75rem;
         }
-        
-        .stat {
-            min-width: 70px;
-        }
-        
         .stat-number {
             font-size: 1.5rem;
         }
-        
         .categories-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-        }
-        
-        .feature-box {
-            padding: 1rem;
         }
     }
 </style>
@@ -302,8 +308,8 @@
 
 <!-- ========== PROMINENT SEARCH BAR ========== -->
 <div class="search-section">
-    <h2 style="color: #2c5e2e; margin-bottom: 0.5rem;">🔍 Find Any Kenyan Food</h2>
-    <p style="color: #666; margin-bottom: 1.5rem;">Search by name — ugali, sukuma, beans, or any traditional food</p>
+    <h2 style="color: #2A9D8F; margin-bottom: 0.5rem;">🔍 Find Any Kenyan Food</h2>
+    <p style="color: #666; margin-bottom: 1rem;">Search by name — ugali, sukuma, beans, or any traditional food</p>
     <form action="{% url 'search' %}" method="GET" class="search-form">
         <input type="text" name="q" class="search-input" placeholder="e.g., ugali, sukuma, maize, beans..." required>
         <button type="submit" class="search-button">🔍 Search Foods →</button>
@@ -313,7 +319,7 @@
 
 <div class="stats">
     <div class="stat">
-        <div class="stat-number">628</div>
+        <div class="stat-number">645</div>
         <div class="stat-label">Foods</div>
     </div>
     <div class="stat">
@@ -321,12 +327,12 @@
         <div class="stat-label">Categories</div>
     </div>
     <div class="stat">
-        <div class="stat-number">40+</div>
+        <div class="stat-number">18</div>
         <div class="stat-label">Nutrients</div>
     </div>
 </div>
 
-<h2 style="color: #2c3e2f; margin: 2rem 0 1rem;">📂 Browse by Category</h2>
+<h2 style="color: #264653; margin: 2rem 0 1rem;">📂 Browse by Category</h2>
 
 <div class="categories-grid">
     <a href="{% url 'search' %}?category=1" class="category-card">
@@ -374,15 +380,13 @@
 <!-- Most Searched Foods -->
 {% if popular_searches %}
 <div class="most-searched">
-    <h3 style="color: #2c5e2e; display: flex; align-items: center; gap: 8px;">
-        <span>🔥</span> Most Searched Foods
-    </h3>
+    <h3>🔥 Most Searched Foods</h3>
     <div class="tags-container">
         {% for search in popular_searches %}
         <a href="{% url 'search' %}?q={{ search.query }}" 
            class="popular-tag">
             {{ search.query }}
-            <span style="background: #e0e0e0; color: #666; border-radius: 20px; padding: 2px 6px; margin-left: 5px; font-size: 0.65rem;">{{ search.count }}</span>
+            <span style="background: #ddd; color: #666; border-radius: 20px; padding: 2px 6px; margin-left: 5px; font-size: 0.65rem;">{{ search.count }}</span>
         </a>
         {% endfor %}
     </div>
@@ -392,19 +396,19 @@
 <!-- ========== END MOST SEARCHED ========== -->
 
 <div class="feature-box">
-    <h2 style="color: #2c3e2f;">🧮 Try the Nutrient Calculator</h2>
+    <h2>🧮 Try the Nutrient Calculator</h2>
     <p>Enter any food and portion size to see exactly what you're getting.</p>
     <a href="{% url 'calculator' %}" class="feature-link">Open Calculator →</a>
 </div>
 
-<div class="feature-box" style="background: #e8f0e8;">
-    <h2 style="color: #2c3e2f;">📋 24-Hour Dietary Recall</h2>
+<div class="feature-box recall-box">
+    <h2>📋 24-Hour Dietary Recall</h2>
     <p>Track everything you ate in the last 24 hours and get personalized nutrition insights.</p>
     <a href="{% url 'recall' %}" class="feature-link">Start Recall →</a>
 </div>
 
 <div class="feature-box">
-    <h2 style="color: #2c3e2f;">🔍 Compare Foods</h2>
+    <h2>🔍 Compare Foods</h2>
     <p>See how different Kenyan foods stack up against each other.</p>
     <a href="{% url 'compare' %}" class="feature-link">Compare Now →</a>
 </div>

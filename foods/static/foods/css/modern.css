@@ -1,0 +1,152 @@
+:root {
+    --primary: #2A9D8F;
+    --primary-dark: #21867A;
+    --secondary: #E9C46A;
+    --accent: #F4A261;
+    --dark: #264653;
+    --light: #E8F4F2;
+    --white: #FFFFFF;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #F8F9FA;
+    margin: 0;
+    padding: 0;
+}
+
+.hero {
+    background: linear-gradient(135deg, #2A9D8F 0%, #264653 100%);
+    border-radius: 24px;
+    padding: 3rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: white;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.search-card {
+    background: white;
+    border-radius: 60px;
+    padding: 0.3rem;
+    display: flex;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.search-card input {
+    flex: 1;
+    border: none;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 60px;
+    background: white;
+}
+
+.search-card input:focus {
+    outline: none;
+}
+
+.search-card button {
+    background: #2A9D8F;
+    border: none;
+    padding: 0 2rem;
+    border-radius: 60px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.search-card button:hover {
+    background: #21867A;
+}
+
+.food-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+}
+
+.food-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.category-item {
+    background: white;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 16px;
+    text-decoration: none;
+    color: #264653;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.category-item:hover {
+    background: #2A9D8F;
+    color: white;
+    transform: translateY(-3px);
+}
+
+.btn-primary {
+    background: #2A9D8F;
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary:hover {
+    background: #21867A;
+    transform: translateY(-2px);
+}
+
+.nutrient-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.nutrient-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.nutrient-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2A9D8F;
+}
+
+footer {
+    background: #264653;
+    color: white;
+    padding: 2rem;
+    border-radius: 24px 24px 0 0;
+    margin-top: 3rem;
+    text-align: center;
+}

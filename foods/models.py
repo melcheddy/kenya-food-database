@@ -45,6 +45,16 @@ class Food(models.Model):
     folate_ug = models.FloatField(default=0)
     vitamin_b12_ug = models.FloatField(default=0)
     vitamin_c_mg = models.FloatField(default=0)
+      
+    # Fat composition
+    saturated_fat_g = models.FloatField(default=0)
+    monounsaturated_fat_g = models.FloatField(default=0)
+    polyunsaturated_fat_g = models.FloatField(default=0)
+    cholesterol_mg = models.FloatField(default=0)
+    
+        # Optional: Additional nutrients
+    water_g = models.FloatField(default=0)
+    sugar_g = models.FloatField(default=0)
     
     def __str__(self):
         return self.food_name
