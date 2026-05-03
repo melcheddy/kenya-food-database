@@ -9,16 +9,16 @@
         box-sizing: border-box;
     }
     
-    /* ========== NEW MODERN COLOR VARIABLES ========== */
+    /* ========== KENYAN GREEN COLOR VARIABLES ========== */
     :root {
-        --primary: #2A9D8F;
-        --primary-dark: #21867A;
-        --primary-light: #6BC9B8;
+        --primary: #2c5e2e;
+        --primary-dark: #1e421f;
+        --primary-light: #3d6b3f;
         --secondary: #E9C46A;
         --accent: #F4A261;
         --accent-dark: #E76F51;
-        --dark: #264653;
-        --light: #E8F4F2;
+        --dark: #2c3e2f;
+        --light: #E8F4E8;
         --white: #FFFFFF;
         --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
         --shadow-md: 0 8px 20px rgba(0,0,0,0.08);
@@ -28,11 +28,11 @@
         --radius-lg: 24px;
     }
     
-    /* Updated Hero with Gradient */
+    /* Updated Hero with Kenyan Green Gradient */
     .hero {
         text-align: center;
         padding: 3rem 1.5rem;
-        background: linear-gradient(135deg, #2A9D8F 0%, #264653 100%);
+        background: linear-gradient(135deg, #2c5e2e 0%, #1e421f 100%);
         border-radius: var(--radius-lg);
         color: white;
         margin-bottom: 2rem;
@@ -57,6 +57,11 @@
         border-radius: var(--radius-lg);
         padding: 2rem;
         margin-bottom: 2rem;
+    }
+    
+    .search-section h2 {
+        color: #2c5e2e !important;
+        margin-bottom: 0.5rem;
     }
     
     .search-form {
@@ -84,7 +89,7 @@
     
     .search-button {
         padding: 0.875rem 2rem;
-        background: var(--primary);
+        background: #2c5e2e;
         color: white;
         border: none;
         border-radius: 60px;
@@ -95,7 +100,7 @@
     }
     
     .search-button:hover {
-        background: var(--primary-dark);
+        background: #1e421f;
         transform: translateY(-2px);
     }
     
@@ -120,7 +125,7 @@
     .stat-number {
         font-size: 2rem;
         font-weight: 700;
-        color: var(--primary);
+        color: #2c5e2e;
     }
     
     .stat-label {
@@ -152,7 +157,7 @@
     
     .category-card:hover {
         transform: translateY(-4px);
-        background: var(--primary);
+        background: #2c5e2e;
         color: white;
         box-shadow: var(--shadow-md);
     }
@@ -184,7 +189,7 @@
     }
     
     .most-searched h3 {
-        color: var(--primary);
+        color: #2c5e2e;
         margin-bottom: 1rem;
     }
     
@@ -200,13 +205,13 @@
         padding: 8px 16px;
         border-radius: 40px;
         text-decoration: none;
-        color: var(--primary);
+        color: #2c5e2e;
         transition: all 0.3s ease;
         font-size: 0.85rem;
     }
     
     .popular-tag:hover {
-        background: var(--primary);
+        background: #2c5e2e;
         color: white;
         transform: translateY(-2px);
     }
@@ -228,7 +233,7 @@
     }
     
     .feature-box h2 {
-        color: var(--primary);
+        color: #2c5e2e;
         margin-bottom: 0.5rem;
     }
     
@@ -236,7 +241,7 @@
         display: inline-block;
         margin-top: 0.75rem;
         padding: 0.7rem 1.8rem;
-        background: var(--primary);
+        background: #2c5e2e;
         color: white;
         text-decoration: none;
         border-radius: 50px;
@@ -245,14 +250,14 @@
     }
     
     .feature-link:hover {
-        background: var(--primary-dark);
+        background: #1e421f;
         transform: translateY(-2px);
         box-shadow: var(--shadow-sm);
     }
     
     /* Special background for recall box */
     .feature-box.recall-box {
-        background: linear-gradient(135deg, #E8F4F2 0%, #D4E4E0 100%);
+        background: linear-gradient(135deg, #E8F4E8 0%, #D4E4D4 100%);
     }
     
     /* Responsive */
@@ -308,7 +313,7 @@
 
 <!-- ========== PROMINENT SEARCH BAR ========== -->
 <div class="search-section">
-    <h2 style="color: #2A9D8F; margin-bottom: 0.5rem;">🔍 Find Any Kenyan Food</h2>
+    <h2>🔍 Find Any Kenyan Food</h2>
     <p style="color: #666; margin-bottom: 1rem;">Search by name — ugali, sukuma, beans, or any traditional food</p>
     <form action="{% url 'search' %}" method="GET" class="search-form">
         <input type="text" name="q" class="search-input" placeholder="e.g., ugali, sukuma, maize, beans..." required>
@@ -332,7 +337,7 @@
     </div>
 </div>
 
-<h2 style="color: #264653; margin: 2rem 0 1rem;">📂 Browse by Category</h2>
+<h2 style="color: #2c3e2f; margin: 2rem 0 1rem;">📂 Browse by Category</h2>
 
 <div class="categories-grid">
     <a href="{% url 'search' %}?category=1" class="category-card">

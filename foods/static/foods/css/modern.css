@@ -1,22 +1,23 @@
 :root {
-    --primary: #2A9D8F;
-    --primary-dark: #21867A;
-    --secondary: #E9C46A;
-    --accent: #F4A261;
-    --dark: #264653;
-    --light: #E8F4F2;
+    --primary: #2c5e2e;
+    --primary-dark: #1e421f;
+    --primary-light: #3d6b3f;
+    --secondary: #e8b44b;
+    --accent: #f4a261;
+    --dark: #2c3e2f;
+    --light: #e8f0e8;
     --white: #FFFFFF;
 }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #F8F9FA;
+    background: #f8f9fa;
     margin: 0;
     padding: 0;
 }
 
 .hero {
-    background: linear-gradient(135deg, #2A9D8F 0%, #264653 100%);
+    background: linear-gradient(135deg, #2c5e2e 0%, #1e421f 100%);
     border-radius: 24px;
     padding: 3rem;
     margin-bottom: 2rem;
@@ -53,7 +54,7 @@ body {
 }
 
 .search-card button {
-    background: #2A9D8F;
+    background: #2c5e2e;
     border: none;
     padding: 0 2rem;
     border-radius: 60px;
@@ -63,21 +64,7 @@ body {
 }
 
 .search-card button:hover {
-    background: #21867A;
-}
-
-.food-card {
-    background: white;
-    border-radius: 20px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transition: transform 0.3s;
-}
-
-.food-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    background: #1e421f;
 }
 
 .category-grid {
@@ -93,19 +80,19 @@ body {
     text-align: center;
     border-radius: 16px;
     text-decoration: none;
-    color: #264653;
+    color: #2c3e2f;
     transition: all 0.3s;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .category-item:hover {
-    background: #2A9D8F;
+    background: #2c5e2e;
     color: white;
     transform: translateY(-3px);
 }
 
 .btn-primary {
-    background: #2A9D8F;
+    background: #2c5e2e;
     color: white;
     border: none;
     padding: 0.8rem 2rem;
@@ -117,33 +104,12 @@ body {
 }
 
 .btn-primary:hover {
-    background: #21867A;
+    background: #1e421f;
     transform: translateY(-2px);
 }
 
-.nutrient-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
-    margin: 2rem 0;
-}
-
-.nutrient-item {
-    background: white;
-    padding: 1rem;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.nutrient-value {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #2A9D8F;
-}
-
 footer {
-    background: #264653;
+    background: #2c3e2f;
     color: white;
     padding: 2rem;
     border-radius: 24px 24px 0 0;
