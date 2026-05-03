@@ -1,14 +1,13 @@
 {
-  "builds": [
-    {
-      "src": "nutrition_platform/wsgi.py",
-      "use": "@vercel/python"
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.12"
     }
-  ],
+  },
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "nutrition_platform/wsgi.py"
+      "src": "/api/health",
+      "dest": "/api/index.py"
     }
   ]
 }
