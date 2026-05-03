@@ -10,12 +10,16 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-fvlpja+w&d9nejn_7bzaporxfbdjepr322_-21*4qzwm5hdzt9'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-fvlpja+w&d9nejn_7bzaporxfbdjepr322_-21*4qzwm5hdzt9')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']
+# Vercel deployment allowed hosts
+ALLOWED_HOSTS = ['.vercel.app', '.now.sh', 'kenya-food-database.vercel.app', 'localhost', '127.0.0.1']
+
+# CSRF Trusted Origins for Vercel
+CSRF_TRUSTED_ORIGINS = ['https://kenya-food-database.vercel.app']
 
 # Application definition
 INSTALLED_APPS = [
@@ -58,7 +62,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'nutrition_platform.wsgi.application'
 
-# Database
+# Database - Use Supabase connection from environment variable
 DATABASES = {
     'default': dj_database_url.config(default='sqlite:///db.sqlite3')
 }
@@ -82,22 +86,22 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# ===== SECURITY HEADERS =====
-SECURE_SSL_REDIRECT = True
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ===== SECURITY HEADERS for Vercel =====
+# Vercel handles SSL, so we don't need to redirect
+SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
+
+# HSTS settings (only if you have SSL, which Vercel provides)
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
-# Vercel deployment settings
-import os
-
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-your-secret-key-here')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = ['.vercel.app', '.now.sh', 'localhost', '127.0.0.1']
 
 # Supabase Configuration
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
