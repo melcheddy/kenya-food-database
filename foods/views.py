@@ -10,6 +10,37 @@ import os
 from datetime import datetime
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from django.conf import settings
+
+# ========== SUPABASE HELPERS (ADD THIS BLOCK) ==========
+def get_all_foods_supabase():
+    """Get all foods from Supabase"""
+    try:
+        response = settings.supabase.table('foods').select('*').execute()
+        return response.data
+    except Exception as e:
+        print(f"Supabase error: {e}")
+        return []
+
+def get_food_by_id_supabase(food_id):
+    """Get a single food by ID from Supabase"""
+    try:
+        response = settings.supabase.table('foods').select('*').eq('id', food_id).execute()
+        return response.data[0] if response.data else None
+    except Exception as e:
+        print(f"Supabase error: {e}")
+        return None
+
+def search_foods_supabase(query):
+    """Search foods by name in Supabase"""
+    try:
+        response = settings.supabase.table('foods').select('*').ilike('food_name', f'%{query}%').limit(50).execute()
+        return response.data
+    except Exception as e:
+        print(f"Supabase error: {e}")
+        return []
+# ========== END SUPABASE HELPERS ==========
+
 
 # ========== HELPER FUNCTIONS ==========
 def get_cost_tag(food_name):
