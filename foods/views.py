@@ -12,14 +12,14 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from django.conf import settings
 
-# ========== SUPABASE HELPERS (ADD THIS BLOCK) ==========
+# ========== SUPABASE HELPERS ==========
 def get_all_foods_supabase():
     """Get all foods from Supabase"""
     try:
         response = settings.supabase.table('foods').select('*').execute()
         return response.data
     except Exception as e:
-        print(f"Supabase error: {e}")
+        print(f"Supabase error in get_all_foods_supabase: {e}")
         return []
 
 def get_food_by_id_supabase(food_id):
@@ -28,7 +28,7 @@ def get_food_by_id_supabase(food_id):
         response = settings.supabase.table('foods').select('*').eq('id', food_id).execute()
         return response.data[0] if response.data else None
     except Exception as e:
-        print(f"Supabase error: {e}")
+        print(f"Supabase error in get_food_by_id_supabase: {e}")
         return None
 
 def search_foods_supabase(query):
@@ -37,10 +37,22 @@ def search_foods_supabase(query):
         response = settings.supabase.table('foods').select('*').ilike('food_name', f'%{query}%').limit(50).execute()
         return response.data
     except Exception as e:
-        print(f"Supabase error: {e}")
+        print(f"Supabase error in search_foods_supabase: {e}")
         return []
-# ========== END SUPABASE HELPERS ==========
 
+# ========== CONVERSION HELPERS ==========
+def dict_to_food_object(data):
+    """Convert Supabase dict to object with attributes for template compatibility"""
+    class FoodItem:
+        pass
+    food = FoodItem()
+    for key, value in data.items():
+        setattr(food, key, value)
+    return food
+
+def dict_list_to_food_objects(data_list):
+    """Convert list of Supabase dicts to list of objects"""
+    return [dict_to_food_object(item) for item in data_list]
 
 # ========== HELPER FUNCTIONS ==========
 def get_cost_tag(food_name):
@@ -135,7 +147,6 @@ NUTRIENT_SWAPS = {
 # ========== MAIN VIEWS ==========
 def home(request):
     """Homepage with search"""
-    from .models import SearchQuery
     popular_searches = SearchQuery.objects.all().order_by('-count')[:10]
     
     return render(request, 'foods/home.html', {
@@ -146,21 +157,23 @@ def search_foods(request):
     query = request.GET.get('q', '')
     category_id = request.GET.get('category', '')
     
+    # Track search query
     if query:
-        from .models import SearchQuery
         search_obj, created = SearchQuery.objects.get_or_create(query=query.lower())
         if not created:
             search_obj.count += 1
             search_obj.save()
     
-    foods = Food.objects.all()
-    
+    # Get foods from Supabase
     if query:
-        foods = foods.filter(food_name__icontains=query)
+        foods_data = search_foods_supabase(query)
+    else:
+        foods_data = get_all_foods_supabase()
     
-    if category_id:
-        foods = foods.filter(category_id=category_id)
+    # Convert to objects for template compatibility
+    foods = dict_list_to_food_objects(foods_data)
     
+    # Get categories
     categories = Category.objects.all().order_by('name')
     
     return render(request, 'foods/search_results.html', {
@@ -173,8 +186,16 @@ def search_foods(request):
 def food_detail(request, food_id):
     """Show detailed nutrient information for a specific food"""
     try:
-        food = Food.objects.get(id=food_id)
+        # Get food from Supabase
+        food_data = get_food_by_id_supabase(food_id)
+        
+        if not food_data:
+            return render(request, 'foods/error.html', {'error': 'Food not found'}, status=404)
+        
+        # Convert to object
+        food = dict_to_food_object(food_data)
 
+        # Track viewed foods
         if 'viewed_foods' not in request.session:
             request.session['viewed_foods'] = []
         
@@ -182,18 +203,10 @@ def food_detail(request, food_id):
         viewed.append(food.food_name)
         request.session['viewed_foods'] = viewed[-10:]
         
-        affordable_keywords = ['maize', 'beans', 'sukuma', 'cabbage', 'dagaa', 'omena', 
-                               'sweet potato', 'cassava', 'spinach', 'amaranth']
-        
-        affordable_count = 0
-        for food_name in viewed:
-            for kw in affordable_keywords:
-                if kw in food_name.lower():
-                    affordable_count += 1
-                    break
-        
+        # Calculate cost tag
         current_cost = get_cost_tag(food.food_name)
         
+        # Generate swap suggestions
         swap_suggestions = []
         food_name_lower = food.food_name.lower()
         
@@ -210,16 +223,19 @@ def food_detail(request, food_id):
                         continue
                         
                     try:
-                        swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
-                        if swap_food and swap_food.id != food.id:
-                            swap_suggestions.append({
-                                'name': swap_food.food_name,
-                                'id': swap_food.id,
-                                'benefit': benefit
-                            })
+                        swap_food_data = search_foods_supabase(swap_name)
+                        if swap_food_data:
+                            swap_food = dict_to_food_object(swap_food_data[0])
+                            if swap_food.id != food.id:
+                                swap_suggestions.append({
+                                    'name': swap_food.food_name,
+                                    'id': swap_food.id,
+                                    'benefit': benefit
+                                })
                     except:
                         pass
         
+        # Add affordable swaps if food is expensive
         if current_cost == 'high':
             affordable_swaps = [
                 ('beans', 'Affordable plant protein — 1/4 the price of meat'),
@@ -230,43 +246,50 @@ def food_detail(request, food_id):
             ]
             for swap_name, benefit in affordable_swaps:
                 try:
-                    swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
-                    if swap_food and swap_food.id != food.id:
-                        if not any(s['id'] == swap_food.id for s in swap_suggestions):
-                            swap_suggestions.append({
-                                'name': swap_food.food_name,
-                                'id': swap_food.id,
-                                'benefit': f'💰 Affordable alternative — {benefit}'
-                            })
-                except:
-                    pass
-        
-        if len(swap_suggestions) < 3:
-            if food.iron_mg < 2.0:
-                for swap_name, benefit in NUTRIENT_SWAPS['low_iron']:
-                    try:
-                        swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
-                        if swap_food and swap_food.id != food.id:
+                    swap_food_data = search_foods_supabase(swap_name)
+                    if swap_food_data:
+                        swap_food = dict_to_food_object(swap_food_data[0])
+                        if swap_food.id != food.id:
                             if not any(s['id'] == swap_food.id for s in swap_suggestions):
                                 swap_suggestions.append({
                                     'name': swap_food.food_name,
                                     'id': swap_food.id,
-                                    'benefit': f'🍳 High in iron — {benefit}'
+                                    'benefit': f'💰 Affordable alternative — {benefit}'
                                 })
+                except:
+                    pass
+        
+        # Add nutrient-based swaps if needed
+        if len(swap_suggestions) < 3:
+            if food.iron_mg < 2.0:
+                for swap_name, benefit in NUTRIENT_SWAPS['low_iron']:
+                    try:
+                        swap_food_data = search_foods_supabase(swap_name)
+                        if swap_food_data:
+                            swap_food = dict_to_food_object(swap_food_data[0])
+                            if swap_food.id != food.id:
+                                if not any(s['id'] == swap_food.id for s in swap_suggestions):
+                                    swap_suggestions.append({
+                                        'name': swap_food.food_name,
+                                        'id': swap_food.id,
+                                        'benefit': f'🍳 High in iron — {benefit}'
+                                    })
                     except:
                         pass
             
             if food.fiber_g < 3.0 and len(swap_suggestions) < 3:
                 for swap_name, benefit in NUTRIENT_SWAPS['low_fiber']:
                     try:
-                        swap_food = Food.objects.filter(food_name__icontains=swap_name).first()
-                        if swap_food and swap_food.id != food.id:
-                            if not any(s['id'] == swap_food.id for s in swap_suggestions):
-                                swap_suggestions.append({
-                                    'name': swap_food.food_name,
-                                    'id': swap_food.id,
-                                    'benefit': f'🌾 High in fiber — {benefit}'
-                                })
+                        swap_food_data = search_foods_supabase(swap_name)
+                        if swap_food_data:
+                            swap_food = dict_to_food_object(swap_food_data[0])
+                            if swap_food.id != food.id:
+                                if not any(s['id'] == swap_food.id for s in swap_suggestions):
+                                    swap_suggestions.append({
+                                        'name': swap_food.food_name,
+                                        'id': swap_food.id,
+                                        'benefit': f'🌾 High in fiber — {benefit}'
+                                    })
                     except:
                         pass
         
@@ -279,12 +302,12 @@ def food_detail(request, food_id):
         })
         
     except Exception as e:
+        print(f"Error in food_detail: {e}")
         return render(request, 'foods/error.html', {
             'error': str(e),
             'food_id': food_id
         }, status=500)
 
-# ========== SIMPLE TEST VIEWS ==========
 def test(request):
     """Simple test view to check if Django is running"""
     return HttpResponse("✅ Server is reachable! Django is working.")
@@ -305,7 +328,12 @@ def get_units(request):
 def export_food_excel(request, food_id):
     """Export a single food's nutrient data as Excel file for nutritionists"""
     try:
-        food = Food.objects.get(id=food_id)
+        food_data = get_food_by_id_supabase(food_id)
+        
+        if not food_data:
+            return HttpResponse(f"Food with ID {food_id} not found", status=404)
+        
+        food = dict_to_food_object(food_data)
         
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -327,7 +355,7 @@ def export_food_excel(request, food_id):
         ws['A2'].font = Font(bold=True, size=12, italic=True)
         ws['A4'] = "Category:"
         ws['A4'].font = Font(bold=True)
-        ws['B4'] = food.category.name if food.category else "Kenyan Food"
+        ws['B4'] = "Kenyan Food"
         
         ws['A6'] = "Nutrient"
         ws['B6'] = "Value per 100g"
@@ -366,8 +394,6 @@ def export_food_excel(request, food_id):
         wb.save(response)
         return response
         
-    except Food.DoesNotExist:
-        return HttpResponse(f"Food with ID {food_id} not found", status=404)
     except Exception as e:
         return HttpResponse(f"Error exporting data: {e}", status=500)
 
@@ -392,7 +418,6 @@ def export_recall_excel(request):
             total_calcium = 0
             total_fluid_ml = 0
             
-            # Process meals
             meals = [
                 {'id': 1, 'name': 'Breakfast'},
                 {'id': 2, 'name': 'Morning Snack'},
@@ -413,41 +438,44 @@ def export_recall_excel(request):
                 for i in range(len(food_ids)):
                     if food_ids[i] and amounts[i]:
                         try:
-                            food = Food.objects.get(id=food_ids[i])
-                            amount = float(amounts[i])
-                            unit = units[i] if i < len(units) else 'grams'
-                            
-                            grams = amount
-                            if unit != 'grams':
-                                try:
-                                    conversion = UnitConversion.objects.get(food=food, unit_name=unit)
-                                    grams = amount * conversion.grams
-                                except UnitConversion.DoesNotExist:
-                                    pass
-                            
-                            energy = (grams / 100) * food.energy_kcal
-                            protein = (grams / 100) * food.protein_g
-                            iron = (grams / 100) * food.iron_mg
-                            calcium = (grams / 100) * food.calcium_mg
-                            
-                            total_energy += energy
-                            total_protein += protein
-                            total_iron += iron
-                            total_calcium += calcium
-                            total_fluid_ml += (grams / 100) * food.water_g
-                            
-                            food_items.append({
-                                'meal': meal['name'],
-                                'food': food.food_name,
-                                'amount': amount,
-                                'unit': unit,
-                                'grams': grams,
-                                'energy': energy,
-                                'protein': protein,
-                                'iron': iron,
-                                'calcium': calcium
-                            })
-                        except (Food.DoesNotExist, ValueError):
+                            food_data = get_food_by_id_supabase(int(food_ids[i]))
+                            if food_data:
+                                food = dict_to_food_object(food_data)
+                                amount = float(amounts[i])
+                                unit = units[i] if i < len(units) else 'grams'
+                                
+                                grams = amount
+                                if unit != 'grams':
+                                    try:
+                                        conversion = UnitConversion.objects.get(food_id=food_ids[i], unit_name=unit)
+                                        grams = amount * conversion.grams
+                                    except:
+                                        pass
+                                
+                                energy = (grams / 100) * food.energy_kcal
+                                protein = (grams / 100) * food.protein_g
+                                iron = (grams / 100) * food.iron_mg
+                                calcium = (grams / 100) * food.calcium_mg
+                                
+                                total_energy += energy
+                                total_protein += protein
+                                total_iron += iron
+                                total_calcium += calcium
+                                total_fluid_ml += (grams / 100) * (getattr(food, 'water_g', 0))
+                                
+                                food_items.append({
+                                    'meal': meal['name'],
+                                    'food': food.food_name,
+                                    'amount': amount,
+                                    'unit': unit,
+                                    'grams': grams,
+                                    'energy': energy,
+                                    'protein': protein,
+                                    'iron': iron,
+                                    'calcium': calcium
+                                })
+                        except Exception as e:
+                            print(f"Error processing food: {e}")
                             pass
             
             # Process fluids
@@ -575,7 +603,8 @@ def export_recall_excel(request):
         return HttpResponse(f"Error exporting recall data: {str(e)}", status=500)
 
 def nutrient_calculator(request):
-    foods = Food.objects.all().order_by('food_name')
+    foods_data = get_all_foods_supabase()
+    foods = dict_list_to_food_objects(foods_data)
     categories = Category.objects.all()
     
     result = None
@@ -590,9 +619,11 @@ def nutrient_calculator(request):
     pre_selected_food = request.GET.get('food', '')
     if pre_selected_food and not request.POST:
         try:
-            food_selected = Food.objects.get(food_name=pre_selected_food)
-            available_units = UnitConversion.objects.filter(food=food_selected)
-        except Food.DoesNotExist:
+            food_selected_data = search_foods_supabase(pre_selected_food)
+            if food_selected_data:
+                food_selected = dict_to_food_object(food_selected_data[0])
+                available_units = UnitConversion.objects.filter(food_id=food_selected.id)
+        except:
             pass
     
     if request.method == 'POST':
@@ -623,53 +654,56 @@ def nutrient_calculator(request):
         age = int(request.POST.get('age', 30))
         
         try:
-            food_selected = Food.objects.get(id=food_id)
-            available_units = UnitConversion.objects.filter(food=food_selected)
-            
-            grams = amount
-            if unit != 'grams':
-                try:
-                    conversion = UnitConversion.objects.get(food=food_selected, unit_name=unit)
-                    grams = amount * conversion.grams
-                except UnitConversion.DoesNotExist:
-                    grams = amount
-            
-            result = {
-                'food_name': food_selected.food_name,
-                'amount': amount,
-                'unit': unit,
-                'grams': grams,
-                'energy_kcal': (grams / 100) * food_selected.energy_kcal,
-                'protein_g': (grams / 100) * food_selected.protein_g,
-                'fat_g': (grams / 100) * food_selected.fat_g,
-                'carbohydrate_g': (grams / 100) * food_selected.carbohydrate_g,
-                'fiber_g': (grams / 100) * food_selected.fiber_g,
-                'iron_mg': (grams / 100) * food_selected.iron_mg,
-                'calcium_mg': (grams / 100) * food_selected.calcium_mg,
-            }
-            
-            if age < 19:
-                if gender == 'female':
-                    rda = {'energy_kcal': 2000, 'protein_g': 46, 'iron_mg': 15, 'calcium_mg': 1300}
+            food_selected_data = get_food_by_id_supabase(int(food_id))
+            if food_selected_data:
+                food_selected = dict_to_food_object(food_selected_data)
+                available_units = UnitConversion.objects.filter(food_id=food_id)
+                
+                grams = amount
+                if unit != 'grams':
+                    try:
+                        conversion = UnitConversion.objects.get(food_id=food_id, unit_name=unit)
+                        grams = amount * conversion.grams
+                    except:
+                        grams = amount
+                
+                result = {
+                    'food_name': food_selected.food_name,
+                    'amount': amount,
+                    'unit': unit,
+                    'grams': grams,
+                    'energy_kcal': (grams / 100) * food_selected.energy_kcal,
+                    'protein_g': (grams / 100) * food_selected.protein_g,
+                    'fat_g': (grams / 100) * food_selected.fat_g,
+                    'carbohydrate_g': (grams / 100) * food_selected.carbohydrate_g,
+                    'fiber_g': (grams / 100) * food_selected.fiber_g,
+                    'iron_mg': (grams / 100) * food_selected.iron_mg,
+                    'calcium_mg': (grams / 100) * food_selected.calcium_mg,
+                }
+                
+                if age < 19:
+                    if gender == 'female':
+                        rda = {'energy_kcal': 2000, 'protein_g': 46, 'iron_mg': 15, 'calcium_mg': 1300}
+                    else:
+                        rda = {'energy_kcal': 2400, 'protein_g': 52, 'iron_mg': 11, 'calcium_mg': 1300}
                 else:
-                    rda = {'energy_kcal': 2400, 'protein_g': 52, 'iron_mg': 11, 'calcium_mg': 1300}
-            else:
-                if gender == 'female':
-                    rda = {'energy_kcal': 2100, 'protein_g': 46, 'iron_mg': 29, 'calcium_mg': 1000}
-                else:
-                    rda = {'energy_kcal': 2500, 'protein_g': 56, 'iron_mg': 11, 'calcium_mg': 1000}
+                    if gender == 'female':
+                        rda = {'energy_kcal': 2100, 'protein_g': 46, 'iron_mg': 29, 'calcium_mg': 1000}
+                    else:
+                        rda = {'energy_kcal': 2500, 'protein_g': 56, 'iron_mg': 11, 'calcium_mg': 1000}
+                
+                result['energy_percent'] = (result['energy_kcal'] / rda['energy_kcal']) * 100
+                result['iron_percent'] = (result['iron_mg'] / rda['iron_mg']) * 100 if rda['iron_mg'] > 0 else 0
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'result': result,
+                        'rda': rda,
+                    })
             
-            result['energy_percent'] = (result['energy_kcal'] / rda['energy_kcal']) * 100
-            result['iron_percent'] = (result['iron_mg'] / rda['iron_mg']) * 100 if rda['iron_mg'] > 0 else 0
-            
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': True,
-                    'result': result,
-                    'rda': rda,
-                })
-            
-        except Food.DoesNotExist:
+        except Exception as e:
+            print(f"Calculator error: {e}")
             pass
     
     return render(request, 'foods/calculator.html', {
@@ -687,7 +721,8 @@ def nutrient_calculator(request):
 
 def recall_24hr(request):
     """24-hour dietary recall with searchable foods and fluids"""
-    foods = Food.objects.all().order_by('food_name')
+    foods_data = get_all_foods_supabase()
+    foods = dict_list_to_food_objects(foods_data)
     
     meals = [
         {'id': 1, 'name': 'Breakfast'},
@@ -748,27 +783,30 @@ def recall_24hr(request):
             for i in range(len(food_ids)):
                 if food_ids[i] and amounts[i]:
                     try:
-                        food = Food.objects.get(id=food_ids[i])
-                        amount = float(amounts[i])
-                        unit = units[i] if i < len(units) else 'grams'
-                        
-                        grams = amount
-                        if unit != 'grams':
-                            try:
-                                conversion = UnitConversion.objects.get(food=food, unit_name=unit)
-                                grams = amount * conversion.grams
-                            except UnitConversion.DoesNotExist:
-                                grams = amount
-                        
-                        total_energy += (grams / 100) * food.energy_kcal
-                        total_protein += (grams / 100) * food.protein_g
-                        total_iron += (grams / 100) * food.iron_mg
-                        total_fiber += (grams / 100) * food.fiber_g
-                        total_calcium += (grams / 100) * food.calcium_mg
-                        total_vitamin_a += (grams / 100) * food.vitamin_a_rae_ug
-                        total_fluid_ml += (grams / 100) * food.water_g
-                        
-                    except (Food.DoesNotExist, ValueError):
+                        food_data = get_food_by_id_supabase(int(food_ids[i]))
+                        if food_data:
+                            food = dict_to_food_object(food_data)
+                            amount = float(amounts[i])
+                            unit = units[i] if i < len(units) else 'grams'
+                            
+                            grams = amount
+                            if unit != 'grams':
+                                try:
+                                    conversion = UnitConversion.objects.get(food_id=food_ids[i], unit_name=unit)
+                                    grams = amount * conversion.grams
+                                except:
+                                    grams = amount
+                            
+                            total_energy += (grams / 100) * food.energy_kcal
+                            total_protein += (grams / 100) * food.protein_g
+                            total_iron += (grams / 100) * food.iron_mg
+                            total_fiber += (grams / 100) * food.fiber_g
+                            total_calcium += (grams / 100) * food.calcium_mg
+                            total_vitamin_a += (grams / 100) * getattr(food, 'vitamin_a_rae_ug', 0)
+                            total_fluid_ml += (grams / 100) * getattr(food, 'water_g', 0)
+                            
+                    except Exception as e:
+                        print(f"Recall error: {e}")
                         pass
         
         if age < 4:
@@ -852,7 +890,8 @@ def recall_24hr(request):
     })
 
 def compare_foods(request):
-    foods = Food.objects.all().order_by('food_name')
+    foods_data = get_all_foods_supabase()
+    foods = dict_list_to_food_objects(foods_data)
     
     food1 = None
     food2 = None
@@ -865,69 +904,74 @@ def compare_foods(request):
         
         if food1_id and food2_id:
             try:
-                food1 = Food.objects.get(id=food1_id)
-                food2 = Food.objects.get(id=food2_id)
+                food1_data = get_food_by_id_supabase(int(food1_id))
+                food2_data = get_food_by_id_supabase(int(food2_id))
                 
-                nutrients = [
-                    {'name': 'Energy (kcal)', 'key': 'energy_kcal', 'unit': 'kcal', 'higher_is': 'better'},
-                    {'name': 'Protein (g)', 'key': 'protein_g', 'unit': 'g', 'higher_is': 'better'},
-                    {'name': 'Fiber (g)', 'key': 'fiber_g', 'unit': 'g', 'higher_is': 'better'},
-                    {'name': 'Iron (mg)', 'key': 'iron_mg', 'unit': 'mg', 'higher_is': 'better'},
-                    {'name': 'Calcium (mg)', 'key': 'calcium_mg', 'unit': 'mg', 'higher_is': 'better'},
-                ]
-                
-                comparison = []
-                for n in nutrients:
-                    val1 = getattr(food1, n['key'], 0)
-                    val2 = getattr(food2, n['key'], 0)
+                if food1_data and food2_data:
+                    food1 = dict_to_food_object(food1_data)
+                    food2 = dict_to_food_object(food2_data)
                     
-                    if n['higher_is'] == 'better':
-                        if val1 > val2:
-                            winner = 1
-                        elif val2 > val1:
-                            winner = 2
+                    nutrients = [
+                        {'name': 'Energy (kcal)', 'key': 'energy_kcal', 'unit': 'kcal', 'higher_is': 'better'},
+                        {'name': 'Protein (g)', 'key': 'protein_g', 'unit': 'g', 'higher_is': 'better'},
+                        {'name': 'Fiber (g)', 'key': 'fiber_g', 'unit': 'g', 'higher_is': 'better'},
+                        {'name': 'Iron (mg)', 'key': 'iron_mg', 'unit': 'mg', 'higher_is': 'better'},
+                        {'name': 'Calcium (mg)', 'key': 'calcium_mg', 'unit': 'mg', 'higher_is': 'better'},
+                    ]
+                    
+                    comparison = []
+                    for n in nutrients:
+                        val1 = getattr(food1, n['key'], 0)
+                        val2 = getattr(food2, n['key'], 0)
+                        
+                        if n['higher_is'] == 'better':
+                            if val1 > val2:
+                                winner = 1
+                            elif val2 > val1:
+                                winner = 2
+                            else:
+                                winner = 0
                         else:
                             winner = 0
-                    else:
-                        winner = 0
+                        
+                        max_val = max(val1, val2)
+                        if max_val > 0:
+                            pct1 = (val1 / max_val) * 100
+                            pct2 = (val2 / max_val) * 100
+                        else:
+                            pct1 = 0
+                            pct2 = 0
+                        
+                        comparison.append({
+                            'name': n['name'],
+                            'key': n['key'],
+                            'unit': n['unit'],
+                            'val1': val1,
+                            'val2': val2,
+                            'pct1': pct1,
+                            'pct2': pct2,
+                            'winner': winner,
+                        })
                     
-                    max_val = max(val1, val2)
-                    if max_val > 0:
-                        pct1 = (val1 / max_val) * 100
-                        pct2 = (val2 / max_val) * 100
-                    else:
-                        pct1 = 0
-                        pct2 = 0
+                    if food1.iron_mg > food2.iron_mg * 1.5:
+                        messages.append(f"🔴 {food1.food_name[:30]} has {food1.iron_mg:.1f}mg iron — more than {food2.food_name[:30]}")
+                    elif food2.iron_mg > food1.iron_mg * 1.5:
+                        messages.append(f"🔴 {food2.food_name[:30]} has {food2.iron_mg:.1f}mg iron — more than {food1.food_name[:30]}")
                     
-                    comparison.append({
-                        'name': n['name'],
-                        'key': n['key'],
-                        'unit': n['unit'],
-                        'val1': val1,
-                        'val2': val2,
-                        'pct1': pct1,
-                        'pct2': pct2,
-                        'winner': winner,
-                    })
+                    if not messages:
+                        messages.append("💡 These foods have similar nutritional profiles.")
+                    
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'success': True,
+                            'food1': {'name': food1.food_name, 'id': food1.id},
+                            'food2': {'name': food2.food_name, 'id': food2.id},
+                            'comparison': comparison,
+                            'messages': messages,
+                        })
                 
-                if food1.iron_mg > food2.iron_mg * 1.5:
-                    messages.append(f"🔴 {food1.food_name[:30]} has {food1.iron_mg:.1f}mg iron — more than {food2.food_name[:30]}")
-                elif food2.iron_mg > food1.iron_mg * 1.5:
-                    messages.append(f"🔴 {food2.food_name[:30]} has {food2.iron_mg:.1f}mg iron — more than {food1.food_name[:30]}")
-                
-                if not messages:
-                    messages.append("💡 These foods have similar nutritional profiles.")
-                
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'success': True,
-                        'food1': {'name': food1.food_name, 'id': food1.id},
-                        'food2': {'name': food2.food_name, 'id': food2.id},
-                        'comparison': comparison,
-                        'messages': messages,
-                    })
-                
-            except Food.DoesNotExist:
+            except Exception as e:
+                print(f"Compare error: {e}")
                 pass
     
     return render(request, 'foods/compare.html', {
@@ -940,51 +984,69 @@ def compare_foods(request):
 
 # ========== API ENDPOINTS ==========
 def api_foods(request):
-    foods = Food.objects.all().values(
-        'id', 'food_name', 'category__name', 
-        'energy_kcal', 'protein_g', 'fat_g', 'carbohydrate_g', 
-        'fiber_g', 'iron_mg', 'calcium_mg'
-    )[:50]
-    return JsonResponse(list(foods), safe=False)
+    foods_data = get_all_foods_supabase()
+    # Limit to 50 for performance
+    foods_data = foods_data[:50]
+    # Format for API response
+    result = []
+    for food in foods_data:
+        result.append({
+            'id': food.get('id'),
+            'food_name': food.get('food_name'),
+            'category_name': food.get('category'),
+            'energy_kcal': food.get('energy_kcal'),
+            'protein_g': food.get('protein_g'),
+            'fat_g': food.get('fat_g'),
+            'carbohydrate_g': food.get('carbohydrate_g'),
+            'fiber_g': food.get('fiber_g'),
+            'iron_mg': food.get('iron_mg'),
+            'calcium_mg': food.get('calcium_mg'),
+        })
+    return JsonResponse(result, safe=False)
 
 def api_food_detail(request, food_id):
     try:
-        food = Food.objects.get(id=food_id)
-        data = {
-            'id': food.id,
-            'name': food.food_name,
-            'category': food.category.name if food.category else None,
-            'energy_kcal': food.energy_kcal,
-            'protein_g': food.protein_g,
-            'fat_g': food.fat_g,
-            'carbohydrate_g': food.carbohydrate_g,
-            'fiber_g': food.fiber_g,
-            'iron_mg': food.iron_mg,
-            'calcium_mg': food.calcium_mg,
-        }
-        return JsonResponse(data)
-    except Food.DoesNotExist:
-        return JsonResponse({'error': 'Food not found'}, status=404)
+        food_data = get_food_by_id_supabase(food_id)
+        if food_data:
+            return JsonResponse({
+                'id': food_data.get('id'),
+                'name': food_data.get('food_name'),
+                'category': food_data.get('category'),
+                'energy_kcal': food_data.get('energy_kcal'),
+                'protein_g': food_data.get('protein_g'),
+                'fat_g': food_data.get('fat_g'),
+                'carbohydrate_g': food_data.get('carbohydrate_g'),
+                'fiber_g': food_data.get('fiber_g'),
+                'iron_mg': food_data.get('iron_mg'),
+                'calcium_mg': food_data.get('calcium_mg'),
+            })
+        else:
+            return JsonResponse({'error': 'Food not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=404)
 
 def api_search(request):
     query = request.GET.get('q', '')
     if query:
-        foods = Food.objects.filter(food_name__icontains=query).values(
-            'id', 'food_name', 'category__name', 'energy_kcal', 'protein_g', 'iron_mg'
-        )[:20]
-        return JsonResponse(list(foods), safe=False)
+        foods_data = search_foods_supabase(query)
+        result = []
+        for food in foods_data:
+            result.append({
+                'id': food.get('id'),
+                'food_name': food.get('food_name'),
+                'category_name': food.get('category'),
+                'energy_kcal': food.get('energy_kcal'),
+                'protein_g': food.get('protein_g'),
+                'iron_mg': food.get('iron_mg'),
+            })
+        return JsonResponse(result, safe=False)
     return JsonResponse([], safe=False)
 
 def api_categories(request):
-    from django.db import models
-    categories = Category.objects.annotate(food_count=models.Count('foods')).values(
-        'id', 'name', 'food_count'
-    )
+    categories = Category.objects.annotate(food_count=Count('foods')).values('id', 'name', 'food_count')
     return JsonResponse(list(categories), safe=False)
 
 def create_admin(request):
-    from django.contrib.auth.models import User
-    
     username = 'admin123'
     email = 'admin@example.com'
     password = 'admin123'
@@ -1001,5 +1063,5 @@ def health_check(request):
     return JsonResponse({
         'status': 'healthy',
         'timestamp': datetime.now().isoformat(),
-        'message': 'Django server is running'
+        'message': 'Django server is running with Supabase'
     })
