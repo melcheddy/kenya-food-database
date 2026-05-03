@@ -12,6 +12,15 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from django.conf import settings
 
+def home_simple(request):
+    """Simple home view for testing"""
+    return HttpResponse("""
+    <h1>Kenya Food Database</h1>
+    <p>Django is running on Vercel!</p>
+    <p><a href="/test/">Test endpoint</a></p>
+    <p><a href="/health/">Health check</a></p>
+    """)
+
 # ========== SUPABASE HELPERS ==========
 def get_all_foods_supabase():
     """Get all foods from Supabase"""
